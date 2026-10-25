@@ -1736,7 +1736,9 @@ const cur=()=>TRACKS[order[pos]];
 function load(){au.src='music/'+cur()[0]+'.mp3';label();}
 function next(){pos++;if(pos>=order.length){const last=order[order.length-1];shuffle();if(order[0]===last&&order.length>1)[order[0],order[1]]=[order[1],order[0]];}load();if(pref.on)au.play().catch(()=>{});}
 au.addEventListener('ended',next);
-au.addEventListener('error',()=>{label('음악 파일을 불러오지 못했습니다');});
+// music/ 폴더에 없으면 Supabase 저장소(공개 버킷 music)에서 받음. GitHub 웹 업로드로 mp3를 못 올린 경우 대비
+const SB_MUSIC='https://qjguvtmkrkbtpvdnyelp.supabase.co/storage/v1/object/public/music/';
+au.addEventListener('error',()=>{const n=cur()[0]+'.mp3';if(!au.src.startsWith(SB_MUSIC)){au.src=SB_MUSIC+n;if(pref.on)au.play().catch(()=>{});return;}label('음악 파일을 불러오지 못했습니다');});
 function label(msg){const b=$('bgmbtn'),t=$('bgmnow');if(!b)return;b.textContent=pref.on?'음악 끄기':'음악 켜기';b.classList.toggle('on',pref.on);
   if(t)t.textContent=msg||(pref.on?'♪ '+cur()[1]:'');b.title=pref.on?'지금 재생: '+cur()[1]+' (Kevin MacLeod)':'배경 음악 켜기';}
 function toggle(){pref.on=!pref.on;save();if(pref.on){if(!au.src)load();au.play().catch(()=>{});}else au.pause();label();}
