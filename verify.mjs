@@ -19,7 +19,7 @@ export function check(stage,weather,cfg){
   const b=baseOf(stage);if(!b)return'알 수 없는 스테이지';const {base,unlock}=b,U=k=>!unlock||unlock.has(k);
   if(!cfg||typeof cfg!=='object')return'설정 없음';
   for(const a of E.APPR){const x=cfg.appr&&cfg.appr[a],y=base.appr[a];if(!x)return'접근로 누락';
-    if(x.vph!==y.vph||x.pl!==y.pl||x.pr!==y.pr||(x.pu||0)!==(y.pu||0))return'교통량이 기본값과 다름';}
+    if(x.vph!==y.vph||x.pl!==y.pl||x.pr!==y.pr||(x.pu||0)!==(y.pu||0)||(x.ped||0)!==(y.ped||0))return'교통량이 기본값과 다름';}
   const wx=cfg.wx||'clear';if(wx!==weather)return'날씨 표시 불일치';if(!E.WXP[wx])return'알 수 없는 날씨';
   if(cfg.ow!=null){if(!U('oneway'))return'일방통행이 열리지 않은 레벨';for(const a in cfg.ow)if(!E.APPR.includes(a)||!['in','out'].includes(cfg.ow[a]))return'일방통행 값 오류';}
   if(!same(cfg.geo,E.owGeo(base.geo,cfg.ow)))return'도로 모양이 기본값과 다름';
@@ -33,11 +33,18 @@ export function check(stage,weather,cfg){
   const CF=E.getConf(cfg.geo),ALL=new Set(E.ALLMOVES),OKPAIR=new Set();
   // 실제 도시 기본 신호에 원래 함께 있는 이동류 쌍(예: 토론토 동서 좌회전 동시 비보호)은 허용
   for(const ph of base.phases)for(const x of ph.m)for(const y of ph.m)OKPAIR.add(x+'|'+y);
+  // 보행 신호: 보행 전용 현시(x)는 1개까지, 차량 이동류 없음. 동시 횡단 끄기는 보행 전용 현시가 있을 때만
+  const XS=P.filter(p=>p&&p.x),baseX=base.phases.some(p=>p.x),hasPed=E.APPR.some(a=>base.appr[a].ped>0);
+  if(XS.length>1)return'보행 전용 현시가 2개 이상';if(XS.some(p=>p.x!==true||!Array.isArray(p.m)||p.m.length))return'보행 전용 현시 값 오류';
+  if(XS.length&&!baseX&&(!U('ped')||!hasPed))return'보행 신호가 열리지 않은 레벨';
+  if(cfg.pedConc!==undefined&&cfg.pedConc!==true&&cfg.pedConc!==false)return'동시 횡단 값 오류';
+  if(cfg.pedConc===false&&(!XS.length||((!U('ped')||!hasPed)&&base.pedConc!==false)))return'동시 횡단 설정 오류';
   for(const ph of P){if(!Array.isArray(ph.m)||!Number.isInteger(ph.g)||ph.g<0||ph.g>180)return'현시 값 오류';
     if(new Set(ph.m).size!==ph.m.length)return'현시 중복';for(const x of ph.m)if(!ALL.has(x))return'이동류 오류';
     for(const x of ph.m)for(const y of ph.m)if(x!==y&&CF[x][y]&&!OKPAIR.has(x+'|'+y))return`충돌하는 이동류를 같은 현시에 넣음(${x}, ${y})`;}
   const cyc=E.cycleOf(cfg);if(cyc<20||cyc>300)return'주기 범위 오류';
-  if(!U('phases')&&!U('scheme')&&!same(P.map(p=>[...p.m].sort()),base.phases.map(p=>[...p.m].sort())))return'현시 구성이 열리지 않은 레벨';
+  const VP=P.filter(p=>!p.x),VB=base.phases.filter(p=>!p.x);
+  if(!U('phases')&&!U('scheme')&&!same(VP.map(p=>[...p.m].sort()),VB.map(p=>[...p.m].sort())))return'현시 구성이 열리지 않은 레벨';
   if(!U('split')&&!U('cycle')&&!same(P.map(p=>p.g),base.phases.map(p=>p.g)))return'신호 시간이 열리지 않은 레벨';
   if(unlock&&!U('cycle')&&!U('phases')&&Math.abs(cyc-E.cycleOf(base))>1)return'주기 길이가 열리지 않은 레벨';
   if(!Number.isInteger(cfg.yellow)||cfg.yellow<2||cfg.yellow>6)return'황색 시간 오류';if(!U('yellow')&&cfg.yellow!==base.yellow)return'황색 시간이 열리지 않은 레벨';
