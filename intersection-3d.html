@@ -284,6 +284,30 @@ body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
 .clear{margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#173d29;border-radius:6px;padding:10px 12px;color:var(--go);font-weight:700}
 
 .pedbox{margin-top:12px;display:flex;flex-direction:column;gap:6px}.pedbox>b{font-size:13px}.pedbox button{align-self:flex-start}.pedbox .note{margin-top:0}
+
+/* 즉각 피드백 */
+.fxl{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:40}
+.fxb{position:absolute;transform:translate(-50%,-100%);padding:6px 11px;border-radius:14px;font:700 13px "IBM Plex Sans KR",sans-serif;white-space:nowrap;color:#fff;background:var(--c);box-shadow:0 4px 14px rgba(0,0,0,.35);animation:fxup 2.1s ease-out forwards}
+.fxb::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:var(--c)}
+.fxb.k-good{--c:#2fae63}.fxb.k-bad{--c:#e2554b}.fxb.k-ped{--c:#ef7aa4}.fxb.k-big{--c:#f2b632;color:#1d2228;font-size:16px;padding:9px 16px;white-space:normal;max-width:70%;text-align:center}
+@keyframes fxup{0%{opacity:0;transform:translate(-50%,-70%) scale(.6)}12%{opacity:1;transform:translate(-50%,-100%) scale(1.08)}22%{transform:translate(-50%,-100%) scale(1)}78%{opacity:1;transform:translate(-50%,-125%)}100%{opacity:0;transform:translate(-50%,-160%)}}
+.fxc{position:absolute;top:-14px;width:8px;height:13px;border-radius:2px;animation:fxfall linear forwards}
+@keyframes fxfall{to{top:110%;transform:rotate(760deg)}}
+/* 간단 화면 */
+body.simple:not(.showadv) .adv,body.simple:not(.showadv) #lbbtn,body.simple:not(.showadv) .bgm,body.simple:not(.showadv) #ttnow,body.simple:not(.showadv) #wxnow,body.simple:not(.showadv) #mapzoom{display:none!important}
+body:not(.simple) #advbtn{display:none}
+/* 목표 */
+.goals{margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}.goals .gh{font-size:11px;color:var(--muted);margin-bottom:3px}
+.goals .g{display:grid;grid-template-columns:14px 1fr auto;gap:6px;font-size:12px;align-items:center;padding:1px 0}.goals .g i{font-style:normal;color:var(--muted)}
+.goals .g.ok i,.goals .g.ok b{color:var(--go)}.goals .g.no b{color:var(--accent)}
+.goalres{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:10px 0;padding:10px 12px;border-radius:10px;background:var(--panel2);font-size:13px}.goalres .ok{color:var(--go)}.goalres .no{color:var(--muted)}
+/* 안내 말풍선 */
+.coach{position:fixed;inset:0;pointer-events:none;z-index:1000}
+.coach .ring{position:fixed;border:3px solid #f2b632;border-radius:12px;box-shadow:0 0 0 4000px rgba(0,0,0,.28);animation:cpulse 1.4s ease-in-out infinite}
+@keyframes cpulse{50%{border-color:#fff;transform:scale(1.03)}}
+.coach .cb{position:fixed;pointer-events:auto;background:#fffaf0;color:#2b2118;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:14px;line-height:1.5}
+.coach .cb p{margin:0 0 10px}.coach .cbb{display:flex;gap:8px;justify-content:flex-end}.coach .cbb button{font-size:13px}
+#coachbtn{margin-left:6px}
 </style>
 
 <div class="wrap">
@@ -886,6 +910,7 @@ REAL.tokyo={id:'tokyo',title:"오하라 교차로 (환7 x 고슈가도)",city:"�
 REAL.tokyo.ped={N:200,S:200,E:200,W:200};
 // ---------- 레벨 ----------
 // appr: [교통량(대/시), 좌회전%, 우회전%, 1차로, 2차로]
+// goals: 행동 목표(별과 별개로 보여 주는 체크리스트). dly 1인당 지연(초), q 접근로 최대 대기열(대), det 우회 차량(대), risk 기대 사고(건), pedW 보행자 평균 대기(초)
 const STAGES=[{n:0,name:'신호 비중'},{n:1,name:'주기 길이'},{n:2,name:'차로 배정'},{n:3,name:'현시 설계'},{n:4,name:'방향 바꾸기'},{n:5,name:'보행자'}];
 const CTRL_NAME={uturn:'유턴',oneway:'일방통행',split:'신호 비중',cycle:'주기 길이',lanes:'차로 배정',scheme:'현시 방식',phases:'현시 편집',perm:'비보호',yellow:'황색 시간',rtor:'적색 우회전',demand:'교통량',bus:'버스 전용 차로',ped:'보행 신호 방식'};
 const LEVELS=[
@@ -893,75 +918,75 @@ const LEVELS=[
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},
   story:'남북 도로는 출근 차량으로 붐비는데, 신호는 남북과 동서에 똑같이 26초씩 주고 있습니다.',
   goal:'신호 막대의 경계를 끌어 남북과 동서의 녹색 시간을 다시 나누세요.',
-  hint:'차가 많이 오는 쪽에 녹색을 더 주면 됩니다. 그렇다고 동서를 너무 줄이면 동서 대기열이 넘칩니다.',stars:[592,624,637]},
+  hint:'차가 많이 오는 쪽에 녹색을 더 주면 됩니다. 그렇다고 동서를 너무 줄이면 동서 대기열이 넘칩니다.',goals:[{k:'dly',max:13},{k:'q',a:'S',max:12}],stars:[592,624,637]},
  {id:'0-2',stage:0,title:'동서 대로',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:34,EW_T:18},
   appr:{N:[300,0,10,'T','TR'],S:[250,0,10,'T','TR'],E:[850,0,10,'T','TR'],W:[800,0,10,'T','TR']},
   story:'이번에는 동서 방향이 간선도로입니다. 그런데 신호는 예전 설정 그대로 남북에 더 많이 주고 있습니다.',
   goal:'동서 차량이 한 번의 녹색에 다 빠져나가도록 비중을 바꾸세요.',
-  hint:'화면 밖 대기 차량(+N)이 계속 늘어나는 쪽이 녹색이 부족한 쪽입니다.',stars:[448,528,591]},
+  hint:'화면 밖 대기 차량(+N)이 계속 늘어나는 쪽이 녹색이 부족한 쪽입니다.',goals:[{k:'q',a:'E',max:10},{k:'q',a:'W',max:10},{k:'dly',max:15}],stars:[448,528,591]},
  {id:'0-3',stage:0,title:'한쪽만 붐빈다',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:20,EW_T:32},
   appr:{N:[1100,0,10,'T','TR'],S:[300,0,10,'T','TR'],E:[560,0,10,'T','TR'],W:[580,0,10,'T','TR']},
   story:'남북 합계는 동서와 비슷하지만, 북측에서만 차가 쏟아집니다. 남측은 한산합니다.',
   goal:'남북 녹색 시간을 무엇에 맞춰야 하는지 찾아보세요.',
-  hint:'신호 시간은 방향의 평균이 아니라 가장 붐비는 차로를 기준으로 정합니다. 교통공학에서는 이것을 임계 차로라고 부릅니다.',stars:[522,590,639]},
+  hint:'신호 시간은 방향의 평균이 아니라 가장 붐비는 차로를 기준으로 정합니다. 교통공학에서는 이것을 임계 차로라고 부릅니다.',goals:[{k:'q',a:'N',max:19},{k:'dly',max:16}],stars:[522,590,639]},
  {id:'1-1',stage:1,title:'한밤의 교차로',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:56,EW_T:56},
   appr:{N:[220,0,10,'T','TR'],S:[220,0,10,'T','TR'],E:[220,0,10,'T','TR'],W:[220,0,10,'T','TR']},
   story:'자정의 교차로. 차는 거의 없는데 신호 주기가 120초라 빈 도로 앞에서 1분 가까이 기다립니다.',
   goal:'이제 주기 길이를 바꿀 수 있습니다. 한산한 시간에 맞는 주기를 찾으세요.',
-  hint:'주기가 짧을수록 빨간불에서 기다리는 시간이 줄어듭니다. 대신 주기마다 황색과 전적색으로 버려지는 시간이 있습니다.',stars:[234,280,315]},
+  hint:'주기가 짧을수록 빨간불에서 기다리는 시간이 줄어듭니다. 대신 주기마다 황색과 전적색으로 버려지는 시간이 있습니다.',goals:[{k:'dly',max:17}],stars:[234,280,315]},
  {id:'1-2',stage:1,title:'포화 직전',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:16,EW_T:16},
   appr:{N:[1400,0,10,'T','TR'],S:[1450,0,10,'T','TR'],E:[1100,0,10,'T','TR'],W:[1050,0,10,'T','TR']},
   story:'모든 방향이 붐비는 저녁 퇴근길. 그런데 주기가 40초밖에 안 돼서 신호가 너무 자주 바뀝니다.',
   goal:'주기 길이와 비중을 함께 조정해 교차로가 감당할 수 있는 양을 늘리세요.',
-  hint:'현시가 바뀔 때마다 황색 3초와 전적색 1초, 출발 지연이 생깁니다. 주기가 짧으면 이 손실의 비율이 커집니다. 다만 너무 길면 대기가 다시 늘어납니다.',stars:[799,869,910]},
+  hint:'현시가 바뀔 때마다 황색 3초와 전적색 1초, 출발 지연이 생깁니다. 주기가 짧으면 이 손실의 비율이 커집니다. 다만 너무 길면 대기가 다시 늘어납니다.',goals:[{k:'dly',max:23}],stars:[799,869,910]},
  {id:'2-1',stage:2,title:'직진이 몰린다',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:24,N_A:22,EW_T:20},
   appr:{N:[700,10,10,'L','TR'],S:[750,10,10,'L','TR'],E:[300,0,10,'T','TR'],W:[300,0,10,'T','TR']},
   story:'남북은 방향별로 직진과 좌회전을 함께 내보내는 직좌 동시 신호입니다. 그런데 1차로가 좌회전 전용이라 좌회전 10%를 위해 차로 하나를 비워두고 있습니다.',
   goal:'이제 차로 배정을 바꿀 수 있습니다. 차로 버튼이나 지도 위 점선 영역을 눌러 보세요.',
-  hint:'직좌 동시 신호에서는 좌회전과 직진이 같은 녹색에 함께 나갑니다. 그러면 1차로를 함께 써도 서로 막지 않습니다.',stars:[264,339,402]},
+  hint:'직좌 동시 신호에서는 좌회전과 직진이 같은 녹색에 함께 나갑니다. 그러면 1차로를 함께 써도 서로 막지 않습니다.',goals:[{k:'q',a:'N',max:16},{k:'dly',max:25}],stars:[264,339,402]},
  {id:'2-2',stage:2,title:'우회전 행렬',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:26,N_A:18,EW_T:20},
   appr:{N:[500,10,10,'L','TR'],S:[900,10,40,'L','TR'],E:[400,0,10,'T','TR'],W:[400,0,10,'T','TR']},
   story:'남측 접근로는 차량 40%가 우회전해서 쇼핑몰로 들어갑니다. 우회전 차량과 직진 차량이 한 차로에 섞여 줄이 길어집니다.',
   goal:'남측 두 차로를 어떻게 나눠야 직진과 우회전이 서로 방해하지 않는지 찾으세요.',
-  hint:'차로마다 맡는 비율이 수요 비율과 비슷할수록 좋습니다. 남측은 좌회전 10%, 직진 50%, 우회전 40%입니다.',stars:[272,358,431]},
+  hint:'차로마다 맡는 비율이 수요 비율과 비슷할수록 좋습니다. 남측은 좌회전 10%, 직진 50%, 우회전 40%입니다.',goals:[{k:'q',a:'S',max:18},{k:'dly',max:25}],stars:[272,358,431]},
  {id:'2-3',stage:2,title:'네 방향 네 가지 사정',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'split'},plan:{S_A:18,N_A:18,E_A:16,W_A:14},
   appr:{N:[600,35,10,'L','TR'],S:[700,5,10,'L','TR'],E:[550,10,35,'L','TR'],W:[450,0,10,'L','TR']},
   story:'네 방향 모두 방향별 직좌 동시 신호입니다. 북측은 좌회전이 많고, 남측은 직진 위주, 동측은 우회전이 많고, 서측은 좌회전이 아예 없습니다. 그런데 차로 배정은 모두 똑같습니다.',
   goal:'접근로마다 수요에 맞게 차로를 나누고, 그다음 신호 비중과 주기를 다듬으세요.',
-  hint:'한 번에 한 접근로씩 바꾸고 세션 결과를 비교하면 무엇이 효과가 있었는지 알 수 있습니다.',stars:[135,209,275]},
+  hint:'한 번에 한 접근로씩 바꾸고 세션 결과를 비교하면 무엇이 효과가 있었는지 알 수 있습니다.',goals:[{k:'q',a:'S',max:20},{k:'dly',max:45}],stars:[135,209,275]},
  {id:'3-1',stage:3,title:'사라진 직진 신호',unlock:['split','cycle','phases'],
   phases:[{m:['NL','NT','NR'],g:22},{m:['SL','SR'],g:20},{m:['ET','ER','WT','WR'],g:20}],
   appr:{N:[700,10,10,'LT','TR'],S:[800,10,10,'LT','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
   story:'공사 뒤에 신호 프로그램을 다시 짜면서 실수가 생겼습니다. 남측에는 직진 차로가 두 개나 있는데, 남측 현시에 직진이 빠졌습니다. 직진하려던 차는 모두 다른 길로 돌아갑니다.',
   goal:'차로는 바꿀 수 없습니다. 현시 편집기에서 신호 쪽 모순을 찾아 고치세요.',
-  hint:'현시 목록에서 남측 현시를 고른 뒤 남측 직진 칸을 켜 보세요. 같은 접근로의 좌회전, 직진, 우회전은 서로 부딪히지 않습니다.',stars:[266,384,487]},
+  hint:'현시 목록에서 남측 현시를 고른 뒤 남측 직진 칸을 켜 보세요. 같은 접근로의 좌회전, 직진, 우회전은 서로 부딪히지 않습니다.',goals:[{k:'det',max:5},{k:'dly',max:20}],stars:[266,384,487]},
  {id:'3-2',stage:3,title:'겸용 차로를 신호로 살리기',unlock:['split','phases'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:28,NS_L:12,EW_T:22},
   appr:{N:[750,20,10,'LT','TR'],S:[800,20,10,'LT','TR'],E:[400,0,10,'T','TR'],W:[400,0,10,'T','TR']},
   story:'남북 1차로는 좌회전과 직진을 함께 쓰는 겸용 차로입니다. 그런데 신호는 좌회전과 직진을 따로 내보냅니다. 맨 앞 차가 다른 신호를 기다리는 동안 뒤차가 막히고, 참다못한 차가 옆 차로로 끼어들다 사고가 납니다.',
   goal:'차로는 그대로 두고, 신호 구성을 바꿔 겸용 차로가 막히지 않게 하세요.',
-  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. 남북 현시를 접근로별로 나눠 보세요.',stars:[334,400,453]},
+  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. 남북 현시를 접근로별로 나눠 보세요.',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
  {id:'4-1',stage:4,title:'돌아가야 하는 차들',unlock:['lanes','uturn','split'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:30,NS_L:12,EW_T:24},
   appr:{N:[800,10,10,'L','TR'],S:[750,12,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},pu:{N:15,S:6},
   story:'북쪽 길가에 대형 쇼핑몰 주차장 입구가 있어서, 북측에서 오는 차 중 15%가 교차로에서 유턴해 되돌아갑니다. 그런데 북측 1차로는 좌회전 전용이라 유턴을 할 수 없어, 이 차량들이 모두 블록을 돌아 우회합니다.',
   goal:'차로 용도를 바꿔 유턴과 좌회전 차량이 교차로에서 바로 처리되게 하세요. 유턴은 같은 접근로의 좌회전 신호 때 갑니다.',
-  hint:'1차로를 \'좌회전 + 유턴\'으로 바꾸면 좌회전 신호 때 함께 갑니다. 좌회전 신호 시간이 모자라지 않은지 신호 비중도 다시 맞춰 보세요. 남측도 유턴 수요가 있습니다.',stars:[353,392,425]},
+  hint:'1차로를 \'좌회전 + 유턴\'으로 바꾸면 좌회전 신호 때 함께 갑니다. 좌회전 신호 시간이 모자라지 않은지 신호 비중도 다시 맞춰 보세요. 남측도 유턴 수요가 있습니다.',goals:[{k:'det',max:0},{k:'risk',max:0.1}],stars:[353,392,425]},
  {id:'4-2',stage:4,title:'한쪽으로만 붐비는 길',unlock:['oneway','lanes','split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:30,EW_T:30},
   appr:{N:[60,5,5,'T','TR'],S:[2000,5,5,'T','TR'],E:[450,2,10,'LT','TR'],W:[450,10,2,'LT','TR']},
   story:'출근 시간 남북 도로는 북쪽 도심으로 가는 차가 몰립니다. 남측에서 시간당 2,000대가 2개 차로로 밀려드는데, 반대 방향(북측에서 오는 차)은 60대뿐입니다. 남측 반대편 2개 차로는 거의 비어 있습니다.',
   goal:'남북 도로를 북쪽으로만 가는 일방통행으로 바꿔 보세요. 남측은 \'들어오는 방향만\', 북측은 \'나가는 방향만\'으로 하면 양쪽 모두 4개 차로가 됩니다. 대신 남쪽으로 가려던 차량은 우회합니다.',
-  hint:'남측만 바꾸면 4개 차로가 북쪽 출구 2개 차로로 몰려 다시 막힙니다. 북측도 함께 바꿔 출구를 넓히고, 늘어난 처리량에 맞춰 남북 신호 비중을 키워 보세요.',stars:[322,442,544]},
+  hint:'남측만 바꾸면 4개 차로가 북쪽 출구 2개 차로로 몰려 다시 막힙니다. 북측도 함께 바꿔 출구를 넓히고, 늘어난 처리량에 맞춰 남북 신호 비중을 키워 보세요.',goals:[{k:'q',a:'S',max:40},{k:'dly',max:36}],stars:[322,442,544]},
  {id:'5-1',stage:5,title:'건너지 못하는 사람들',unlock:['split','cycle'],
   phases:[{m:['NT','NR','ST','SR'],g:46},{m:['ET','ER','WT','WR'],g:6}],
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},ped:{N:700,S:700,E:80,W:80},
   story:'역 앞 교차로입니다. 출근길 사람들이 남북 대로를 건너 역으로 갑니다. 남북 대로를 건너는 보행 신호는 동서 차량 녹색과 함께 켜지는데, 차가 적다고 동서 녹색을 6초만 주고 있습니다. 사람들이 다 건너지 못하거나 기다리다 지쳐 무단 횡단을 합니다.',
   goal:'이제 보행자도 통과 인원에 들어갑니다. 보행자가 안전하게 건널 시간을 주면서 차량 흐름도 지키세요.',
-  hint:'횡단보도 길이를 걸음 속도(초당 1~1.5m)로 나눈 시간이 최소 보행 시간입니다. 녹색이 그보다 짧으면 건너던 사람이 남고, 30초 넘게 기다린 보행자는 감점입니다.',stars:[548,713,855]},
+  hint:'횡단보도 길이를 걸음 속도(초당 1~1.5m)로 나눈 시간이 최소 보행 시간입니다. 녹색이 그보다 짧으면 건너던 사람이 남고, 30초 넘게 기다린 보행자는 감점입니다.',goals:[{k:'pedW',max:35},{k:'risk',max:0.2}],stars:[548,713,855]},
  {id:'5-2',stage:5,title:'사람이 쏟아지는 사거리',unlock:['split','cycle','ped'],
   phases:[{m:['NT','NR','ST','SR'],g:28},{m:['ET','ER','WT','WR'],g:26}],
   appr:{N:[600,0,45,'T','TR'],S:[600,0,45,'T','TR'],E:[550,0,45,'T','TR'],W:[550,0,45,'T','TR']},ped:{N:1400,S:1400,E:1400,W:1400},
   story:'번화가 한복판 사거리입니다. 네 방향 모두 횡단보도마다 시간당 1,400명이 건너고, 차량 절반 가까이가 우회전해 상가 골목으로 들어갑니다. 우회전 차량이 끝없이 이어지는 보행자 앞에서 멈춰 서고, 뒤따르는 직진 차량까지 막힙니다.',
   goal:'보행 신호 방식을 바꿀 수 있습니다. 모든 차량을 세우고 사람만 건너는 보행 전용 현시(스크램블)를 넣어 보세요.',
-  hint:'보행 전용 현시를 넣고 차량 신호와 함께 건너는 동시 횡단을 끄면, 우회전 차량은 보행자 없이 돌 수 있습니다. 대각선으로 가는 사람도 한 번에 건너서 대기가 줄어듭니다. 대신 주기가 길어지니 각 현시 시간을 다시 다듬으세요.',stars:[482,711,907]},
+  hint:'보행 전용 현시를 넣고 차량 신호와 함께 건너는 동시 횡단을 끄면, 우회전 차량은 보행자 없이 돌 수 있습니다. 대각선으로 가는 사람도 한 번에 건너서 대기가 줄어듭니다. 대신 주기가 길어지니 각 현시 시간을 다시 다듬으세요.',goals:[{k:'dly',max:28},{k:'risk',max:0.1}],stars:[482,711,907]},
 ];
 function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,pl,pr]=s.appr[a];appr[a]={vph,pl,pr,lanes:['L','TR'],perm:false};}
   return{geo:clone(GEO2),phases:templatePhases('protL','protL',DEFAULT_PLAN),scheme:{NS:'protL',EW:'protL'},yellow:3,rtor:false,appr};}
@@ -1197,7 +1222,7 @@ function renderStatus(a){const el=$('ms-'+a);if(!el)return;const {r,w}=moveStatu
   el.innerHTML=`<div class="mrow">${(showU?['U','L','T','R']:['L','T','R']).map(k=>`<div><span>${MOVE[k]}</span><b class="${r[k][1]}">${r[k][0]}</b></div>`).join('')}</div>`+
     (w.length?`<ul>${w.map(([c2,t])=>`<li class="${c2}">${t}</li>`).join('')}</ul>`:'');}
 function renderAllStatus(){if(!cfg||!$('ms-N'))return;for(const a of APPR)renderStatus(a);}
-function applyLocks(){$('phed').hidden=!unlocked('phases');$('schemes').hidden=!unlocked('scheme');$('cycrow').hidden=!unlocked('cycle');$('yelrow').hidden=!unlocked('yellow');$('rtorlbl').hidden=!unlocked('rtor');$('pedbox').hidden=!(unlocked('ped')&&hasPed(cfg));}
+function applyLocks(){$('phed').hidden=!unlocked('phases');$('schemes').hidden=!unlocked('scheme');$('cycrow').hidden=!unlocked('cycle');$('yelrow').hidden=!unlocked('yellow');$('rtorlbl').hidden=!unlocked('rtor');$('pedbox').hidden=!(unlocked('ped')&&hasPed(cfg));$('phbtn').hidden=!(unlocked('scheme')||unlocked('phases')||unlocked('rtor')||(unlocked('ped')&&hasPed(cfg)));}
 function syncControls(){PH=cfg.phases;selP=0;{const w=document.getElementById('wxsel');if(w)w.value=cfg.wx||'clear';}syncSchemeSel();$('rtor').checked=cfg.rtor;
   applyLocks();buildApprUI();refreshPlan();}
 
@@ -1322,6 +1347,7 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
       </div>
       <div class="side">${apprMap(s,an.focus)}${sparkline(rec)}</div>
     </div>
+    ${goalResultHTML(rec)}
     ${riskLine(s)}
     ${hasPed(rec.cfg)?`<div class="riskrow"><span>보행자</span><span>${f0(s.peds||0)}명 건넘, 평균 대기 ${f0(s.pedW||0)}초${s.pedQ?`, 아직 대기 ${s.pedQ}명`:''}</span><span>대기 감점 ${Math.round(s.pedPen||0)}점</span></div>`:''}
     ${driversHTML(an)}
@@ -1831,7 +1857,7 @@ function positionArms(){if(!playMode||!cfg)return;const placed=[];for(const a of
   if(popArm&&!$('pop').hidden)placePop(...armAnchor(popArm));}
 function renderHud(){if(!playMode||!sim)return;const st=stats(sim),el=sim.t-sim.t0,t=thresholds();
   $('hudtl').innerHTML=`<div class="t">세션 ${sessNo}${state==='done'?' 종료':''}  ${fmtT(Math.min(el,SESS_T))} / ${fmtT(SESS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/SESS_T*100)}%"></i></div>
-    <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>`;
+    <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>${goalHTML(st)}`;
   const R=curReal(),lv=curLevel();
   $('lvchip').innerHTML=(lv?`${lv.id} ${lv.title}`:R?R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
   for(const a of APPR){const b=$('arm-'+a);if(!b)continue;let n=0;sim.net.inL[a].forEach((sg,i)=>{n+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)n++;});b.querySelector('.q').textContent='대기 '+n;}}
@@ -1872,6 +1898,127 @@ function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
 setPlayMode(playMode);updateUI();requestAnimationFrame(frame);
 window.__test={owGeo,evalCfg,runSession,realCfg,levelCfg,LEVELS,REAL,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,step,DT,get WXP(){return WXP}};
 window.__g={NAME,touch:()=>updateUI(),modeId:()=>modeId(),openModal:(t,e)=>openModal(t,e),get cfg2(){return cfg},setWx(k){if(k==='clear')delete cfg.wx;else cfg.wx=k;const w=document.getElementById('wxsel');if(w)w.value=k;updateUI();},WXP,get sim(){return sim},get cfg(){return cfg},get mode(){return mode},sigState,vehPose,curReal,APPR,HEAD};
+// ---------- 즉각 피드백: 말풍선, 효과음, 색종이 ----------
+// 실제 지표가 바뀐 순간에만 띄움: 대기열 해소, 오래 기다린 차, 보행자 무리 횡단, 무단 횡단, 사고, 이전 세션 대비 속도
+const FXP=(()=>{let p={bub:true,snd:true};try{Object.assign(p,JSON.parse(localStorage.getItem('fx-v1')||'{}'));}catch(e){}return p;})();
+const fxSave=()=>{try{localStorage.setItem('fx-v1',JSON.stringify(FXP));}catch(e){}};
+const fxLayer=(()=>{const d=document.createElement('div');d.id='fxl';d.className='fxl';$('stage').appendChild(d);return d;})();
+// 효과음: 웹 오디오로 직접 합성(음원 파일 없음)
+let fxAC=null;
+function fxAudio(){if(!FXP.snd)return null;if(!fxAC){try{fxAC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(fxAC.state==='suspended')fxAC.resume().catch(()=>{});return fxAC;}
+window.addEventListener('pointerdown',()=>{if(FXP.snd)fxAudio();},{once:true});
+function fxTone(f,t0,dur,type,g){const ac=fxAudio();if(!ac)return;const o=ac.createOscillator(),v=ac.createGain(),t=ac.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g||.12,t+.015);v.gain.exponentialRampToValueAtTime(.0008,t+dur);o.connect(v).connect(ac.destination);o.start(t);o.stop(t+dur+.05);}
+function fxNoise(dur,g){const ac=fxAudio();if(!ac)return;const n=Math.floor(ac.sampleRate*dur),b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=ac.createBufferSource(),f=ac.createBiquadFilter(),v=ac.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=900;v.gain.value=g||.25;s.connect(f).connect(v).connect(ac.destination);s.start();}
+const SFX={
+  good:()=>{fxTone(1047,0,.18,'sine',.1);fxTone(1319,.07,.18,'sine',.1);fxTone(1568,.14,.3,'sine',.1);},
+  ped:()=>{fxTone(880,0,.12,'triangle',.08);fxTone(1175,.08,.2,'triangle',.08);},
+  honk:()=>{for(const t of [0,.22]){fxTone(392,t,.16,'square',.035);fxTone(466,t,.16,'square',.035);}},
+  bad:()=>{fxTone(330,0,.18,'sine',.08);fxTone(262,.12,.3,'sine',.08);},
+  crash:()=>{fxNoise(.35,.3);fxTone(110,0,.3,'sawtooth',.05);},
+  fanfare:()=>{[523,659,784,1047].forEach((f,i)=>fxTone(f,i*.11,.35,'triangle',.11));fxTone(1319,.48,.6,'triangle',.1);}};
+const fxSound=k=>{if(FXP.snd&&SFX[k])try{SFX[k]();}catch(e){}};
+// 말풍선: 화면 좌표(x, y), 종류 good/bad/ped/big. 1.2초에 하나, 동시에 4개까지(big은 예외)
+// 나쁜 소식(경적, 무단 횡단)은 5초에 하나만: 막힌 교차로에서 말풍선이 잔소리가 되지 않게
+let fxLast=0,fxLastBad=0;
+function fxBubble(x,y,text,kind,snd){if(!FXP.bub)return;const now=performance.now();
+  if(kind!=='big'){if(now-fxLast<1200||fxLayer.querySelectorAll('.fxb').length>=4)return;if(kind==='bad'){if(now-fxLastBad<5000)return;fxLastBad=now;}fxLast=now;}
+  const b=document.createElement('div');b.className='fxb k-'+kind;b.textContent=text;
+  const r=$('stage').getBoundingClientRect();x=Math.max(60,Math.min(r.width-60,x));y=Math.max(40,Math.min(r.height-30,y));
+  b.style.left=x+'px';b.style.top=y+'px';fxLayer.appendChild(b);setTimeout(()=>b.remove(),2200);if(snd)fxSound(snd);}
+function fxConfetti(){if(!FXP.bub)return;const cols=['#ffd35a','#ef5a50','#4fc3f7','#7bd389','#c9b3e6','#f7b98b'];
+  for(let i=0;i<60;i++){const c=document.createElement('i');c.className='fxc';c.style.left=(Math.random()*100)+'%';c.style.background=cols[i%cols.length];
+    c.style.animationDelay=(Math.random()*.6)+'s';c.style.animationDuration=(1.6+Math.random()*1.2)+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;fxLayer.appendChild(c);setTimeout(()=>c.remove(),3600);}}
+const fxW=(x,y)=>toScreen(x,y);
+// 감지 루프
+const FXS={sim:null,Q:{},W:{},crash:0,tick:0};
+function fxStep(){if(!sim||state!=='run'||!cw)return;
+  if(FXS.sim!==sim){FXS.sim=sim;FXS.Q={};FXS.W={};FXS.crash=sim.crashes;FXS.tick=0;FXS.prev=fxPrevRec();}
+  const el=sim.t-sim.t0;if(el<3)return;
+  // 1) 빨간불 동안 쌓인 대기열이 한 번의 녹색에 다 빠지면
+  for(const a of APPR){let q=0;sim.net.inL[a].forEach((sg,i)=>{if(sg.slip)return;q+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)q++;});
+    const g=['T','L'].some(mv=>{const s=sigState(sim,a,mv);return s==='G'||s==='P';}),S=FXS.Q[a]||(FXS.Q[a]={peak:0,g});
+    if(!g){if(S.g&&S.peak)S.peak=0;S.peak=Math.max(S.peak,q);}
+    else if(S.peak>=8&&q<=1){const [x,y]=armAnchor(a);fxBubble(x,y-26,`쭉쭉! ${S.peak}대 통과`,'good','good');S.peak=0;}
+    S.g=g;}
+  // 2) 정지선에서 45초 넘게 서 있는 맨 앞 차
+  for(const sg of sim.net.ins){const h=sg.vehicles[0];if(h&&!h.fxA&&(h.waitT||0)>45){h.fxA=1;const p=vehPose(h),[x,y]=fxW(p.x,p.y);fxBubble(x,y-18,'빵빵! 언제 가요','bad','honk');}}
+  // 3) 보행자 무리가 다 건넜을 때, 무단 횡단
+  if(sim.net.cw&&sim.net.cw.length){for(const c of sim.net.cw){const n=sim.peds.filter(p=>p.cw===c&&p.st==='walk').length,S=FXS.W[c.a]||(FXS.W[c.a]={max:0});
+      if(n>S.max)S.max=n;if(n===0&&S.max>=6){const m=(c.lat0+c.lat1)/2,[x,y]=fxW(...add(mul(c.d,-c.cwD),mul(c.r,m)));fxBubble(x,y-16,`♥ ${S.max}명 건넜어요`,'ped','ped');S.max=0;}}
+    for(const p of sim.peds)if(p.jay&&!p.fxJ){p.fxJ=1;const c=p.cw,[x,y]=fxW(...add(mul(c.d,-c.cwD),mul(c.r,p.lat)));fxBubble(x,y-14,'무단 횡단!','bad');}}
+  // 4) 사고
+  if(sim.crashes>FXS.crash){FXS.crash=sim.crashes;const ac=sim.accidents[sim.accidents.length-1];if(ac){const [x,y]=fxW(ac.x,ac.y);fxBubble(x,y-18,'쾅! 사고','big','crash');}}
+  // 5) 1분마다 이전 세션(같은 교통량, 다른 설정)과 평균 속도 비교
+  const m=Math.floor(el/60);if(m>FXS.tick&&m<=4){FXS.tick=m;const P=FXS.prev;
+    if(P){const cur=stats(sim).spd,d=(cur-P.st.spd)/Math.max(.1,P.st.spd)*100;
+      if(d>=5)fxBubble(cw/2,70,`이전 세션보다 ${Math.round(d)}% 빨라요`,'big','good');else if(d<=-5)fxBubble(cw/2,70,`이전 세션보다 ${Math.round(-d)}% 느려요`,'big','bad');}}}
+function fxPrevRec(){const h=history[0];if(!h||!sim)return null;if(demandSig(h.cfg)!==demandSig(sim.cfg))return null;if(JSON.stringify(h.cfg)===JSON.stringify(sim.cfg))return null;return h;}
+setInterval(()=>{try{fxStep();}catch(e){}},200);
+// 별, 기록 경신
+window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(!r)return;
+  if(r.newStars||r.record||r.opened){setTimeout(()=>{fxConfetti();fxSound('fanfare');},250);}});
+// 설정: 말풍선, 효과음
+{const mk=(id,label,key)=>{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML=`<input type="checkbox" id="${id}">${label}`;
+    $('ctlbar').insertBefore(l,$('resetcfg'));const c=$(id);c.checked=FXP[key];c.addEventListener('change',()=>{FXP[key]=c.checked;fxSave();if(key==='snd'&&c.checked){fxAudio();fxSound('good');}});};
+  mk('fxbub','말풍선 효과','bub');mk('fxsnd','효과음','snd');}
+// ---------- 튜토리얼: 간단 화면, 행동 목표, 안내 말풍선(코치 마크) ----------
+// 간단 화면: 앞쪽 레벨(단계 0~2)에서는 스킨, 날씨, 음악, 랭킹 같은 부가 조작을 '설정 더보기' 안에 숨김
+const ADV_SEL=['#ctlbar label.skin','#ctlbar .skinchk','#btn3d','#sig'];
+ADV_SEL.forEach(q=>document.querySelectorAll(q).forEach(e=>e.classList.add('adv')));
+{const b=document.createElement('button');b.type='button';b.id='advbtn';b.textContent='설정 더보기';$('ctlbar').appendChild(b);
+  b.addEventListener('click',()=>{const on=!document.body.classList.contains('showadv');document.body.classList.toggle('showadv',on);b.textContent=on?'설정 접기':'설정 더보기';});}
+function tutSimple(){const lv=curLevel(),on=!!lv&&lv.stage<=2;document.body.classList.toggle('simple',on);}
+
+// 행동 목표: 점수 대신 눈에 보이는 목표. 진행 중에는 지금까지 값, 끝나면 시드 3개 평균
+// 함수 선언으로 둠: 화면 초기화 중(이 파일이 실행되기 전)에도 호출될 수 있음
+function goalTxt(g){return g.k==='q'?`${NAME[g.a]} 최대 대기열 ${g.max}대 이하`:g.k==='det'?(g.max?`우회 차량 ${g.max}대 이하`:'우회 차량 0대'):g.k==='risk'?`기대 사고 ${g.max}건 이하`:g.k==='pedW'?`보행자 평균 대기 ${g.max}초 이하`:`1인당 지연 ${g.max}초 이하`;}
+function goalVal(g,st){return g.k==='q'?(st.byA&&st.byA[g.a]?st.byA[g.a].q:0):g.k==='det'?st.det:g.k==='risk'?st.risk:g.k==='pedW'?(st.pedW||0):st.dly;}
+function goalFmt(g,v){return g.k==='risk'?(+v).toFixed(2):Math.round(v);}
+function goalsOf(){const lv=curLevel();if(!lv)return null;return lv&&lv.goals&&sim&&demandSig(sim.cfg)===demandSig(baseCfg())?lv.goals:null;}
+function goalHTML(st){const G=goalsOf();if(!G)return'';
+  return`<div class="goals"><div class="gh">목표</div>${G.map(g=>{const v=goalVal(g,st),ok=v<=g.max+1e-9;return`<div class="g ${ok?'ok':'no'}"><i>${ok?'✓':'·'}</i><span>${goalTxt(g)}</span><b>${goalFmt(g,v)}</b></div>`;}).join('')}</div>`;}
+function goalResultHTML(rec){const lv=curLevel();if(!lv||!lv.goals||!rec.sameDemand)return'';const G=lv.goals,res=G.map(g=>({g,v:goalVal(g,rec.st)})),n=res.filter(r=>r.v<=r.g.max+1e-9).length;
+  return`<div class="goalres"><b>목표 ${n} / ${G.length} 달성</b>${res.map(r=>`<span class="${r.v<=r.g.max+1e-9?'ok':'no'}">${r.v<=r.g.max+1e-9?'✓':'✗'} ${goalTxt(r.g)} (${goalFmt(r.g,r.v)})</span>`).join('')}</div>`;}
+window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!d||!lv||!lv.goals||!d.rec.sameDemand)return;
+  const all=lv.goals.every(g=>goalVal(g,d.rec.st)<=g.max+1e-9),k='goal-v1',seen=store.get(k)||{};
+  if(all&&!seen[lv.id]){seen[lv.id]=1;store.set(k,seen);setTimeout(()=>{fxBubble(cw/2,ch/2-40,'목표 달성!','big');fxConfetti();fxSound('fanfare');},300);}});
+
+// 안내 말풍선: 레벨에 처음 들어왔을 때 새 조작을 가리킴. 대상이 화면에 나타날 때까지 기다렸다가 표시
+const COACH={
+ '0-1':[{sel:'#tl .h',t:'이 손잡이를 좌우로 끌면 남북과 동서의 녹색 시간이 나뉩니다. 차가 많은 남북 쪽에 녹색을 더 주세요.'},
+        {sel:'#applynow',t:'설정을 바꾸면 이 버튼이 나타납니다. 눌러서 새 설정으로 다시 돌려 보세요.'},
+        {sel:'#skip',t:'5분을 다 기다리지 않아도 됩니다. 결과를 바로 볼 수 있어요.'}],
+ '1-1':[{sel:'#cyc',t:'이제 주기 길이를 바꿀 수 있습니다. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
+ '2-1':[{sel:'#arm-N',t:'접근로 버튼을 누르면 차로마다 용도(좌회전, 직진, 우회전)를 바꿀 수 있습니다.'}],
+ '3-1':[{sel:'#phbtn',t:'신호 구성 편집에서 현시마다 녹색을 줄 이동류를 고를 수 있습니다.'}],
+ '4-1':[{sel:'#arm-N',t:'북측 차로 버튼을 눌러 1차로에서 유턴도 할 수 있게 바꿔 보세요.'}],
+ '4-2':[{sel:'#arm-S',t:'접근로 창에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
+ '5-1':[{sel:'#tl .h',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 다 건널 만큼 동서 녹색을 늘려 주세요.'}],
+ '5-2':[{sel:'#phbtn',t:'신호 구성 편집에서 보행 전용 현시를 넣을 수 있습니다.'}]};
+const coach={id:null,steps:null,i:0,el:null};
+const coachBox=(()=>{const d=document.createElement('div');d.className='coach';d.hidden=true;d.innerHTML='<div class="ring"></div><div class="cb"><p></p><div class="cbb"><button type="button" class="cskip">그만 보기</button><button type="button" class="cnext primary">알겠어요</button></div></div>';document.body.appendChild(d);return d;})();
+function coachSeen(){return store.get('coach-v1')||{};}
+function coachStart(id,force){const steps=COACH[id];coachBox.hidden=true;coach.id=id;coach.steps=null;if(!steps)return;if(!force&&coachSeen()[id])return;coach.steps=steps;coach.i=0;}
+function coachDone(){const s=coachSeen();s[coach.id]=1;store.set('coach-v1',s);coach.steps=null;coachBox.hidden=true;}
+function coachNext(){coach.i++;coachBox.hidden=true;if(!coach.steps||coach.i>=coach.steps.length)coachDone();}
+coachBox.querySelector('.cnext').addEventListener('click',coachNext);coachBox.querySelector('.cskip').addEventListener('click',coachDone);
+document.addEventListener('pointerdown',e=>{if(coach.steps&&coach.el&&!coachBox.hidden&&coach.el.contains(e.target))setTimeout(coachNext,250);},true);
+function coachTick(){const id=curLevel()?curLevel().id:null;if(id!==coach.id){coachStart(id);tutSimple();}
+  if(!coach.steps)return;
+  const st=coach.steps[coach.i];if(!st)return;const el=document.querySelector(st.sel);
+  const r=el&&el.getBoundingClientRect(),vis=r&&r.width>0&&r.height>0&&el.offsetParent!==null&&r.bottom>0&&r.top<innerHeight&&($('modal').hidden||$('modal').contains(el));
+  if(!vis){coachBox.hidden=true;coach.el=null;return;}
+  coach.el=el;coachBox.hidden=false;const ring=coachBox.querySelector('.ring'),cb=coachBox.querySelector('.cb');coachBox.querySelector('p').textContent=st.t;
+  const pad=6;Object.assign(ring.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
+  const w=Math.min(300,innerWidth-24),h=cb.offsetHeight||90;let x=Math.max(12,Math.min(innerWidth-w-12,r.left+r.width/2-w/2)),y=r.top-h-16;if(y<10)y=r.bottom+16;
+  Object.assign(cb.style,{left:x+'px',top:y+'px',width:w+'px'});}
+setInterval(()=>{try{coachTick();}catch(e){}},300);
+// 다시 보기 버튼(레벨 칩 옆)
+{const b=document.createElement('button');b.type='button';b.id='coachbtn';b.className='chip';b.textContent='도움말';$('hudtop').appendChild(b);
+  b.addEventListener('click',()=>{const lv=curLevel();if(!lv)return;if(COACH[lv.id])coachStart(lv.id,true);else fxBubble(cw/2,90,lv.goal,'big');});}
+tutSimple();
 })();
 </script>
 <script>
