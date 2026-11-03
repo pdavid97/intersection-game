@@ -284,12 +284,113 @@ body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
 .clear{margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#173d29;border-radius:6px;padding:10px 12px;color:var(--go);font-weight:700}
 
 .pedbox{margin-top:12px;display:flex;flex-direction:column;gap:6px}.pedbox>b{font-size:13px}.pedbox button{align-self:flex-start}.pedbox .note{margin-top:0}
+
+/* 즉각 피드백 */
+.fxl{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:40}
+.fxb{position:absolute;transform:translate(-50%,-100%);padding:6px 11px;border-radius:14px;font:700 13px "IBM Plex Sans KR",sans-serif;white-space:nowrap;color:#fff;background:var(--c);box-shadow:0 4px 14px rgba(0,0,0,.35);animation:fxup 2.1s ease-out forwards}
+.fxb::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:var(--c)}
+.fxb.k-good{--c:#2fae63}.fxb.k-bad{--c:#e2554b}.fxb.k-ped{--c:#ef7aa4}.fxb.k-big{--c:#f2b632;color:#1d2228;font-size:16px;padding:9px 16px;white-space:normal;max-width:70%;text-align:center}
+@keyframes fxup{0%{opacity:0;transform:translate(-50%,-70%) scale(.6)}12%{opacity:1;transform:translate(-50%,-100%) scale(1.08)}22%{transform:translate(-50%,-100%) scale(1)}78%{opacity:1;transform:translate(-50%,-125%)}100%{opacity:0;transform:translate(-50%,-160%)}}
+.fxc{position:absolute;top:-14px;width:8px;height:13px;border-radius:2px;animation:fxfall linear forwards}
+@keyframes fxfall{to{top:110%;transform:rotate(760deg)}}
+/* 간단 화면 */
+body.simple:not(.showadv) .adv,body.simple:not(.showadv) #lbbtn,body.simple:not(.showadv) .bgm,body.simple:not(.showadv) #ttnow,body.simple:not(.showadv) #wxnow,body.simple:not(.showadv) #mapzoom{display:none!important}
+body:not(.simple) #advbtn{display:none}
+/* 목표 */
+.goals{margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}.goals .gh{font-size:11px;color:var(--muted);margin-bottom:3px}
+.goals .g{display:grid;grid-template-columns:14px 1fr auto;gap:6px;font-size:12px;align-items:center;padding:1px 0}.goals .g i{font-style:normal;color:var(--muted)}
+.goals .g.ok i,.goals .g.ok b{color:var(--go)}.goals .g.no b{color:var(--accent)}
+.goalres{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:10px 0;padding:10px 12px;border-radius:10px;background:var(--panel2);font-size:13px}.goalres .ok{color:var(--go)}.goalres .no{color:var(--muted)}
+/* 안내 말풍선 */
+.coach{position:fixed;inset:0;pointer-events:none;z-index:1000}
+.coach .ring{position:fixed;border:3px solid #f2b632;border-radius:12px;box-shadow:0 0 0 4000px rgba(0,0,0,.28);animation:cpulse 1.4s ease-in-out infinite}
+@keyframes cpulse{50%{border-color:#fff;transform:scale(1.03)}}
+.coach .cb{position:fixed;pointer-events:auto;background:#fffaf0;color:#2b2118;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:14px;line-height:1.5}
+.coach .cb p{margin:0 0 10px}.coach .cbb{display:flex;gap:8px;justify-content:flex-end}.coach .cbb button{font-size:13px}
+#coachbtn{margin-left:6px}
+/* ---------- 모바일 레이아웃(body.mobile: 폭 700px 이하, 또는 높이 500px 이하 가로 화면) ---------- */
+body{-webkit-tap-highlight-color:transparent}
+body.mobile{touch-action:manipulation}
+body.mobile .wrap{padding:6px max(6px,env(safe-area-inset-left,0px)) 0 max(6px,env(safe-area-inset-right,0px))}
+body.mobile header{margin-bottom:6px;align-items:center;flex-wrap:nowrap}
+body.mobile h1{font-size:20px}
+body.mobile header .sub,body.mobile #modebtn{display:none}
+body.mobile.play .stage{height:calc(100dvh - 44px);min-height:0;border-radius:10px}
+body.mobile.land header{display:none}
+body.mobile.land.play .stage{height:calc(100dvh - 6px)}
+/* 위쪽 정보: 왼쪽 시간과 핵심 지표, 오른쪽 레벨 이름 */
+body.mobile .hud-tl{top:6px!important;left:6px!important;padding:5px 7px;font-size:11px;min-width:0;max-width:46%}
+body.mobile .hud-tl .grid2{gap:0 8px;margin-top:3px}
+body.mobile .hud-tl .grid2>:nth-child(n+5):not(:nth-last-child(-n+2)){display:none}
+body.mobile .hud-tl .goals .g{font-size:10.5px;grid-template-columns:12px 1fr auto;gap:4px}
+body.mobile .hud-top{top:6px!important;right:6px!important;left:auto!important;transform:none!important;max-width:calc(54% - 16px)!important;align-items:flex-end}
+body.mobile .hud-top .chip{font-size:11px;padding:4px 8px;text-align:right;white-space:normal}
+body.mobile .hud-top .chip .lvx{display:none}
+body.mobile .hud-top .pending{font-size:11px;padding:6px 8px;flex-direction:column;align-items:flex-end;gap:6px}
+body.mobile .hud-top .pending>span{display:none}
+/* 조작 막대: 지도 아래 한 줄(가로로 밀어서 보기). 설정 더보기를 누르면 여러 줄로 펼침 */
+body.mobile .hud-tr{position:static!important;order:2;max-width:none!important;border-radius:0;border-width:1px 0 0;padding:6px;background:var(--panel)}
+body.mobile .hud-tr .bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
+body.mobile .hud-tr .bar::-webkit-scrollbar{display:none}
+body.mobile.showadv .hud-tr .bar{flex-wrap:wrap}
+body.mobile .hud-tr button,body.mobile .hud-tr select{min-height:36px;padding:6px 11px;font-size:13px}
+body.mobile .stage canvas{order:1}
+body.mobile .dock{order:3}
+body.mobile .dock .tl{height:44px}
+body.mobile .tl .h{width:36px;margin-left:-18px}
+body.mobile .tl .h::before{left:16px}body.mobile .tl .h::after{left:12px}
+body.mobile .dockbar button{min-height:34px}
+/* 접근로 버튼: 작게 */
+body.mobile .armbtn{padding:3px 8px;font-size:11px;gap:4px}
+body.mobile .armbtn .cr{display:none}
+/* 접근로 창, 모달: 아래에서 올라오는 시트 */
+body.mobile .pop{position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;width:auto!important;max-height:72dvh;border-radius:14px 14px 0 0;padding:12px 12px max(12px,env(safe-area-inset-bottom,0px));z-index:60}
+body.mobile .modal{position:fixed;z-index:60}
+body.mobile .modalbox{left:0;right:0;top:auto;bottom:0;transform:none;width:auto;max-height:88dvh;border-radius:14px 14px 0 0;padding:14px 12px max(14px,env(safe-area-inset-bottom,0px))}
+body.mobile .poph button{min-height:34px;padding:6px 14px}
+body.mobile .fxb{font-size:12px;padding:5px 9px}body.mobile .fxb.k-big{font-size:14px}
+body.mobile .coach .cb{font-size:13px}
+body.mobile .hud-tr .bar>*{flex:none}
+body.simple:not(.showadv) #v3mode{display:none!important}
+body.mobile.land .hud-tl .goals{display:none}
+.modalbox .box>h2{display:none}
+
+/* 흐름 계기판 */
+.gauge{width:176px;position:relative;text-align:center;background:rgba(14,18,22,.88);border:1px solid var(--line);border-radius:14px;padding:6px 8px 7px;pointer-events:auto}
+.gauge svg{width:100%;display:block;overflow:visible}
+.gauge .arcs path{fill:none;stroke-width:13}
+.gauge .z0{stroke:#3a444e}.gauge .z1{stroke:#7d6438}.gauge .z2{stroke:#a9b4bf}.gauge .z3{stroke:#f2b632}
+.gauge .ticks text{font-size:8.5px;fill:#f2b632;text-anchor:middle;font-weight:700}
+.gauge .needle,.gauge .ghost{transform-box:view-box;transform-origin:100px 100px;transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
+.gauge .needle{stroke:#fff;stroke-width:4;stroke-linecap:round}
+.gauge .ghost{stroke:rgba(255,255,255,.35);stroke-width:3;stroke-dasharray:3 3}
+.gauge .hub{fill:#fff}
+.gauge .gv{margin-top:-34px;position:relative;line-height:1.15}
+.gauge .gs{font-family:var(--f-mono);font-size:25px;font-weight:700}
+.gauge .gd{display:block;font-size:11.5px;color:var(--muted)}.gauge .gd.up{color:var(--go)}.gauge .gd.down{color:var(--stop)}
+.gauge .gl{font-size:10px;color:var(--muted);margin-top:1px}
+.gauge.calc .needle{opacity:.55;animation:gpulse 1s ease-in-out infinite}
+@keyframes gpulse{50%{opacity:.2}}
+.gauge.jam{border-color:var(--stop);box-shadow:0 0 0 2px rgba(239,90,80,.35)}.gauge.jam .gs{color:var(--stop)}
+.calcov{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);z-index:30;padding:10px 18px;border-radius:12px;background:rgba(14,18,22,.9);border:1px solid var(--line);font-weight:600}
+.calcov[hidden]{display:none}
+.jamres{margin:10px 0;padding:10px 12px;border-radius:10px;background:rgba(239,90,80,.14);border:1px solid rgba(239,90,80,.5);font-size:13px}.jamres b{color:var(--stop);margin-right:6px}
+body.tutlv .hud-tl .grid2{display:none}
+body.mobile .gauge{width:136px;padding:4px 6px 5px}body.mobile .gauge .gs{font-size:19px}body.mobile .gauge .gv{margin-top:-27px}body.mobile .gauge .gd{font-size:10.5px}
+/* 첫 방문 소개 */
+.intro{position:fixed;inset:0;z-index:1100;background:rgba(5,7,10,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+.intro[hidden]{display:none}
+.intro .ib{max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.intro h2{margin:0 0 10px;font-size:20px}.intro p{margin:0 0 12px;line-height:1.6}.intro p.sm{font-size:13px;color:var(--muted)}
+.intro .road{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 14px}.intro .road span{font-size:12px;padding:4px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
+.intro .road i{width:10px;height:2px;background:var(--line)}.intro .road .end{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700}
+.intro button{width:100%;min-height:42px;font-size:15px}
 </style>
 
 <div class="wrap">
   <header>
     <h1>교차로 신호 <span>퍼즐</span></h1>
-    <div class="sub">프로토타입 v0.18. 교차로 위에서 바로 조작하세요. 접근로 버튼은 차로, 교차로 가운데는 신호 구성, 아래 막대는 신호 시간입니다.</div>
+    <div class="sub">프로토타입 v0.19. 교차로 위에서 바로 조작하세요. 접근로 버튼은 차로, 교차로 가운데는 신호 구성, 아래 막대는 신호 시간입니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -313,7 +414,7 @@ body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
         <div class="seg" role="group" aria-label="배속">
           <button data-sp="1">1x</button><button data-sp="4" class="on">4x</button><button data-sp="16">16x</button>
         </div>
-        <button id="skip">결과 바로 보기</button>
+        <button id="skip" title="지금 설정으로 점수를 확정합니다(5분을 기다리지 않음)">이 설정으로 확정</button>
         <button id="mapzoom" hidden>지도 넓게 보기</button>
         <button id="btn3d" hidden>3D 보기</button>
         <label class="skin"><span>스킨</span><select id="skinsel" aria-label="교차로 화면 스킨"></select></label>
@@ -411,8 +512,7 @@ body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
   </div>
 </div>
 
-<script>
-(()=>{
+<script id="engsrc">
 // ---------- 상수 ----------
 const L=122,V_FREE=13.9,DT=0.1;let VIEW=72;
 const AR_T=1,SESS_T=300,WARM_T=90,SEED=20261022,DETOUR_DIST=240,DETOUR_BASE=120;
@@ -886,88 +986,100 @@ REAL.tokyo={id:'tokyo',title:"오하라 교차로 (환7 x 고슈가도)",city:"�
 REAL.tokyo.ped={N:200,S:200,E:200,W:200};
 // ---------- 레벨 ----------
 // appr: [교통량(대/시), 좌회전%, 우회전%, 1차로, 2차로]
-const STAGES=[{n:0,name:'신호 비중'},{n:1,name:'주기 길이'},{n:2,name:'차로 배정'},{n:3,name:'현시 설계'},{n:4,name:'방향 바꾸기'},{n:5,name:'보행자'}];
+// goals: 행동 목표(별과 별개로 보여 주는 체크리스트). dly 1인당 지연(초), q 접근로 최대 대기열(대), det 우회 차량(대), risk 기대 사고(건), pedW 보행자 평균 대기(초)
+const STAGES=[{n:0,name:'1장 신호 나누기'},{n:1,name:'2장 신호 리듬'},{n:2,name:'3장 차로 정리'},{n:3,name:'4장 현시 설계'},{n:4,name:'5장 길 바꾸기'},{n:5,name:'6장 사람과 함께'}];
+// 화면 표시용 번호(장-순서). 내부 id(0-1 등)는 기록, 랭킹 키라서 그대로 둠
+const lvLabel=lv=>(lv.stage+1)+'-'+lv.id.split('-')[1];
+// jam: 한 차로 대기열이 이 대수를 넘으면 '정체 발생'으로 별 0개(1장 튜토리얼)
 const CTRL_NAME={uturn:'유턴',oneway:'일방통행',split:'신호 비중',cycle:'주기 길이',lanes:'차로 배정',scheme:'현시 방식',phases:'현시 편집',perm:'비보호',yellow:'황색 시간',rtor:'적색 우회전',demand:'교통량',bus:'버스 전용 차로',ped:'보행 신호 방식'};
 const LEVELS=[
- {id:'0-1',stage:0,title:'첫 신호',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:26,EW_T:26},
+ {id:'0-1',stage:0,jam:15,title:'첫 신호',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:26,EW_T:26},
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},
   story:'남북 도로는 출근 차량으로 붐비는데, 신호는 남북과 동서에 똑같이 26초씩 주고 있습니다.',
   goal:'신호 막대의 경계를 끌어 남북과 동서의 녹색 시간을 다시 나누세요.',
-  hint:'차가 많이 오는 쪽에 녹색을 더 주면 됩니다. 그렇다고 동서를 너무 줄이면 동서 대기열이 넘칩니다.',stars:[592,624,637]},
- {id:'0-2',stage:0,title:'동서 대로',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:34,EW_T:18},
+  hint:'차가 많이 오는 쪽에 녹색을 더 주면 됩니다. 그렇다고 동서를 너무 줄이면 동서 대기열이 넘칩니다.',goals:[{k:'dly',max:13},{k:'q',a:'S',max:12}],stars:[592,624,637]},
+ {id:'0-2',stage:0,jam:15,title:'동서 대로',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:34,EW_T:18},
   appr:{N:[300,0,10,'T','TR'],S:[250,0,10,'T','TR'],E:[850,0,10,'T','TR'],W:[800,0,10,'T','TR']},
   story:'이번에는 동서 방향이 간선도로입니다. 그런데 신호는 예전 설정 그대로 남북에 더 많이 주고 있습니다.',
   goal:'동서 차량이 한 번의 녹색에 다 빠져나가도록 비중을 바꾸세요.',
-  hint:'화면 밖 대기 차량(+N)이 계속 늘어나는 쪽이 녹색이 부족한 쪽입니다.',stars:[448,528,591]},
- {id:'0-3',stage:0,title:'한쪽만 붐빈다',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:20,EW_T:32},
+  hint:'화면 밖 대기 차량(+N)이 계속 늘어나는 쪽이 녹색이 부족한 쪽입니다.',goals:[{k:'q',a:'E',max:10},{k:'q',a:'W',max:10},{k:'dly',max:15}],stars:[448,528,591]},
+ {id:'0-3',stage:0,jam:15,title:'한쪽만 붐빈다',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:20,EW_T:32},
   appr:{N:[1100,0,10,'T','TR'],S:[300,0,10,'T','TR'],E:[560,0,10,'T','TR'],W:[580,0,10,'T','TR']},
   story:'남북 합계는 동서와 비슷하지만, 북측에서만 차가 쏟아집니다. 남측은 한산합니다.',
   goal:'남북 녹색 시간을 무엇에 맞춰야 하는지 찾아보세요.',
-  hint:'신호 시간은 방향의 평균이 아니라 가장 붐비는 차로를 기준으로 정합니다. 교통공학에서는 이것을 임계 차로라고 부릅니다.',stars:[522,590,639]},
+  hint:'신호 시간은 방향의 평균이 아니라 가장 붐비는 차로를 기준으로 정합니다. 교통공학에서는 이것을 임계 차로라고 부릅니다.',goals:[{k:'q',a:'N',max:19},{k:'dly',max:16}],stars:[522,590,639]},
+ {id:'0-4',stage:0,jam:15,title:'실제 교차로: 토론토 레이크쇼어',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:40,EW_T:20},
+  appr:{N:[355,0,10,'T','TR'],S:[322,0,10,'T','TR'],E:[1326,0,10,'T','TR'],W:[891,0,10,'T','TR']},
+  story:'1장의 마지막은 실제 교차로입니다. 토론토 호숫가 레이크쇼어 대로와 파를러먼트 거리, 2022년 토론토 혼잡 교차로 10위입니다. 교통량은 토론토시가 2024년 6월에 실제로 센 출근 시간 값(동쪽에서 시간당 1,326대)이고, 1장에서는 좌회전 없이 직진과 우회전만 남겨 단순하게 만들었습니다. 지금 신호는 차가 적은 남북에 녹색을 두 배로 주고 있어 동쪽 대기열이 넘칩니다.',
+  goal:'정체를 풀고 별 3개에 도전하세요. 엔드게임에서는 같은 교차로를 좌회전, 차로, 보행자까지 모두 다뤄 다시 풉니다.',
+  hint:'실제 교통량 비율을 보세요. 동서 합계가 남북의 3배가 넘습니다. 녹색도 그 비율에 가깝게 나눠야 합니다.',goals:[{k:'q',a:'E',max:12},{k:'dly',max:16}],stars:[368,577,756]},
  {id:'1-1',stage:1,title:'한밤의 교차로',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:56,EW_T:56},
   appr:{N:[220,0,10,'T','TR'],S:[220,0,10,'T','TR'],E:[220,0,10,'T','TR'],W:[220,0,10,'T','TR']},
   story:'자정의 교차로. 차는 거의 없는데 신호 주기가 120초라 빈 도로 앞에서 1분 가까이 기다립니다.',
   goal:'이제 주기 길이를 바꿀 수 있습니다. 한산한 시간에 맞는 주기를 찾으세요.',
-  hint:'주기가 짧을수록 빨간불에서 기다리는 시간이 줄어듭니다. 대신 주기마다 황색과 전적색으로 버려지는 시간이 있습니다.',stars:[234,280,315]},
+  hint:'주기가 짧을수록 빨간불에서 기다리는 시간이 줄어듭니다. 대신 주기마다 황색과 전적색으로 버려지는 시간이 있습니다.',goals:[{k:'dly',max:17}],stars:[234,280,315]},
  {id:'1-2',stage:1,title:'포화 직전',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:16,EW_T:16},
   appr:{N:[1400,0,10,'T','TR'],S:[1450,0,10,'T','TR'],E:[1100,0,10,'T','TR'],W:[1050,0,10,'T','TR']},
   story:'모든 방향이 붐비는 저녁 퇴근길. 그런데 주기가 40초밖에 안 돼서 신호가 너무 자주 바뀝니다.',
   goal:'주기 길이와 비중을 함께 조정해 교차로가 감당할 수 있는 양을 늘리세요.',
-  hint:'현시가 바뀔 때마다 황색 3초와 전적색 1초, 출발 지연이 생깁니다. 주기가 짧으면 이 손실의 비율이 커집니다. 다만 너무 길면 대기가 다시 늘어납니다.',stars:[799,869,910]},
+  hint:'현시가 바뀔 때마다 황색 3초와 전적색 1초, 출발 지연이 생깁니다. 주기가 짧으면 이 손실의 비율이 커집니다. 다만 너무 길면 대기가 다시 늘어납니다.',goals:[{k:'dly',max:23}],stars:[799,869,910]},
  {id:'2-1',stage:2,title:'직진이 몰린다',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:24,N_A:22,EW_T:20},
   appr:{N:[700,10,10,'L','TR'],S:[750,10,10,'L','TR'],E:[300,0,10,'T','TR'],W:[300,0,10,'T','TR']},
   story:'남북은 방향별로 직진과 좌회전을 함께 내보내는 직좌 동시 신호입니다. 그런데 1차로가 좌회전 전용이라 좌회전 10%를 위해 차로 하나를 비워두고 있습니다.',
   goal:'이제 차로 배정을 바꿀 수 있습니다. 차로 버튼이나 지도 위 점선 영역을 눌러 보세요.',
-  hint:'직좌 동시 신호에서는 좌회전과 직진이 같은 녹색에 함께 나갑니다. 그러면 1차로를 함께 써도 서로 막지 않습니다.',stars:[264,339,402]},
+  hint:'직좌 동시 신호에서는 좌회전과 직진이 같은 녹색에 함께 나갑니다. 그러면 1차로를 함께 써도 서로 막지 않습니다.',goals:[{k:'q',a:'N',max:16},{k:'dly',max:25}],stars:[264,339,402]},
  {id:'2-2',stage:2,title:'우회전 행렬',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:26,N_A:18,EW_T:20},
   appr:{N:[500,10,10,'L','TR'],S:[900,10,40,'L','TR'],E:[400,0,10,'T','TR'],W:[400,0,10,'T','TR']},
   story:'남측 접근로는 차량 40%가 우회전해서 쇼핑몰로 들어갑니다. 우회전 차량과 직진 차량이 한 차로에 섞여 줄이 길어집니다.',
   goal:'남측 두 차로를 어떻게 나눠야 직진과 우회전이 서로 방해하지 않는지 찾으세요.',
-  hint:'차로마다 맡는 비율이 수요 비율과 비슷할수록 좋습니다. 남측은 좌회전 10%, 직진 50%, 우회전 40%입니다.',stars:[272,358,431]},
+  hint:'차로마다 맡는 비율이 수요 비율과 비슷할수록 좋습니다. 남측은 좌회전 10%, 직진 50%, 우회전 40%입니다.',goals:[{k:'q',a:'S',max:18},{k:'dly',max:25}],stars:[272,358,431]},
  {id:'2-3',stage:2,title:'네 방향 네 가지 사정',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'split'},plan:{S_A:18,N_A:18,E_A:16,W_A:14},
   appr:{N:[600,35,10,'L','TR'],S:[700,5,10,'L','TR'],E:[550,10,35,'L','TR'],W:[450,0,10,'L','TR']},
   story:'네 방향 모두 방향별 직좌 동시 신호입니다. 북측은 좌회전이 많고, 남측은 직진 위주, 동측은 우회전이 많고, 서측은 좌회전이 아예 없습니다. 그런데 차로 배정은 모두 똑같습니다.',
   goal:'접근로마다 수요에 맞게 차로를 나누고, 그다음 신호 비중과 주기를 다듬으세요.',
-  hint:'한 번에 한 접근로씩 바꾸고 세션 결과를 비교하면 무엇이 효과가 있었는지 알 수 있습니다.',stars:[135,209,275]},
+  hint:'한 번에 한 접근로씩 바꾸고 세션 결과를 비교하면 무엇이 효과가 있었는지 알 수 있습니다.',goals:[{k:'q',a:'S',max:20},{k:'dly',max:45}],stars:[135,209,275]},
  {id:'3-1',stage:3,title:'사라진 직진 신호',unlock:['split','cycle','phases'],
   phases:[{m:['NL','NT','NR'],g:22},{m:['SL','SR'],g:20},{m:['ET','ER','WT','WR'],g:20}],
   appr:{N:[700,10,10,'LT','TR'],S:[800,10,10,'LT','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
   story:'공사 뒤에 신호 프로그램을 다시 짜면서 실수가 생겼습니다. 남측에는 직진 차로가 두 개나 있는데, 남측 현시에 직진이 빠졌습니다. 직진하려던 차는 모두 다른 길로 돌아갑니다.',
   goal:'차로는 바꿀 수 없습니다. 현시 편집기에서 신호 쪽 모순을 찾아 고치세요.',
-  hint:'현시 목록에서 남측 현시를 고른 뒤 남측 직진 칸을 켜 보세요. 같은 접근로의 좌회전, 직진, 우회전은 서로 부딪히지 않습니다.',stars:[266,384,487]},
+  hint:'현시 목록에서 남측 현시를 고른 뒤 남측 직진 칸을 켜 보세요. 같은 접근로의 좌회전, 직진, 우회전은 서로 부딪히지 않습니다.',goals:[{k:'det',max:5},{k:'dly',max:20}],stars:[266,384,487]},
  {id:'3-2',stage:3,title:'겸용 차로를 신호로 살리기',unlock:['split','phases'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:28,NS_L:12,EW_T:22},
   appr:{N:[750,20,10,'LT','TR'],S:[800,20,10,'LT','TR'],E:[400,0,10,'T','TR'],W:[400,0,10,'T','TR']},
   story:'남북 1차로는 좌회전과 직진을 함께 쓰는 겸용 차로입니다. 그런데 신호는 좌회전과 직진을 따로 내보냅니다. 맨 앞 차가 다른 신호를 기다리는 동안 뒤차가 막히고, 참다못한 차가 옆 차로로 끼어들다 사고가 납니다.',
   goal:'차로는 그대로 두고, 신호 구성을 바꿔 겸용 차로가 막히지 않게 하세요.',
-  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. 남북 현시를 접근로별로 나눠 보세요.',stars:[334,400,453]},
+  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. 남북 현시를 접근로별로 나눠 보세요.',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
  {id:'4-1',stage:4,title:'돌아가야 하는 차들',unlock:['lanes','uturn','split'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:30,NS_L:12,EW_T:24},
   appr:{N:[800,10,10,'L','TR'],S:[750,12,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},pu:{N:15,S:6},
   story:'북쪽 길가에 대형 쇼핑몰 주차장 입구가 있어서, 북측에서 오는 차 중 15%가 교차로에서 유턴해 되돌아갑니다. 그런데 북측 1차로는 좌회전 전용이라 유턴을 할 수 없어, 이 차량들이 모두 블록을 돌아 우회합니다.',
   goal:'차로 용도를 바꿔 유턴과 좌회전 차량이 교차로에서 바로 처리되게 하세요. 유턴은 같은 접근로의 좌회전 신호 때 갑니다.',
-  hint:'1차로를 \'좌회전 + 유턴\'으로 바꾸면 좌회전 신호 때 함께 갑니다. 좌회전 신호 시간이 모자라지 않은지 신호 비중도 다시 맞춰 보세요. 남측도 유턴 수요가 있습니다.',stars:[353,392,425]},
+  hint:'1차로를 \'좌회전 + 유턴\'으로 바꾸면 좌회전 신호 때 함께 갑니다. 좌회전 신호 시간이 모자라지 않은지 신호 비중도 다시 맞춰 보세요. 남측도 유턴 수요가 있습니다.',goals:[{k:'det',max:0},{k:'risk',max:0.1}],stars:[353,392,425]},
  {id:'4-2',stage:4,title:'한쪽으로만 붐비는 길',unlock:['oneway','lanes','split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:30,EW_T:30},
   appr:{N:[60,5,5,'T','TR'],S:[2000,5,5,'T','TR'],E:[450,2,10,'LT','TR'],W:[450,10,2,'LT','TR']},
   story:'출근 시간 남북 도로는 북쪽 도심으로 가는 차가 몰립니다. 남측에서 시간당 2,000대가 2개 차로로 밀려드는데, 반대 방향(북측에서 오는 차)은 60대뿐입니다. 남측 반대편 2개 차로는 거의 비어 있습니다.',
   goal:'남북 도로를 북쪽으로만 가는 일방통행으로 바꿔 보세요. 남측은 \'들어오는 방향만\', 북측은 \'나가는 방향만\'으로 하면 양쪽 모두 4개 차로가 됩니다. 대신 남쪽으로 가려던 차량은 우회합니다.',
-  hint:'남측만 바꾸면 4개 차로가 북쪽 출구 2개 차로로 몰려 다시 막힙니다. 북측도 함께 바꿔 출구를 넓히고, 늘어난 처리량에 맞춰 남북 신호 비중을 키워 보세요.',stars:[322,442,544]},
+  hint:'남측만 바꾸면 4개 차로가 북쪽 출구 2개 차로로 몰려 다시 막힙니다. 북측도 함께 바꿔 출구를 넓히고, 늘어난 처리량에 맞춰 남북 신호 비중을 키워 보세요.',goals:[{k:'q',a:'S',max:40},{k:'dly',max:36}],stars:[322,442,544]},
  {id:'5-1',stage:5,title:'건너지 못하는 사람들',unlock:['split','cycle'],
   phases:[{m:['NT','NR','ST','SR'],g:46},{m:['ET','ER','WT','WR'],g:6}],
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},ped:{N:700,S:700,E:80,W:80},
   story:'역 앞 교차로입니다. 출근길 사람들이 남북 대로를 건너 역으로 갑니다. 남북 대로를 건너는 보행 신호는 동서 차량 녹색과 함께 켜지는데, 차가 적다고 동서 녹색을 6초만 주고 있습니다. 사람들이 다 건너지 못하거나 기다리다 지쳐 무단 횡단을 합니다.',
   goal:'이제 보행자도 통과 인원에 들어갑니다. 보행자가 안전하게 건널 시간을 주면서 차량 흐름도 지키세요.',
-  hint:'횡단보도 길이를 걸음 속도(초당 1~1.5m)로 나눈 시간이 최소 보행 시간입니다. 녹색이 그보다 짧으면 건너던 사람이 남고, 30초 넘게 기다린 보행자는 감점입니다.',stars:[548,713,855]},
+  hint:'횡단보도 길이를 걸음 속도(초당 1~1.5m)로 나눈 시간이 최소 보행 시간입니다. 녹색이 그보다 짧으면 건너던 사람이 남고, 30초 넘게 기다린 보행자는 감점입니다.',goals:[{k:'pedW',max:35},{k:'risk',max:0.2}],stars:[548,713,855]},
  {id:'5-2',stage:5,title:'사람이 쏟아지는 사거리',unlock:['split','cycle','ped'],
   phases:[{m:['NT','NR','ST','SR'],g:28},{m:['ET','ER','WT','WR'],g:26}],
   appr:{N:[600,0,45,'T','TR'],S:[600,0,45,'T','TR'],E:[550,0,45,'T','TR'],W:[550,0,45,'T','TR']},ped:{N:1400,S:1400,E:1400,W:1400},
   story:'번화가 한복판 사거리입니다. 네 방향 모두 횡단보도마다 시간당 1,400명이 건너고, 차량 절반 가까이가 우회전해 상가 골목으로 들어갑니다. 우회전 차량이 끝없이 이어지는 보행자 앞에서 멈춰 서고, 뒤따르는 직진 차량까지 막힙니다.',
   goal:'보행 신호 방식을 바꿀 수 있습니다. 모든 차량을 세우고 사람만 건너는 보행 전용 현시(스크램블)를 넣어 보세요.',
-  hint:'보행 전용 현시를 넣고 차량 신호와 함께 건너는 동시 횡단을 끄면, 우회전 차량은 보행자 없이 돌 수 있습니다. 대각선으로 가는 사람도 한 번에 건너서 대기가 줄어듭니다. 대신 주기가 길어지니 각 현시 시간을 다시 다듬으세요.',stars:[482,711,907]},
+  hint:'보행 전용 현시를 넣고 차량 신호와 함께 건너는 동시 횡단을 끄면, 우회전 차량은 보행자 없이 돌 수 있습니다. 대각선으로 가는 사람도 한 번에 건너서 대기가 줄어듭니다. 대신 주기가 길어지니 각 현시 시간을 다시 다듬으세요.',goals:[{k:'dly',max:28},{k:'risk',max:0.1}],stars:[482,711,907]},
 ];
 function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,pl,pr]=s.appr[a];appr[a]={vph,pl,pr,lanes:['L','TR'],perm:false};}
   return{geo:clone(GEO2),phases:templatePhases('protL','protL',DEFAULT_PLAN),scheme:{NS:'protL',EW:'protL'},yellow:3,rtor:false,appr};}
 function levelCfg(lv){const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];}
   if(lv.phases)return{geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
+</script>
+<script>
+(()=>{
 // 좌측 통행 스테이지: 시뮬레이션 안의 동/서, 좌/우는 실제와 반대. 화면 글자를 실제 기준으로 바꿔 보여 줌
 const HAND={on:false,nodes:new Set(),orig:new WeakMap(),done:new WeakMap(),obs:null};
 const LR_MAP={'좌회전':'우회전','우회전':'좌회전','직좌':'직우','직우':'직좌','좌직':'우직','우직':'좌직','좌유':'우유','우유':'좌유'};
@@ -993,6 +1105,7 @@ const unlocked=k=>mode.kind==='lab'||(mode.kind==='real'&&k!=='demand')||(mode.k
 // ★1 = 시작점 + 30%, ★2 = + 65%, ★3 = + 95% (v0.18 보행자 반영. 시작점 335/738/269/529/152, 탐색 최고 469/819/338/710/361. 탐색: tools/opt.mjs, 보행 전용 현시 포함)
 const REAL_STARS={gangnam:[375,422,462],edirnekapi:[762,791,815],toronto:[290,314,335],london:[583,647,701],tokyo:[215,288,351]};
 function thresholds(){if(mode.kind==='level')return curLevel().stars;if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
+function jammed(st){const lv=curLevel();return!!(lv&&lv.jam&&st&&st.peakQ>=lv.jam);}
 function starsOf(score,risk){const t=thresholds();let n=score>=t[2]?3:score>=t[1]?2:score>=t[0]?1:0;if(riskGrade(risk)===2)n=Math.min(n,1);return n;}
 // 시제품 기간: 모든 레벨 열어 둠. 출시 때 순서 잠금을 다시 켜려면 UNLOCK_ALL=false
 const UNLOCK_ALL=true;
@@ -1002,6 +1115,14 @@ prog=store.get('prog-v3')||{};
 
 // ---------- UI 공통 ----------
 const $=id=>document.getElementById(id);
+// ---------- 점수 계산 Web Worker: 화면을 멈추지 않고 evalCfg(시드 3개)를 계산. 실패하면 화면 스레드에서 계산 ----------
+const EVW={w:null,id:0,cb:new Map()};
+try{const src=$('engsrc').textContent+"\nself.onmessage=e=>{const d=e.data;try{const ev=evalCfg(d.cfg,d.first||undefined);postMessage({id:d.id,score:ev.score,st:ev.st});}catch(err){postMessage({id:d.id,err:String(err)});}};";
+  EVW.w=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));
+  EVW.w.onmessage=e=>{const j=EVW.cb.get(e.data.id);if(!j)return;EVW.cb.delete(e.data.id);clearTimeout(j.to);j.res(e.data.err?evalCfg(j.c,j.first):{score:e.data.score,st:e.data.st});};
+  EVW.w.onerror=()=>{EVW.w=null;for(const [k,j] of EVW.cb){clearTimeout(j.to);EVW.cb.delete(k);j.res(evalCfg(j.c,j.first));}};}catch(e){EVW.w=null;}
+function evalAsync(c,first){return new Promise(res=>{if(!EVW.w){setTimeout(()=>res(evalCfg(c,first)),20);return;}
+  const id=++EVW.id,j={c,first,res,to:setTimeout(()=>{if(EVW.cb.delete(id))res(evalCfg(c,first));},90000)};EVW.cb.set(id,j);EVW.w.postMessage({id,cfg:c,first:first||null});});}
 const fmtT=t=>{t=Math.max(0,t);const m=Math.floor(t/60),s=Math.floor(t%60);return m+':'+String(s).padStart(2,'0');};
 const scenSel=$('scen');
 for(const k in SCEN){const o=document.createElement('option');o.value=k;o.textContent=SCEN[k].name;scenSel.appendChild(o);}
@@ -1197,7 +1318,7 @@ function renderStatus(a){const el=$('ms-'+a);if(!el)return;const {r,w}=moveStatu
   el.innerHTML=`<div class="mrow">${(showU?['U','L','T','R']:['L','T','R']).map(k=>`<div><span>${MOVE[k]}</span><b class="${r[k][1]}">${r[k][0]}</b></div>`).join('')}</div>`+
     (w.length?`<ul>${w.map(([c2,t])=>`<li class="${c2}">${t}</li>`).join('')}</ul>`:'');}
 function renderAllStatus(){if(!cfg||!$('ms-N'))return;for(const a of APPR)renderStatus(a);}
-function applyLocks(){$('phed').hidden=!unlocked('phases');$('schemes').hidden=!unlocked('scheme');$('cycrow').hidden=!unlocked('cycle');$('yelrow').hidden=!unlocked('yellow');$('rtorlbl').hidden=!unlocked('rtor');$('pedbox').hidden=!(unlocked('ped')&&hasPed(cfg));}
+function applyLocks(){$('phed').hidden=!unlocked('phases');$('schemes').hidden=!unlocked('scheme');$('cycrow').hidden=!unlocked('cycle');$('yelrow').hidden=!unlocked('yellow');$('rtorlbl').hidden=!unlocked('rtor');$('pedbox').hidden=!(unlocked('ped')&&hasPed(cfg));$('phbtn').hidden=!(unlocked('scheme')||unlocked('phases')||unlocked('rtor')||(unlocked('ped')&&hasPed(cfg)));}
 function syncControls(){PH=cfg.phases;selP=0;{const w=document.getElementById('wxsel');if(w)w.value=cfg.wx||'clear';}syncSchemeSel();$('rtor').checked=cfg.rtor;
   applyLocks();buildApprUI();refreshPlan();}
 
@@ -1222,20 +1343,32 @@ function diffCfg(p,c){const out=[];
   return out;}
 function startSession(){closeModal();sim=warmSim(cfg,SEEDS[0]);state='run';running=true;sessNo=(history[0]?history[0].no:0)+1;
   $('play').textContent='일시정지';updateUI();}
-function finishSession(){const base=baseCfg(),ev=evalCfg(sim.cfg,stats(sim)),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
-  const changes=diffCfg(ref,sim.cfg),sameDemand=demandSig(sim.cfg)===demandSig(base);
+// 세션 끝: 점수 계산은 Web Worker에서(화면 멈춤 없음). evPre={cfg, score?, st?}: 확정 버튼처럼 지금 편집 중인 설정을 바로 평가할 때
+function finishSession(evPre){if(state==='calc')return;state='calc';running=false;const fc=evPre&&evPre.cfg?clone(evPre.cfg):clone(sim.cfg),first=evPre||sim.swapped?null:stats(sim);
+  calcOv(true);updateUI();(evPre&&evPre.score!=null?Promise.resolve(evPre):evalAsync(fc,first)).then(ev=>{calcOv(false);finishWith(fc,ev);}).catch(()=>{calcOv(false);state='run';running=true;});}
+// 설정 비교용 짧은 서명: 도로 기하(geo)는 크고 거의 안 바뀌므로 객체마다 한 번만 해시해서 넣음(0.15초마다 비교해도 가벼움)
+const GEOH=new WeakMap();
+function geoHash(g){let h=GEOH.get(g);if(h)return h;const s=JSON.stringify(g);let x=0;for(let i=0;i<s.length;i++)x=(x*31+s.charCodeAt(i))|0;h='g'+(x>>>0).toString(36)+'_'+s.length;GEOH.set(g,h);return h;}
+function cfgSig(c){return c?JSON.stringify(c,(k,v)=>k==='geo'&&v&&typeof v==='object'?geoHash(v):v):'';}
+// 신호 시간, 황색, 보행 방식만 바뀐 경우: 세션을 다시 시작하지 않고 다음 주기 시작에 바로 바꿈
+const TIMING_KEYS=['phases','yellow','scheme','pedConc'];
+function timingOnly(a,b){const s=o=>cfgSig(Object.fromEntries(Object.entries(o).filter(([k])=>!TIMING_KEYS.includes(k))));return s(a)===s(b);}
+function hotSwap(){const n=sim.nextCfg;sim.nextCfg=null;for(const k of TIMING_KEYS){if(n[k]===undefined)delete sim.cfg[k];else sim.cfg[k]=clone(n[k]);}sim.swapped=true;}
+function calcOv(on){let el=$('calcov');if(!el){el=document.createElement('div');el.id='calcov';el.className='calcov';el.textContent='결과 계산 중';$('stage').appendChild(el);}el.hidden=!on;}
+function finishWith(fc,ev){const base=baseCfg(),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
+  const changes=diffCfg(ref,fc),sameDemand=demandSig(fc)===demandSig(base),jam=jammed(st);
   const prevBest=history.filter(h=>h.sameDemand).reduce((m,h)=>Math.max(m,h.score),-Infinity);
-  const stars=sameDemand?starsOf(score,st.risk):0;
-  const rec={no:sessNo,cfg:clone(sim.cfg),st,score,changes,sameDemand,stars,record:sameDemand&&score>prevBest&&history.length>0};
+  const stars=sameDemand&&!jam?starsOf(score,st.risk):0;
+  const rec={no:sessNo,cfg:clone(fc),st,score,changes,sameDemand,stars,jam,record:sameDemand&&!jam&&score>prevBest&&history.length>0};
   if(mode.kind==='real'&&sameDemand){const id='real-'+mode.id,p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
   if(mode.kind==='level'&&sameDemand){const id=curLevel().id,p=prog[id]||{stars:0,best:-1e9},nextLocked=mode.idx+1<LEVELS.length&&!levelUnlocked(mode.idx+1);
     prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);
     if(nextLocked&&levelUnlocked(mode.idx+1))rec.opened=LEVELS[mode.idx+1];
     if(stars>p.stars)rec.newStars=true;}
-  if(sim.cfg.wx&&sim.cfg.wx!=='clear'&&demandSig({...sim.cfg,wx:0})===demandSig(base)){const wb=store.get('wxbest-v1')||{},k=modeId()+':'+sim.cfg.wx;rec.wxPrev=wb[k]??null;rec.wxBest=Math.max(score,wb[k]??-1e9);wb[k]=rec.wxBest;store.set('wxbest-v1',wb);}
+  if(fc.wx&&fc.wx!=='clear'&&demandSig({...fc,wx:0})===demandSig(base)){const wb=store.get('wxbest-v1')||{},k=modeId()+':'+fc.wx;rec.wxPrev=wb[k]??null;rec.wxBest=Math.max(score,wb[k]??-1e9);wb[k]=rec.wxBest;store.set('wxbest-v1',wb);}
   history.unshift(rec);if(history.length>30)history.pop();store.set(histKey(),history);
   state='done';running=false;renderResult(rec,prev);renderHistory();renderLevels();updateUI();if(playMode)openResult();
-  try{window.dispatchEvent(new CustomEvent('session-done',{detail:{rec,stage:modeId(),title:(curReal()&&curReal().title)||(mode.kind==='level'?curLevel().id+' '+curLevel().title:''),eligible:mode.kind!=='lab'&&!!(rec.sameDemand||rec.wxBest!=null),weather:sim.cfg.wx||'clear'}}));}catch(e){}}
+  try{window.dispatchEvent(new CustomEvent('session-done',{detail:{rec,stage:modeId(),title:(curReal()&&curReal().title)||(mode.kind==='level'?lvLabel(curLevel())+' '+curLevel().title:''),eligible:mode.kind!=='lab'&&!jam&&!!(rec.sameDemand||rec.wxBest!=null),weather:fc.wx||'clear'}}));}catch(e){}}
 function deltaPill(cur,prev,better,fmt){if(prev==null)return'';const d=cur-prev;if(Math.abs(d)<1e-9)return'<span class="pill flat">변화 없음</span>';
   const good=better==='up'?d>0:d<0;return`<span class="pill ${good?'up':'down'}">${d>0?'+':''}${fmt(d)}</span>`;}
 function riskLine(st){const g=riskGrade(st.risk),top=Object.entries(st.riskBy).filter(x=>x[1]>0.005).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ${v.toFixed(2)}`).join(', ');
@@ -1310,8 +1443,9 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
       <div class="badges">${rec.record?'<span class="record">최고 기록 경신</span>':''}
         <div class="stars" aria-label="별 ${rec.stars}개">${rec.sameDemand?starHTML(rec.stars):''}</div>
         ${pct!=null?`<span class="pill ${pct>=0?'up':'down'}">이전 세션 대비 ${pct>=0?'+':''}${pct.toFixed(1)}%</span>`:''}</div></div>
+    ${rec.jam?`<div class="jamres"><b>정체 발생</b> 한 차로 대기열이 ${rec.st.peakQ}대까지 늘어 도로가 막혔습니다. 별을 받으려면 먼저 정체를 풀어야 합니다.</div>`:''}
     ${rec.sameDemand?scoreTrack(rec,prev,best,t):''}
-    ${rec.opened?`<div class="clear"><span>레벨 클리어. ${rec.opened.id} ${rec.opened.title} 레벨이 열렸습니다.</span><button class="primary" data-go="${LEVELS.indexOf(rec.opened)}">다음 레벨로</button></div>`:''}
+    ${rec.opened?`<div class="clear"><span>레벨 클리어. ${lvLabel(rec.opened)} ${rec.opened.title} 레벨이 열렸습니다.</span><button class="primary" data-go="${LEVELS.indexOf(rec.opened)}">다음 레벨로</button></div>`:''}
     ${!rec.sameDemand?(rec.wxBest!=null?`<div class="exp">날씨 도전 (${wxOf(rec.cfg).n}) 세션입니다. 이 날씨 최고 ${rec.wxBest}점${rec.wxPrev!=null&&rec.score>rec.wxPrev?' (새 기록)':''}. 별과 순위는 맑음 기준에서만 집계합니다.</div>`:'<div class="exp">교통량을 바꿔서 별과 최고 기록에는 반영하지 않았습니다.</div>'):capped?'<div class="nextstar">점수는 충분하지만 위험도가 높아 별은 1개까지만 받습니다. 위험 원인을 먼저 고치세요.</div>':next!=null?`<div class="nextstar">다음 별까지 <b>${next.toLocaleString()}</b>점 남았습니다.</div>`:rec.stars===3?'<div class="nextstar">별 3개 달성. 더 높은 점수에 도전해 보세요.</div>':''}
     <div class="dash">
       <div class="kpis">
@@ -1322,6 +1456,7 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
       </div>
       <div class="side">${apprMap(s,an.focus)}${sparkline(rec)}</div>
     </div>
+    ${goalResultHTML(rec)}
     ${riskLine(s)}
     ${hasPed(rec.cfg)?`<div class="riskrow"><span>보행자</span><span>${f0(s.peds||0)}명 건넘, 평균 대기 ${f0(s.pedW||0)}초${s.pedQ?`, 아직 대기 ${s.pedQ}명`:''}</span><span>대기 감점 ${Math.round(s.pedPen||0)}점</span></div>`:''}
     ${driversHTML(an)}
@@ -1350,7 +1485,7 @@ $('clearhist').addEventListener('click',()=>{history=[];store.set(histKey(),hist
 // ---- 레벨 선택, 브리핑 ----
 function renderLevels(){const box=$('levels');
   box.innerHTML=STAGES.map(sg=>`<div class="stage-row"><span>${sg.n}단계 ${sg.name}</span><div class="lvbtns">${LEVELS.map((lv,i)=>lv.stage!==sg.n?'':
-    `<button class="lv ${mode.kind==='level'&&mode.idx===i?'cur':''}" data-lv="${i}" ${levelUnlocked(i)?'':'disabled'}>${lv.id}<small>${levelUnlocked(i)?starHTML((prog[lv.id]||{}).stars||0):'잠김'}</small></button>`).join('')}</div></div>`).join('')+
+    `<button class="lv ${mode.kind==='level'&&mode.idx===i?'cur':''}" data-lv="${i}" ${levelUnlocked(i)?'':'disabled'}>${lvLabel(lv)}<small>${levelUnlocked(i)?starHTML((prog[lv.id]||{}).stars||0):'잠김'}</small></button>`).join('')}</div></div>`).join('')+
     `<div class="stage-row"><span>실제 도시</span><div class="lvbtns">${Object.values(REAL).map(R=>`<button class="lv ${mode.kind==='real'&&mode.id===R.id?'cur':''}" data-real="${R.id}">${R.title}<small>${starHTML((prog['real-'+R.id]||{}).stars||0)}</small></button>`).join('')}</div></div>`+
     `<div class="stage-row"><span>자유</span><div class="lvbtns"><button class="lv ${mode.kind==='lab'?'cur':''}" data-lab="1">실험실<small>전체 조작</small></button></div></div>`;}
 $('levels').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
@@ -1365,7 +1500,7 @@ function renderBrief(){const el=$('brief');$('labrow').hidden=mode.kind!=='lab';
       <div id="datatbl" hidden><table class="hist" style="margin-top:6px"><thead><tr><th>항목</th><th>구분</th><th>출처, 비고</th></tr></thead><tbody>${R.data.map(r=>`<tr><td>${r[0]}</td><td class="${r[1]==='측정값'||r[1]==='공식 자료'?'ok':r[1]==='가정'||r[1]==='미반영'?'bad':'risk'}">${r[1]}</td><td class="chgcell">${r[2]}</td></tr>`).join('')}</tbody></table></div>`;
     $('databtn').addEventListener('click',()=>{$('datatbl').hidden=false;$('databtn').hidden=true;});return;}
   const lv=curLevel(),t=lv.stars,p=prog[lv.id];
-  el.innerHTML=`<h3><small>${lv.id}</small>${lv.title}</h3><p>${lv.story}</p><div class="goal"><b>목표</b> ${lv.goal}</div>
+  el.innerHTML=`<h3><small>${lvLabel(lv)}</small>${lv.title}</h3><p>${lv.story}</p><div class="goal"><b>목표</b> ${lv.goal}</div>
     <div class="thr"><span>★ <b>${t[0]}</b></span><span>★★ <b>${t[1]}</b></span><span>★★★ <b>${t[2]}</b></span><span>시작 설정 ${baseline?baseline.score:'-'}점</span>${p?`<span>내 최고 ${p.best}점</span>`:''}</div>
     <div class="unl">열린 조작: ${lv.unlock.map(k=>CTRL_NAME[k]).join(', ')}</div>
     <button class="link" id="hintbtn" style="margin-top:6px;padding-left:0">힌트 보기</button><div class="hint" id="hint" hidden>${lv.hint}</div>`;
@@ -1382,8 +1517,8 @@ $('newsess').addEventListener('click',startSession);
 let resetArm=0;$('resetcfg').addEventListener('click',()=>{const btn=$('resetcfg');
   if(Date.now()>resetArm){resetArm=Date.now()+3000;btn.textContent='한 번 더 누르면 초기화';btn.classList.add('primary');setTimeout(()=>{if(Date.now()>=resetArm){btn.textContent='처음 설정으로';btn.classList.remove('primary');}},3100);return;}
   resetArm=0;btn.textContent='처음 설정으로';btn.classList.remove('primary');closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();});$('applynow').addEventListener('click',startSession);
-$('skip').addEventListener('click',()=>{if(state!=='run')return;const b=$('skip');b.disabled=true;b.textContent='계산 중...';
-  setTimeout(()=>{while(sim.t-sim.t0<SESS_T)step(sim);finishSession();b.disabled=false;b.textContent='결과 바로 보기';},20);});
+// 결과 바로 보기 = 지금 편집 중인 설정으로 확정(5분을 기다리지 않음). 예상 점수가 이미 계산돼 있으면 그대로 씀
+$('skip').addEventListener('click',()=>{if(state!=='run')return;const fc=clone(cfg),f=typeof fcGet==='function'?fcGet(fc):null;finishSession(f?{cfg:fc,score:f.score,st:f.st}:{cfg:fc});});
 document.querySelectorAll('[data-sp]').forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('on',x===b));}));
 
 // ---------- 그리기 ----------
@@ -1561,7 +1696,7 @@ function decorate(stage){const sk=skin,W=VIEW;
     for(const a of APPR){const d=HEAD[a],r=rightOf(d);for(let t=D.boxD(a)+30;t<W;t+=32){const q=add(mul(d,-t),mul(r,-(sim.cfg.geo.nOut[a]+.6)*sim.cfg.geo.LW));cs.push(q);}}
     ctx.globalCompositeOperation='lighter';for(const [lx,ly] of cs){const g=ctx.createRadialGradient(lx,ly,0,lx,ly,14);g.addColorStop(0,'rgba(255,190,110,.22)');g.addColorStop(1,'rgba(255,190,110,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(lx,ly,14,0,Math.PI*2);ctx.fill();}
     ctx.globalCompositeOperation='source-over';}}
-function resize(){const r=cv.getBoundingClientRect();dpr=window.devicePixelRatio||1;cw=r.width;ch=r.height;cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);}
+function resize(){const r=cv.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,document.body.classList.contains('mobile')?2:3);cw=r.width;ch=r.height;cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);}
 new ResizeObserver(resize).observe(cv);resize();
 function laneAt(ev){if(!cfg)return null;const r=cv.getBoundingClientRect(),sc=Math.min(r.width,r.height)/(2*VIEW),p=[MX*(ev.clientX-r.left-r.width/2)/sc,-(ev.clientY-r.top-r.height/2)/sc],G=cfg.geo,D=geoDims(G);
   for(const a of APPR){const d=HEAD[a],rt=rightOf(d),al=dot(p,d),lat=dot(p,rt)-D.off(a),sd=D.stopD(a),n=G.nIn[a];
@@ -1817,7 +1952,7 @@ $('lvchip').addEventListener('click',openLevels);$('phbtn').addEventListener('cl
 $('dockh').addEventListener('click',()=>{const d=$('dock');d.classList.toggle('min');$('dockh').textContent=d.classList.contains('min')?'신호 시간 펼치기':'신호 시간 접기';});
 function buildArms(){const box=$('arms');box.innerHTML='';if(!playMode||!cfg)return;
   for(const a of APPR){const b=document.createElement('button');b.type='button';b.className='armbtn';b.id='arm-'+a;
-    b.innerHTML=`<span class="w"></span><span>${curReal()?curReal().arm[a].split(' ')[0]+' '+NAME[a].slice(0,1):NAME[a]} 차로</span><span class="q">대기 0</span>`;
+    b.innerHTML=`<span class="w"></span><span>${curReal()?curReal().arm[a].split(' ')[0]+' '+NAME[a].slice(0,1):NAME[a]}<span class="cr"> 차로</span></span><span class="q">대기 0</span>`;
     b.addEventListener('click',()=>openArm(a));box.appendChild(b);}
   positionArms();}
 function armAvoid(b,x,y,placed){const sr=cv.getBoundingClientRect(),w=b.offsetWidth||120,h=b.offsetHeight||26;let ny=y;
@@ -1831,9 +1966,9 @@ function positionArms(){if(!playMode||!cfg)return;const placed=[];for(const a of
   if(popArm&&!$('pop').hidden)placePop(...armAnchor(popArm));}
 function renderHud(){if(!playMode||!sim)return;const st=stats(sim),el=sim.t-sim.t0,t=thresholds();
   $('hudtl').innerHTML=`<div class="t">세션 ${sessNo}${state==='done'?' 종료':''}  ${fmtT(Math.min(el,SESS_T))} / ${fmtT(SESS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/SESS_T*100)}%"></i></div>
-    <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>`;
+    <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>${goalHTML(st)}`;
   const R=curReal(),lv=curLevel();
-  $('lvchip').innerHTML=(lv?`${lv.id} ${lv.title}`:R?R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
+  $('lvchip').innerHTML=(lv?`${lvLabel(lv)} ${lv.title}`:R?R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
   for(const a of APPR){const b=$('arm-'+a);if(!b)continue;let n=0;sim.net.inL[a].forEach((sg,i)=>{n+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)n++;});b.querySelector('.q').textContent='대기 '+n;}}
 function setPlayMode(on){playMode=on;try{localStorage.setItem('play-v1',JSON.stringify(on));}catch(e){}document.body.classList.toggle('play',on);
   $('modebtn').textContent=on?'상세 패널 보기':'플레이 화면으로';
@@ -1857,13 +1992,16 @@ function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim
   const iv=sim.curIv;if(iv){const left=Math.max(0,iv.e-sim.ct),typ=iv.type==='G'?'녹색':iv.type==='Y'?'황색':'전적색';
     $('sig').textContent=`${phName(iv.p)} ${typ} ${left.toFixed(0)}초`;
     const same=JSON.stringify(cfg.phases)===JSON.stringify(sim.cfg.phases)&&cfg.yellow===sim.cfg.yellow;
-    $('tlnow').textContent=same?`현재 ${phName(iv.p)} (${typ})`:'변경된 계획은 새 세션부터 적용';
+    $('tlnow').textContent=same?`현재 ${phName(iv.p)} (${typ})`:sim.nextCfg?'바꾼 신호는 다음 주기부터 바로 적용됩니다':'변경된 계획은 새 세션부터 적용';
     const m=$('tlmark');if(m){m.hidden=!same;if(same&&sim.tl)m.style.left=(sim.ct/sim.tl.len*100)+'%';}}
-  const pend=JSON.stringify(cfg)!==JSON.stringify(sim.cfg);
-  $('pending').hidden=!(pend&&state==='run');
+  const cs=cfgSig(cfg),pend=cs!==cfgSig(sim.cfg),live=pend&&state==='run'&&timingOnly(cfg,sim.cfg);
+  if(live&&cfgSig(sim.nextCfg)!==cs)sim.nextCfg=clone(cfg);else if(!live)sim.nextCfg=null;
+  $('pending').hidden=!(pend&&!live&&state==='run');
   $('newsess').classList.toggle('primary',state==='done');$('play').disabled=state!=='run';$('skip').disabled=state!=='run';}
 function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
-  if(running&&state==='run'){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;if(sim.t-sim.t0>=SESS_T){finishSession();acc=0;break;}}if(n>=80)acc=0;}
+  if(running&&state==='run'){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
+      if(sim.nextCfg&&sim.ct<(sim.lastCt||0))hotSwap();sim.lastCt=sim.ct;
+      if(sim.t-sim.t0>=SESS_T){finishSession();acc=0;break;}}if(n>=80)acc=0;}
   if(!window.__v3on){draw();if(window.__wxDraw)window.__wxDraw(real);}uiT+=real;if(uiT>.15){uiT=0;updateUI();}
   requestAnimationFrame(frame);}
 {const lastM=store.get('last-v3');let m={kind:'level',idx:0};
@@ -1872,6 +2010,227 @@ function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
 setPlayMode(playMode);updateUI();requestAnimationFrame(frame);
 window.__test={owGeo,evalCfg,runSession,realCfg,levelCfg,LEVELS,REAL,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,step,DT,get WXP(){return WXP}};
 window.__g={NAME,touch:()=>updateUI(),modeId:()=>modeId(),openModal:(t,e)=>openModal(t,e),get cfg2(){return cfg},setWx(k){if(k==='clear')delete cfg.wx;else cfg.wx=k;const w=document.getElementById('wxsel');if(w)w.value=k;updateUI();},WXP,get sim(){return sim},get cfg(){return cfg},get mode(){return mode},sigState,vehPose,curReal,APPR,HEAD};
+// ---------- 즉각 피드백: 말풍선, 효과음, 색종이 ----------
+// 실제 지표가 바뀐 순간에만 띄움: 대기열 해소, 오래 기다린 차, 보행자 무리 횡단, 무단 횡단, 사고, 이전 세션 대비 속도
+const FXP=(()=>{let p={bub:true,snd:true};try{Object.assign(p,JSON.parse(localStorage.getItem('fx-v1')||'{}'));}catch(e){}return p;})();
+const fxSave=()=>{try{localStorage.setItem('fx-v1',JSON.stringify(FXP));}catch(e){}};
+const fxLayer=(()=>{const d=document.createElement('div');d.id='fxl';d.className='fxl';$('stage').appendChild(d);return d;})();
+// 효과음: 웹 오디오로 직접 합성(음원 파일 없음)
+let fxAC=null;
+function fxAudio(){if(!FXP.snd)return null;if(!fxAC){try{fxAC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(fxAC.state==='suspended')fxAC.resume().catch(()=>{});return fxAC;}
+window.addEventListener('pointerdown',()=>{if(FXP.snd)fxAudio();},{once:true});
+function fxTone(f,t0,dur,type,g){const ac=fxAudio();if(!ac)return;const o=ac.createOscillator(),v=ac.createGain(),t=ac.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g||.12,t+.015);v.gain.exponentialRampToValueAtTime(.0008,t+dur);o.connect(v).connect(ac.destination);o.start(t);o.stop(t+dur+.05);}
+function fxNoise(dur,g){const ac=fxAudio();if(!ac)return;const n=Math.floor(ac.sampleRate*dur),b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=ac.createBufferSource(),f=ac.createBiquadFilter(),v=ac.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=900;v.gain.value=g||.25;s.connect(f).connect(v).connect(ac.destination);s.start();}
+const SFX={
+  good:()=>{fxTone(1047,0,.18,'sine',.1);fxTone(1319,.07,.18,'sine',.1);fxTone(1568,.14,.3,'sine',.1);},
+  ped:()=>{fxTone(880,0,.12,'triangle',.08);fxTone(1175,.08,.2,'triangle',.08);},
+  honk:()=>{for(const t of [0,.22]){fxTone(392,t,.16,'square',.035);fxTone(466,t,.16,'square',.035);}},
+  bad:()=>{fxTone(330,0,.18,'sine',.08);fxTone(262,.12,.3,'sine',.08);},
+  crash:()=>{fxNoise(.35,.3);fxTone(110,0,.3,'sawtooth',.05);},
+  fanfare:()=>{[523,659,784,1047].forEach((f,i)=>fxTone(f,i*.11,.35,'triangle',.11));fxTone(1319,.48,.6,'triangle',.1);}};
+const fxSound=k=>{if(FXP.snd&&SFX[k])try{SFX[k]();}catch(e){}};
+// 말풍선: 화면 좌표(x, y), 종류 good/bad/ped/big. 1.2초에 하나, 동시에 4개까지(big은 예외)
+// 나쁜 소식(경적, 무단 횡단)은 5초에 하나만: 막힌 교차로에서 말풍선이 잔소리가 되지 않게
+let fxLast=0,fxLastBad=0;
+function fxBubble(x,y,text,kind,snd){if(!FXP.bub)return;const now=performance.now();
+  if(kind!=='big'){if(now-fxLast<1200||fxLayer.querySelectorAll('.fxb').length>=4)return;if(kind==='bad'){if(now-fxLastBad<5000)return;fxLastBad=now;}fxLast=now;}
+  const b=document.createElement('div');b.className='fxb k-'+kind;b.textContent=text;
+  const r=$('stage').getBoundingClientRect();x=Math.max(60,Math.min(r.width-60,x));y=Math.max(40,Math.min(r.height-30,y));
+  b.style.left=x+'px';b.style.top=y+'px';fxLayer.appendChild(b);setTimeout(()=>b.remove(),2200);if(snd)fxSound(snd);}
+function fxConfetti(){if(!FXP.bub)return;const cols=['#ffd35a','#ef5a50','#4fc3f7','#7bd389','#c9b3e6','#f7b98b'];
+  for(let i=0;i<60;i++){const c=document.createElement('i');c.className='fxc';c.style.left=(Math.random()*100)+'%';c.style.background=cols[i%cols.length];
+    c.style.animationDelay=(Math.random()*.6)+'s';c.style.animationDuration=(1.6+Math.random()*1.2)+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;fxLayer.appendChild(c);setTimeout(()=>c.remove(),3600);}}
+const fxW=(x,y)=>toScreen(x,y);
+// 감지 루프
+const FXS={sim:null,Q:{},W:{},crash:0,tick:0};
+function fxStep(){if(!sim||state!=='run'||!cw)return;
+  if(FXS.sim!==sim){FXS.sim=sim;FXS.Q={};FXS.W={};FXS.crash=sim.crashes;FXS.tick=0;FXS.prev=fxPrevRec();}
+  const el=sim.t-sim.t0;if(el<3)return;
+  // 1) 빨간불 동안 쌓인 대기열이 한 번의 녹색에 다 빠지면
+  for(const a of APPR){let q=0;sim.net.inL[a].forEach((sg,i)=>{if(sg.slip)return;q+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)q++;});
+    const g=['T','L'].some(mv=>{const s=sigState(sim,a,mv);return s==='G'||s==='P';}),S=FXS.Q[a]||(FXS.Q[a]={peak:0,g});
+    if(!g){if(S.g&&S.peak)S.peak=0;S.peak=Math.max(S.peak,q);}
+    else if(S.peak>=8&&q<=1){const [x,y]=armAnchor(a);fxBubble(x,y-26,`쭉쭉! ${S.peak}대 통과`,'good','good');S.peak=0;}
+    S.g=g;}
+  // 2) 정지선에서 45초 넘게 서 있는 맨 앞 차
+  for(const sg of sim.net.ins){const h=sg.vehicles[0];if(h&&!h.fxA&&(h.waitT||0)>45){h.fxA=1;const p=vehPose(h),[x,y]=fxW(p.x,p.y);fxBubble(x,y-18,'빵빵! 언제 가요','bad','honk');}}
+  // 3) 보행자 무리가 다 건넜을 때, 무단 횡단
+  if(sim.net.cw&&sim.net.cw.length){for(const c of sim.net.cw){const n=sim.peds.filter(p=>p.cw===c&&p.st==='walk').length,S=FXS.W[c.a]||(FXS.W[c.a]={max:0});
+      if(n>S.max)S.max=n;if(n===0&&S.max>=6){const m=(c.lat0+c.lat1)/2,[x,y]=fxW(...add(mul(c.d,-c.cwD),mul(c.r,m)));fxBubble(x,y-16,`♥ ${S.max}명 건넜어요`,'ped','ped');S.max=0;}}
+    for(const p of sim.peds)if(p.jay&&!p.fxJ){p.fxJ=1;const c=p.cw,[x,y]=fxW(...add(mul(c.d,-c.cwD),mul(c.r,p.lat)));fxBubble(x,y-14,'무단 횡단!','bad');}}
+  // 4) 사고
+  if(sim.crashes>FXS.crash){FXS.crash=sim.crashes;const ac=sim.accidents[sim.accidents.length-1];if(ac){const [x,y]=fxW(ac.x,ac.y);fxBubble(x,y-18,'쾅! 사고','big','crash');}}
+  // 5) 1분마다 이전 세션(같은 교통량, 다른 설정)과 평균 속도 비교
+  const m=Math.floor(el/60);if(m>FXS.tick&&m<=4){FXS.tick=m;const P=FXS.prev;
+    if(P){const cur=stats(sim).spd,d=(cur-P.st.spd)/Math.max(.1,P.st.spd)*100;
+      if(d>=5)fxBubble(cw/2,70,`이전 세션보다 ${Math.round(d)}% 빨라요`,'big','good');else if(d<=-5)fxBubble(cw/2,70,`이전 세션보다 ${Math.round(-d)}% 느려요`,'big','bad');}}}
+function fxPrevRec(){const h=history[0];if(!h||!sim)return null;if(demandSig(h.cfg)!==demandSig(sim.cfg))return null;if(cfgSig(h.cfg)===cfgSig(sim.cfg))return null;return h;}
+setInterval(()=>{try{fxStep();}catch(e){}},200);
+// 별, 기록 경신
+window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(!r)return;
+  if(r.newStars||r.record||r.opened){setTimeout(()=>{fxConfetti();fxSound('fanfare');},250);}});
+// 설정: 말풍선, 효과음
+{const mk=(id,label,key)=>{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML=`<input type="checkbox" id="${id}">${label}`;
+    $('ctlbar').insertBefore(l,$('resetcfg'));const c=$(id);c.checked=FXP[key];c.addEventListener('change',()=>{FXP[key]=c.checked;fxSave();if(key==='snd'&&c.checked){fxAudio();fxSound('good');}});};
+  mk('fxbub','말풍선 효과','bub');mk('fxsnd','효과음','snd');}
+// ---------- 흐름 계기판: 지금 편집 중인 설정의 점수를 바로 계산(Web Worker)해서 바늘로 보여 줌 ----------
+// 예상 점수 = 확정했을 때 받을 점수와 똑같은 계산(evalCfg, 시드 3개). 조작이 멈추고 0.25초 뒤 계산, 최근 60개 설정은 기억
+const FC={cache:new Map(),busy:false,want:null,wantAt:0,shown:null,mode:null,base:null};
+function fcKey(c){return cfgSig(c);}
+function fcGet(c){return FC.cache.get(fcKey(c))||null;}
+function fcPut(k,v){FC.cache.set(k,v);if(FC.cache.size>60)FC.cache.delete(FC.cache.keys().next().value);}
+function fcRun(){if(FC.busy||!FC.want)return;if(performance.now()-FC.wantAt<250)return;const k=FC.want;if(FC.cache.has(k)){FC.want=null;fcShow();return;}
+  FC.busy=true;const c=FC.wantCfg;evalAsync(c,null).then(ev=>{fcPut(k,{score:ev.score,st:ev.st});FC.busy=false;if(FC.want===k)FC.want=null;fcShow();});}
+const gauge=(()=>{const d=document.createElement('div');d.id='gauge';d.className='gauge';d.innerHTML=`<svg viewBox="0 0 200 112" aria-hidden="true"><g class="arcs"></g><g class="ticks"></g>
+  <line class="ghost" x1="100" y1="100" x2="100" y2="22"/><line class="needle" x1="100" y1="100" x2="100" y2="18"/><circle cx="100" cy="100" r="6" class="hub"/></svg>
+  <div class="gv"><b class="gs">-</b><span class="gd"></span></div><div class="gl">흐름 점수</div>`;$('hudtop').insertBefore(d,$('lvchip').nextSibling);return d;})();
+function gAng(v,lo,hi){const f=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));return -90+180*f;}
+function gArc(a0,a1,r){const p=a=>[100+r*Math.sin(a*Math.PI/180),100-r*Math.cos(a*Math.PI/180)],[x0,y0]=p(a0),[x1,y1]=p(a1);return`M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;}
+function gRange(){const t=thresholds(),b=FC.base?FC.base.score:t[0];const lo=Math.min(b,t[0])-Math.abs(t[2]-Math.min(b,t[0]))*.25,hi=t[2]+(t[2]-Math.min(b,t[0]))*.15;return{t,lo,hi:Math.max(hi,lo+1)};}
+function gDrawScale(){const {t,lo,hi}=gRange(),A=v=>gAng(v,lo,hi),seg=[[lo,t[0],'z0'],[t[0],t[1],'z1'],[t[1],t[2],'z2'],[t[2],hi,'z3']];
+  gauge.querySelector('.arcs').innerHTML=seg.map(([a,b,c])=>`<path class="${c}" d="${gArc(A(a),A(b),80)}"/>`).join('');
+  gauge.querySelector('.ticks').innerHTML=t.map((v,i)=>{const a=A(v)*Math.PI/180,x=100+94*Math.sin(a),y=100-94*Math.cos(a);return`<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}">${'★'.repeat(i+1)}</text>`;}).join('');}
+function gSet(el,v){const {lo,hi}=gRange();el.style.transform=`rotate(${gAng(v,lo,hi)}deg)`;}
+// 결과 표시 + 소리: 좋아지면 오르는 음, 나빠지면 내려가는 음, 별 기준을 넘으면 종소리와 말풍선
+function fcShow(){const r=fcGet(cfg);gauge.classList.toggle('calc',!r);if(!r)return;
+  const jam=jammed(r.st),t=thresholds(),stars=jam?0:starsOf(r.score,r.st.risk),b=FC.base?FC.base.score:null;
+  gauge.classList.toggle('jam',jam);gSet(gauge.querySelector('.needle'),jam?-1e9:r.score);
+  gauge.querySelector('.gs').textContent=jam?'정체':r.score.toLocaleString();
+  const d=b!=null&&!jam?(r.score-b)/Math.max(1,Math.abs(b))*100:null;const gd=gauge.querySelector('.gd');
+  gd.textContent=jam?`대기열 ${r.st.peakQ}대`:d==null?'':Math.abs(d)<.5?'시작 설정':`시작 대비 ${d>0?'+':''}${Math.round(d)}%`;gd.className='gd '+(jam||d<-.5?'down':d>.5?'up':'');
+  const prev=FC.shown;FC.shown={score:r.score,stars,jam,key:fcKey(cfg)};
+  if(prev&&prev.key!==FC.shown.key&&FC.mode===modeId()){const dd=r.score-prev.score;gSet(gauge.querySelector('.ghost'),prev.jam?-1e9:prev.score);gauge.classList.add('moved');
+    if(jam&&!prev.jam){fxSound('bad');fxBubble(cw/2,100,'정체 발생! 대기열이 넘칩니다','big');}
+    else if(stars>prev.stars){fxSound('fanfare');fxBubble(cw/2,100,`예상 별 ${stars}개`,'big');}
+    else if(dd>Math.max(2,Math.abs(prev.score)*.005))fxSound('up');else if(dd<-Math.max(2,Math.abs(prev.score)*.005))fxSound('down');}
+  else gSet(gauge.querySelector('.ghost'),jam?-1e9:r.score);
+  FC.mode=modeId();}
+SFX.up=()=>{fxTone(660,0,.12,'sine',.07);fxTone(880,.08,.18,'sine',.07);};
+SFX.down=()=>{fxTone(440,0,.14,'sine',.06);fxTone(349,.09,.22,'sine',.06);};
+// 0.15초마다: 레벨이 바뀌면 시작 설정 점수부터, 설정이 바뀌면 그 설정 점수를 요청
+setInterval(()=>{try{if(!cfg)return;const id=modeId();
+    if(FC.baseId!==id){FC.baseId=id;FC.base=null;FC.shown=null;const bc=baseCfg(),bk=fcKey(bc);const have=FC.cache.get(bk);if(have)FC.base=have;else evalAsync(bc,null).then(ev=>{fcPut(bk,{score:ev.score,st:ev.st});if(FC.baseId===id){FC.base={score:ev.score,st:ev.st};gDrawScale();fcShow();}});gDrawScale();}
+    const k=fcKey(cfg);if(!FC.cache.has(k)&&FC.want!==k){FC.want=k;FC.wantCfg=clone(cfg);FC.wantAt=performance.now();gauge.classList.add('calc');}
+    fcRun();if(FC.cache.has(k)&&(!FC.shown||FC.shown.key!==k))fcShow();}catch(e){}},150);
+// ---------- 익명 이용 통계: Supabase events 표에 쓰기만 함(읽기 불가) ----------
+// 개인 정보 없음: 브라우저마다 만든 무작위 id(cid)와 방문 id(vid), 기기 종류, 화면 크기, 레벨 진행만 보냄. '설정 더보기'에서 끌 수 있음
+// 이벤트: open, level_start, session_end, session_restart, skip, coach, leave, error
+const AN={url:'https://qjguvtmkrkbtpvdnyelp.supabase.co/rest/v1/events',key:'sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',q:[],on:true};
+try{const v=localStorage.getItem('an-off');AN.on=v!=='1';}catch(e){}
+const anRid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+AN.cid=(()=>{try{let c=localStorage.getItem('an-cid');if(!c){c=anRid();localStorage.setItem('an-cid',c);}return c;}catch(e){return anRid();}})();
+AN.vid=anRid();AN.t0=Date.now();
+AN.ver=(document.querySelector('header .sub')||{textContent:''}).textContent.match(/v[0-9.]+/)?.[0]||'';
+function anDevice(){const ua=navigator.userAgent,os=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'ios':/Android/.test(ua)?'android':/Windows/.test(ua)?'windows':/Mac/.test(ua)?'mac':/Linux|CrOS/.test(ua)?'linux':'other';
+  const br=/Edg\//.test(ua)?'edge':/SamsungBrowser/.test(ua)?'samsung':/CriOS|Chrome\//.test(ua)?'chrome':/FxiOS|Firefox\//.test(ua)?'firefox':/Safari\//.test(ua)?'safari':'other';
+  const touch=navigator.maxTouchPoints>0,small=Math.min(screen.width,screen.height)<=820;
+  return{os,br,kind:touch&&small?'phone':touch?'tablet':'desktop',w:innerWidth,h:innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),lang:navigator.language,
+    tz:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){return'';}})(),standalone:matchMedia('(display-mode: standalone)').matches,ref:(()=>{try{return document.referrer?new URL(document.referrer).hostname:'';}catch(e){return'';}})()};}
+const anStage=()=>{try{return modeId();}catch(e){return'';}};
+function anTrack(ev,data){if(!AN.on)return;AN.q.push({cid:AN.cid,vid:AN.vid,ev,ver:AN.ver,host:location.hostname||location.protocol.replace(':',''),stage:anStage(),data:data||{}});if(AN.q.length>=20)anFlush();}
+function anFlush(beacon){if(!AN.q.length||!AN.on)return;const body=JSON.stringify(AN.q.splice(0,50));
+  try{fetch(AN.url,{method:'POST',keepalive:!!beacon,headers:{apikey:AN.key,'Content-Type':'application/json',Prefer:'return=minimal'},body}).catch(()=>{});}catch(e){}}
+setInterval(anFlush,15000);
+addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')anFlush(true);});
+// 방문 시작
+anTrack('open',anDevice());
+// 레벨(스테이지) 진입, 세션 시작과 중간 재시작
+const ANS={stage:null,sim:null,simWall:0,firstChange:null,changes:0,lastCfg:''};
+setInterval(()=>{const id=anStage();if(id&&id!==ANS.stage){ANS.stage=id;ANS.firstChange=null;ANS.enter=Date.now();anTrack('level_start',{mobile:document.body.classList.contains('mobile'),simple:document.body.classList.contains('simple')});}
+  if(sim&&sim!==ANS.sim){if(ANS.sim&&ANS.sim.t-ANS.sim.t0<SESS_T-1&&ANS.simState==='run')anTrack('session_restart',{el:Math.round(ANS.sim.t-ANS.sim.t0)});ANS.sim=sim;ANS.simWall=Date.now();}
+  ANS.simState=state;
+  // 처음 설정을 바꾼 시점(레벨 진입 후 초): 조작을 찾는 데 걸린 시간
+  try{const c=cfgSig(cfg);if(c!==ANS.lastCfg){if(ANS.lastCfg&&ANS.firstChange==null)ANS.firstChange=Math.round((Date.now()-(ANS.enter||Date.now()))/1000);ANS.lastCfg=c;}}catch(e){}},1000);
+$('skip').addEventListener('click',()=>{if(sim)anTrack('skip',{el:Math.round(sim.t-sim.t0)});});
+window.addEventListener('session-done',ev=>{const d=ev.detail;if(!d)return;const r=d.rec,lv=curLevel(),G=lv&&lv.goals;
+  anTrack('session_end',{score:r.score,stars:r.stars,same:!!r.sameDemand,wx:d.weather,changes:(r.changes||[]).length,record:!!r.record,
+    goals:G?G.filter(g=>goalVal(g,r.st)<=g.max+1e-9).length:null,goalsN:G?G.length:null,wall:Math.round((Date.now()-ANS.simWall)/1000),first_change:ANS.firstChange,
+    spd:+r.st.spd.toFixed(1),risk:+r.st.risk.toFixed(2),peds:r.st.peds||0,sessNo:r.no,mobile:document.body.classList.contains('mobile')});});
+// 오류(같은 메시지는 한 번만)
+{const seen=new Set();addEventListener('error',e=>{const m=String(e.message||'').slice(0,200);if(!m||seen.has(m)||seen.size>10)return;seen.add(m);anTrack('error',{m,src:String(e.filename||'').split('/').pop(),line:e.lineno});});}
+// 떠날 때
+addEventListener('pagehide',()=>{anTrack('leave',{sec:Math.round((Date.now()-AN.t0)/1000),state,el:sim?Math.round(sim.t-sim.t0):null,sessNo});anFlush(true);});
+// 설정: 끄기
+{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML='<input type="checkbox" id="anon">익명 이용 통계 보내기';$('ctlbar').insertBefore(l,$('resetcfg'));
+  const c=$('anon');c.checked=AN.on;c.title='레벨 진행, 기기 종류, 화면 크기만 익명으로 보냅니다. 게임 개선에 씁니다.';
+  c.addEventListener('change',()=>{AN.on=c.checked;try{localStorage.setItem('an-off',c.checked?'0':'1');}catch(e){}if(!c.checked)AN.q=[];});}
+window.__an={get q(){return AN.q},flush:anFlush,get on(){return AN.on}};
+// ---------- 튜토리얼: 간단 화면, 행동 목표, 안내 말풍선(코치 마크) ----------
+// 간단 화면: 앞쪽 레벨(단계 0~2)에서는 스킨, 날씨, 음악, 랭킹 같은 부가 조작을 '설정 더보기' 안에 숨김
+const ADV_SEL=['#ctlbar label.skin','#ctlbar .skinchk','#btn3d','#sig'];
+ADV_SEL.forEach(q=>document.querySelectorAll(q).forEach(e=>e.classList.add('adv')));
+{const b=document.createElement('button');b.type='button';b.id='advbtn';b.textContent='설정 더보기';$('ctlbar').appendChild(b);
+  b.addEventListener('click',()=>{const on=!document.body.classList.contains('showadv');document.body.classList.toggle('showadv',on);b.textContent=on?'설정 접기':'설정 더보기';});}
+function tutSimple(){const lv=curLevel(),tut=!!lv&&lv.stage<=2,on=document.body.classList.contains('mobile')||tut;document.body.classList.toggle('simple',on);document.body.classList.toggle('tutlv',tut);}
+// 모바일: 폭 700px 이하, 또는 높이 500px 이하 가로 화면. 항상 플레이 화면으로 보고, 가로 화면은 신호 시간 막대를 접어 지도를 넓힘
+function applyMobile(){const B=document.body,m=innerWidth<=700||(innerHeight<=500&&innerWidth<=1000),land=m&&innerWidth>innerHeight,was=B.classList.contains('mobile'),wasL=B.classList.contains('land');
+  B.classList.toggle('mobile',m);B.classList.toggle('land',land);
+  if(m&&!playMode)setPlayMode(true);
+  if(m&&land&&!wasL&&!$('dock').classList.contains('min'))$('dockh').click();
+  if(was!==m||wasL!==land){tutSimple();requestAnimationFrame(()=>{resize();positionArms();});}}
+addEventListener('resize',applyMobile);addEventListener('orientationchange',()=>setTimeout(applyMobile,200));applyMobile();
+
+// 행동 목표: 점수 대신 눈에 보이는 목표. 진행 중에는 지금까지 값, 끝나면 시드 3개 평균
+// 함수 선언으로 둠: 화면 초기화 중(이 파일이 실행되기 전)에도 호출될 수 있음
+function goalTxt(g){return g.k==='q'?`${NAME[g.a]} 최대 대기열 ${g.max}대 이하`:g.k==='det'?(g.max?`우회 차량 ${g.max}대 이하`:'우회 차량 0대'):g.k==='risk'?`기대 사고 ${g.max}건 이하`:g.k==='pedW'?`보행자 평균 대기 ${g.max}초 이하`:`1인당 지연 ${g.max}초 이하`;}
+function goalVal(g,st){return g.k==='q'?(st.byA&&st.byA[g.a]?st.byA[g.a].q:0):g.k==='det'?st.det:g.k==='risk'?st.risk:g.k==='pedW'?(st.pedW||0):st.dly;}
+function goalFmt(g,v){return g.k==='risk'?(+v).toFixed(2):Math.round(v);}
+function goalsOf(){const lv=curLevel();if(!lv)return null;return lv&&lv.goals&&sim&&demandSig(sim.cfg)===demandSig(baseCfg())?lv.goals:null;}
+function goalHTML(st){const G=goalsOf();if(!G)return'';
+  return`<div class="goals"><div class="gh">목표</div>${G.map(g=>{const v=goalVal(g,st),ok=v<=g.max+1e-9;return`<div class="g ${ok?'ok':'no'}"><i>${ok?'✓':'·'}</i><span>${goalTxt(g)}</span><b>${goalFmt(g,v)}</b></div>`;}).join('')}</div>`;}
+function goalResultHTML(rec){const lv=curLevel();if(!lv||!lv.goals||!rec.sameDemand)return'';const G=lv.goals,res=G.map(g=>({g,v:goalVal(g,rec.st)})),n=res.filter(r=>r.v<=r.g.max+1e-9).length;
+  return`<div class="goalres"><b>목표 ${n} / ${G.length} 달성</b>${res.map(r=>`<span class="${r.v<=r.g.max+1e-9?'ok':'no'}">${r.v<=r.g.max+1e-9?'✓':'✗'} ${goalTxt(r.g)} (${goalFmt(r.g,r.v)})</span>`).join('')}</div>`;}
+window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!d||!lv||!lv.goals||!d.rec.sameDemand)return;
+  const all=lv.goals.every(g=>goalVal(g,d.rec.st)<=g.max+1e-9),k='goal-v1',seen=store.get(k)||{};
+  if(all&&!seen[lv.id]){seen[lv.id]=1;store.set(k,seen);setTimeout(()=>{fxBubble(cw/2,ch/2-40,'목표 달성!','big');fxConfetti();fxSound('fanfare');},300);}});
+
+// 안내 말풍선: 레벨에 처음 들어왔을 때 새 조작을 가리킴. 대상이 화면에 나타날 때까지 기다렸다가 표시
+const COACH={
+ '0-1':[{sel:'#tl .h',t:'이 손잡이를 좌우로 끌면 남북과 동서의 녹색 시간이 나뉩니다. 차가 많은 남북 쪽에 녹색을 더 주세요.'},
+        {sel:'#gauge',t:'바늘이 흐름 점수입니다. 손잡이를 움직이면 바로 다시 계산되고, 오른쪽 별 쪽으로 갈수록 좋습니다. 바꾼 신호는 다음 주기부터 화면에도 바로 적용돼요.'},
+        {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 5분을 기다리지 않아도 됩니다.'}],
+ '0-4':[{sel:'#gauge',t:'계기판이 빨간 정체 상태입니다. 실제 토론토 교통량에 맞게 녹색을 다시 나눠 정체부터 풀어 보세요.'}],
+ '1-1':[{sel:'#cyc',t:'이제 주기 길이를 바꿀 수 있습니다. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
+ '2-1':[{sel:'#arm-N',t:'접근로 버튼을 누르면 차로마다 용도(좌회전, 직진, 우회전)를 바꿀 수 있습니다.'}],
+ '3-1':[{sel:'#phbtn',t:'신호 구성 편집에서 현시마다 녹색을 줄 이동류를 고를 수 있습니다.'}],
+ '4-1':[{sel:'#arm-N',t:'북측 차로 버튼을 눌러 1차로에서 유턴도 할 수 있게 바꿔 보세요.'}],
+ '4-2':[{sel:'#arm-S',t:'접근로 창에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
+ '5-1':[{sel:'#tl .h',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 다 건널 만큼 동서 녹색을 늘려 주세요.'}],
+ '5-2':[{sel:'#phbtn',t:'신호 구성 편집에서 보행 전용 현시를 넣을 수 있습니다.'}]};
+const coach={id:null,steps:null,i:0,el:null};
+const coachBox=(()=>{const d=document.createElement('div');d.className='coach';d.hidden=true;d.innerHTML='<div class="ring"></div><div class="cb"><p></p><div class="cbb"><button type="button" class="cskip">그만 보기</button><button type="button" class="cnext primary">알겠어요</button></div></div>';document.body.appendChild(d);return d;})();
+function coachSeen(){return store.get('coach-v1')||{};}
+function coachStart(id,force){const steps=COACH[id];coachBox.hidden=true;coach.id=id;coach.steps=null;if(!steps)return;if(!force&&coachSeen()[id])return;coach.steps=steps;coach.i=0;}
+function coachDone(skipped){if(coach.steps)anTrack('coach',{id:coach.id,step:coach.i,n:coach.steps.length,skipped:skipped===true});const s=coachSeen();s[coach.id]=1;store.set('coach-v1',s);coach.steps=null;coachBox.hidden=true;}
+function coachNext(){coach.i++;coachBox.hidden=true;if(!coach.steps||coach.i>=coach.steps.length)coachDone();}
+coachBox.querySelector('.cnext').addEventListener('click',coachNext);coachBox.querySelector('.cskip').addEventListener('click',()=>coachDone(true));
+document.addEventListener('pointerdown',e=>{if(coach.steps&&coach.el&&!coachBox.hidden&&coach.el.contains(e.target))setTimeout(coachNext,250);},true);
+function coachTick(){const id=curLevel()?curLevel().id:null;if(id!==coach.id){coachStart(id);tutSimple();}
+  if(!coach.steps||!introBox.hidden)return;
+  const st=coach.steps[coach.i];if(!st)return;const el=document.querySelector(st.sel);
+  const r=el&&el.getBoundingClientRect(),vis=r&&r.width>0&&r.height>0&&el.offsetParent!==null&&r.bottom>0&&r.top<innerHeight&&($('modal').hidden||$('modal').contains(el));
+  if(!vis){coachBox.hidden=true;coach.el=null;return;}
+  coach.el=el;coachBox.hidden=false;const ring=coachBox.querySelector('.ring'),cb=coachBox.querySelector('.cb');coachBox.querySelector('p').textContent=st.t;
+  const pad=6;Object.assign(ring.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
+  const w=Math.min(300,innerWidth-24),h=cb.offsetHeight||90;let x=Math.max(12,Math.min(innerWidth-w-12,r.left+r.width/2-w/2)),y=r.top-h-16;if(y<10)y=r.bottom+16;
+  Object.assign(cb.style,{left:x+'px',top:y+'px',width:w+'px'});}
+setInterval(()=>{try{coachTick();}catch(e){}},300);
+// 다시 보기 버튼(레벨 칩 옆)
+{const b=document.createElement('button');b.type='button';b.id='coachbtn';b.className='chip';b.textContent='도움말';$('hudtop').appendChild(b);
+  b.addEventListener('click',()=>{const lv=curLevel();if(!lv)return;if(COACH[lv.id])coachStart(lv.id,true);else fxBubble(cw/2,90,lv.goal,'big');});}
+tutSimple();
+
+// 첫 방문 소개: 게임의 목적(실제 교차로의 정체를 푸는 것)과 장 구성을 먼저 보여 줌
+const introBox=(()=>{const d=document.createElement('div');d.className='intro';d.hidden=true;
+  d.innerHTML=`<div class="ib"><h2>교통 관제 엔지니어가 되어 보세요</h2>
+  <p>서울 강남역, 이스탄불, 토론토, 런던, 도쿄. 세계에서 손꼽히게 막히는 실제 교차로들이 기다리고 있습니다. 실제 교통량 자료로 만든 교차로의 신호와 차로를 바꿔 <b>정체를 푸는 것</b>이 최종 목표입니다.</p>
+  <div class="road">${STAGES.map(s=>`<span>${s.name}</span>`).join('<i></i>')}<i></i><span class="end">실제 교차로 5곳</span></div>
+  <p class="sm">장마다 도구가 하나씩 늘어납니다. 화면 위 계기판 바늘을 별 쪽으로 보내면 됩니다.</p>
+  <button type="button" class="primary">1장 시작</button></div>`;document.body.appendChild(d);
+  d.querySelector('button').addEventListener('click',()=>{d.hidden=true;store.set('intro-v1',1);if(!curLevel()||curLevel().id!=='0-1')loadMode({kind:'level',idx:0});anTrack('coach',{id:'intro',step:1,n:1,skipped:false});});return d;})();
+if(!store.get('intro-v1'))introBox.hidden=false;
 })();
 </script>
 <script>
@@ -1970,7 +2329,7 @@ window.__wxDraw=dt=>{const s=g().sim;if(!s)return;const k=(s.cfg&&s.cfg.wx)||'cl
 // 랭킹: Supabase(익명 로그인 + scores 표). 공개 키만 씀(행 수준 보안으로 본인 점수만 올릴 수 있음)
 // 올린 기록은 '검증 대기'(pending)로 들어가고, GitHub Actions가 엔진으로 다시 계산해 '확정'(verified)한 기록만 랭킹에 보임
 (()=>{
-const URL_='https://qjguvtmkrkbtpvdnyelp.supabase.co',KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',VER='v0.18';
+const URL_='https://qjguvtmkrkbtpvdnyelp.supabase.co',KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',VER='v0.19';
 const $=id=>document.getElementById(id),g=()=>window.__g;
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

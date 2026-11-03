@@ -61,10 +61,11 @@ async function main(){
   for(const r of rows){if(Date.now()-t0>TIME_BUDGET){console.log('시간 예산 소진, 나머지는 다음 실행에서');break;}
     const why=check(r.stage_id,r.weather,r.cfg);let patch;
     if(why){patch={status:'rejected',note:why};no++;}
-    else{const t=Date.now(),ev=E.evalCfg(r.cfg),st=ev.st;
+    else{const t=Date.now(),ev=E.evalCfg(r.cfg),st=ev.st,lv=r.stage_id.startsWith('L')&&E.LEVELS.find(l=>'L'+l.id===r.stage_id);
+      if(lv&&lv.jam&&st.peakQ>=lv.jam){patch={status:'rejected',note:`정체 발생(대기열 ${st.peakQ}대)`,claimed_score:r.score,score:ev.score};no++;}else{
       patch={status:'verified',claimed_score:r.score,score:ev.score,persons:st.persons,speed:+st.spd.toFixed(2),risk:+st.risk.toFixed(3),
         note:(ev.score!==r.score?`제출 ${r.score}점, 재계산 ${ev.score}점`:'일치')+(r.version!==E.VER?`, 제출 버전 ${r.version}, 검증 엔진 ${E.VER}`:''),};ok++;
-      console.log(`  #${r.id} ${r.stage_id} 제출 ${r.score} -> ${ev.score} (${Date.now()-t}ms)`);}
+      console.log(`  #${r.id} ${r.stage_id} 제출 ${r.score} -> ${ev.score} (${Date.now()-t}ms)`);}}
     patch.verified_at=new Date().toISOString();
     if(DRY)console.log('  [dry]',r.id,patch.status,patch.note);else await api(`scores?id=eq.${r.id}`,{method:'PATCH',body:JSON.stringify(patch)});}
   console.log(`확정 ${ok}건, 거절 ${no}건, ${((Date.now()-t0)/1000).toFixed(0)}초`);}
