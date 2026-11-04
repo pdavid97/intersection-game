@@ -385,12 +385,48 @@ body.mobile .gauge{width:136px;padding:4px 6px 5px}body.mobile .gauge .gs{font-s
 .intro .road{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 14px}.intro .road span{font-size:12px;padding:4px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
 .intro .road i{width:10px;height:2px;background:var(--line)}.intro .road .end{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700}
 .intro button{width:100%;min-height:42px;font-size:15px}
+
+.gauge.none .needle,.gauge.none .ghost{opacity:0}.gauge.none .gs{color:var(--muted)}
+.tries{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;padding:8px 12px;border-radius:10px;background:var(--panel2);font-size:13px;color:var(--muted)}
+.tries.out{color:var(--fg);border:1px solid var(--accent)}
+.nextq{margin:10px 0;padding:12px 14px;border-radius:12px;background:rgba(242,182,50,.12);border:1px solid var(--accent);display:flex;flex-direction:column;gap:6px}
+.nextq b{font-size:15px}.nextq span{font-size:13px;color:var(--muted)}.nextq div{display:flex;gap:8px;flex-wrap:wrap}
+
+.row2{display:flex;gap:8px;flex-wrap:wrap}.row2 button{min-height:38px}
+/* AI 기능: 시민, 코치, 라이벌 */
+.cav,.aiav{flex:none;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;background:#f7d9a8;color:#5a3d2b;border:2px solid #e9b872}
+.aiav{background:#1f3b57;color:#9fd4ff;border-color:#3d7bb0;font-size:12px;letter-spacing:.5px}
+.cit{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+.cit p{margin:3px 0 6px;line-height:1.45}.cit .cwho{font-size:12px;color:var(--muted)}.cit .cwho b{color:var(--fg)}
+.cit.m-great,.cit.m-good{border-color:#4f9d69}.cit.m-bad,.cit.m-jam{border-color:#b5524c}
+.cit.brief{margin:0 0 10px}.cit.brief p{margin-bottom:0}
+.cmet{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.06);color:var(--muted)}
+.cmet.up{color:#7bd389;background:rgba(123,211,137,.12)}.cmet.down{color:#ef8a80;background:rgba(239,90,80,.12)}
+.citcard{position:absolute;left:10px;top:72px;z-index:6;max-width:min(330px,calc(100% - 20px));display:flex;gap:10px;align-items:flex-start;background:#fffaf0;color:#2b2118;border-radius:14px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:13.5px;line-height:1.45;animation:citin .35s ease-out}
+.citcard p{margin:3px 0 0}.citcard .cwho{font-size:12px;color:#7a6250;display:flex;align-items:center;gap:4px}.citcard .cwho b{color:#2b2118}
+.citcard .cx{margin-left:auto;background:none;border:0;color:#7a6250;font-size:16px;padding:0 4px;line-height:1}
+@keyframes citin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.aicoach{background:linear-gradient(180deg,rgba(61,123,176,.14),rgba(61,123,176,.05));border:1px solid #2f5677;border-radius:10px;padding:10px 12px;margin:10px 0}
+.aicoach .ach{display:flex;align-items:center;gap:8px}.aicoach .ach .aiav{width:26px;height:26px;font-size:10px}.aicoach .src{margin-left:auto;color:var(--muted);font-size:11px}
+.aicoach .act{margin:8px 0;line-height:1.55}
+.ahints{display:flex;gap:6px;flex-wrap:wrap}.ahints button{font-size:12.5px;padding:5px 10px}.ahints button:disabled{opacity:.5;cursor:default}
+.ahout{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.18);line-height:1.5;font-size:13px}.ahout small{color:var(--muted)}
+.ahout .spin{display:inline-block;min-width:34px;color:#9fd4ff;font-variant-numeric:tabular-nums}
+.rival{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;background:var(--panel2)}
+.rival.won{border-color:#f3b531;box-shadow:0 0 0 1px rgba(243,181,49,.35) inset}
+.rival .rh{display:flex;align-items:center;gap:10px}.rival .rh small{display:block;color:var(--muted);font-size:11.5px}.rival .rh em{margin-left:auto;font-style:normal;font-weight:800;font-size:18px;color:#9fd4ff}
+.rbar{position:relative;height:18px;border-radius:99px;background:rgba(255,255,255,.06);margin:9px 0 6px;overflow:hidden}
+.rbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#3d7bb0,#f3b531);border-radius:99px}.rbar span{position:relative;font-size:11.5px;padding-left:8px;line-height:18px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.rival .rmsg{font-size:13px;margin-bottom:6px}.rival button{font-size:12.5px;padding:5px 10px}.rival .rlock{color:var(--muted);font-size:11.5px}
+.airv{color:#9fd4ff}
+.gauge .ticks text.aitk{fill:#9fd4ff;font-size:7.5px}
+body.mobile .citcard{top:64px;font-size:12.5px}
 </style>
 
 <div class="wrap">
   <header>
     <h1>교차로 신호 <span>퍼즐</span></h1>
-    <div class="sub">프로토타입 v0.19. 교차로 위에서 바로 조작하세요. 접근로 버튼은 차로, 교차로 가운데는 신호 구성, 아래 막대는 신호 시간입니다.</div>
+    <div class="sub">프로토타입 v0.20. 교차로 위에서 바로 조작하세요. 접근로 버튼은 차로, 교차로 가운데는 신호 구성, 아래 막대는 신호 시간입니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -414,17 +450,17 @@ body.mobile .gauge{width:136px;padding:4px 6px 5px}body.mobile .gauge .gs{font-s
         <div class="seg" role="group" aria-label="배속">
           <button data-sp="1">1x</button><button data-sp="4" class="on">4x</button><button data-sp="16">16x</button>
         </div>
-        <button id="skip" title="지금 설정으로 점수를 확정합니다(5분을 기다리지 않음)">이 설정으로 확정</button>
+        <button id="skip" title="지금 설정으로 확정합니다(세션 1번 사용)">이 설정으로 확정</button>
         <button id="mapzoom" hidden>지도 넓게 보기</button>
         <button id="btn3d" hidden>3D 보기</button>
         <label class="skin"><span>스킨</span><select id="skinsel" aria-label="교차로 화면 스킨"></select></label>
         <label class="chk sm skinchk"><input type="checkbox" id="spdcol">차로 정체 색</label>
-        <button id="newsess">새 세션 시작</button>
+        <button id="newsess" title="지금 설정으로 3분 관찰을 처음부터 다시 봅니다(세션을 쓰지 않음)">관찰 다시 시작</button>
         <label class="skin" id="wxlbl" title="날씨는 차량 속도, 차간 간격, 가감속, 사고 위험에 영향을 줍니다. 별과 순위는 맑음 기준에서만 집계합니다."><span>날씨</span><select id="wxsel" aria-label="날씨"></select></label>
         <button id="resetcfg" title="이 스테이지의 차로, 신호, 비보호 등 모든 설정을 처음 상태로 되돌립니다">처음 설정으로</button>
         <span class="status" id="sig">신호</span>
       </div>
-      <div class="pending" id="pending" hidden><span>설정이 바뀌었습니다. 새 세션을 시작하면 적용되고, 이번 세션과 비교할 수 있습니다.</span><button id="applynow" class="primary">적용하고 새 세션</button></div>
+      <div class="pending" id="pending" hidden><span>도로 구조(차로, 통행 방향 등)가 바뀌었습니다. 화면에 보려면 관찰을 다시 시작하세요. 확정은 지금 설정 그대로 할 수 있습니다.</span><button id="applynow" class="primary">바꾼 도로로 다시 관찰</button></div>
       <div class="legend">
         <span><i style="background:hsl(130,62%,52%)"></i>원활</span>
         <span><i style="background:hsl(45,80%,55%)"></i>서행</span>
@@ -1008,11 +1044,10 @@ const LEVELS=[
   story:'남북 합계는 동서와 비슷하지만, 북측에서만 차가 쏟아집니다. 남측은 한산합니다.',
   goal:'남북 녹색 시간을 무엇에 맞춰야 하는지 찾아보세요.',
   hint:'신호 시간은 방향의 평균이 아니라 가장 붐비는 차로를 기준으로 정합니다. 교통공학에서는 이것을 임계 차로라고 부릅니다.',goals:[{k:'q',a:'N',max:19},{k:'dly',max:16}],stars:[522,590,639]},
- {id:'0-4',stage:0,jam:15,title:'실제 교차로: 토론토 레이크쇼어',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:40,EW_T:20},
-  appr:{N:[355,0,10,'T','TR'],S:[322,0,10,'T','TR'],E:[1326,0,10,'T','TR'],W:[891,0,10,'T','TR']},
-  story:'1장의 마지막은 실제 교차로입니다. 토론토 호숫가 레이크쇼어 대로와 파를러먼트 거리, 2022년 토론토 혼잡 교차로 10위입니다. 교통량은 토론토시가 2024년 6월에 실제로 센 출근 시간 값(동쪽에서 시간당 1,326대)이고, 1장에서는 좌회전 없이 직진과 우회전만 남겨 단순하게 만들었습니다. 지금 신호는 차가 적은 남북에 녹색을 두 배로 주고 있어 동쪽 대기열이 넘칩니다.',
-  goal:'정체를 풀고 별 3개에 도전하세요. 엔드게임에서는 같은 교차로를 좌회전, 차로, 보행자까지 모두 다뤄 다시 풉니다.',
-  hint:'실제 교통량 비율을 보세요. 동서 합계가 남북의 3배가 넘습니다. 녹색도 그 비율에 가깝게 나눠야 합니다.',goals:[{k:'q',a:'E',max:12},{k:'dly',max:16}],stars:[368,577,756]},
+ {id:'0-4',stage:0,real:'gangnam',title:'실제 교차로: 서울 강남역 사거리',unlock:['split'],
+  story:'1장의 마지막은 실제 교차로입니다. 강남대로와 테헤란로, 서초대로가 만나는 강남역 사거리를 서울시 실측 교통량(평일 오전 8~9시)과 실제 차로, 신호 구조 그대로 옮겼습니다. 네 방향이 차례로 직진과 좌회전을 함께 받는 4현시 신호입니다. 지금은 1장에서 배운 신호 나누기만 할 수 있습니다.',
+  goal:'주기는 그대로 두고, 네 현시의 녹색 시간만 다시 나눠 흐름 점수를 올리세요.',
+  hint:'접근로 버튼의 대기 대수와 화면 밖 대기 차량(+N)을 보세요. 계속 쌓이는 방향의 현시에 녹색을 몇 초씩 옮기면 됩니다. 실제 교차로는 교통량이 많아서 별 기준이 빡빡합니다.',stars:[366,401,432]},
  {id:'1-1',stage:1,title:'한밤의 교차로',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:56,EW_T:56},
   appr:{N:[220,0,10,'T','TR'],S:[220,0,10,'T','TR'],E:[220,0,10,'T','TR'],W:[220,0,10,'T','TR']},
   story:'자정의 교차로. 차는 거의 없는데 신호 주기가 120초라 빈 도로 앞에서 1분 가까이 기다립니다.',
@@ -1023,6 +1058,15 @@ const LEVELS=[
   story:'모든 방향이 붐비는 저녁 퇴근길. 그런데 주기가 40초밖에 안 돼서 신호가 너무 자주 바뀝니다.',
   goal:'주기 길이와 비중을 함께 조정해 교차로가 감당할 수 있는 양을 늘리세요.',
   hint:'현시가 바뀔 때마다 황색 3초와 전적색 1초, 출발 지연이 생깁니다. 주기가 짧으면 이 손실의 비율이 커집니다. 다만 너무 길면 대기가 다시 늘어납니다.',goals:[{k:'dly',max:23}],stars:[799,869,910]},
+ {id:'1-3',stage:1,title:'너무 긴 주기, 한쪽으로 쏠린 교통',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:66,EW_T:66},
+  appr:{N:[900,0,10,'T','TR'],S:[850,0,10,'T','TR'],E:[450,0,10,'T','TR'],W:[420,0,10,'T','TR']},
+  story:'신호 주기가 140초나 되고 남북과 동서에 똑같이 나눠져 있습니다. 그런데 남북 교통량이 동서의 두 배입니다. 차들은 빈 도로 앞에서 1분 넘게 기다리고, 남북은 녹색이 끝나기 전에 줄이 다시 길어집니다.',
+  goal:'주기 길이와 신호 비중을 함께 조정하세요. 2장에서 배운 두 가지를 같이 쓰는 복습 레벨입니다.',
+  hint:'먼저 주기를 줄여 기다리는 시간 자체를 줄이고, 그다음 남북에 녹색을 더 주세요. 주기가 너무 짧으면 황색과 전적색 손실이 커집니다.',goals:[{k:'dly',max:16},{k:'q',a:'N',max:10}],stars:[490,582,662]},
+ {id:'1-4',stage:1,real:'toronto',title:'실제 교차로: 토론토 레이크쇼어',unlock:['split','cycle'],
+  story:'2장의 마지막은 토론토 호숫가 레이크쇼어 대로와 파를러먼트 거리입니다. 2022년 토론토 혼잡 교차로 10위이고, 교통량은 토론토시가 2024년 6월에 실제로 센 출근 시간 값입니다. 동서 좌회전 보호, 동서 직진, 남북 순서의 3현시 신호입니다. 지금은 신호 비중과 주기 길이만 바꿀 수 있습니다.',
+  goal:'주기 길이와 녹색 배분을 실제 교통량에 맞게 다듬어 흐름 점수를 올리세요.',
+  hint:'동쪽에서 시간당 1,326대가 들어옵니다. 동서 직진 현시의 비중과 주기 길이를 함께 보세요.',stars:[280,292,302]},
  {id:'2-1',stage:2,title:'직진이 몰린다',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:24,N_A:22,EW_T:20},
   appr:{N:[700,10,10,'L','TR'],S:[750,10,10,'L','TR'],E:[300,0,10,'T','TR'],W:[300,0,10,'T','TR']},
   story:'남북은 방향별로 직진과 좌회전을 함께 내보내는 직좌 동시 신호입니다. 그런데 1차로가 좌회전 전용이라 좌회전 10%를 위해 차로 하나를 비워두고 있습니다.',
@@ -1038,6 +1082,10 @@ const LEVELS=[
   story:'네 방향 모두 방향별 직좌 동시 신호입니다. 북측은 좌회전이 많고, 남측은 직진 위주, 동측은 우회전이 많고, 서측은 좌회전이 아예 없습니다. 그런데 차로 배정은 모두 똑같습니다.',
   goal:'접근로마다 수요에 맞게 차로를 나누고, 그다음 신호 비중과 주기를 다듬으세요.',
   hint:'한 번에 한 접근로씩 바꾸고 세션 결과를 비교하면 무엇이 효과가 있었는지 알 수 있습니다.',goals:[{k:'q',a:'S',max:20},{k:'dly',max:45}],stars:[135,209,275]},
+ {id:'2-4',stage:2,real:'london',title:'실제 교차로: 런던 노스서큘러',unlock:['split','cycle','lanes'],
+  story:'3장의 마지막은 런던 북부 순환도로 A406과 A109가 만나는 뉴사우스게이트 교차로입니다. 2016년 영국 정체 상위 10곳 중 8위로 꼽힌 곳이고, 교통량은 영국 교통부의 실제 계수값입니다. 영국은 좌측 통행이라 우회전이 맞은편 차로를 가로지릅니다. 지금은 신호 시간과 차로 배정만 바꿀 수 있습니다.',
+  goal:'차로 용도를 실제 회전 수요에 맞게 정리하고 신호를 다듬어 흐름 점수를 올리세요.',
+  hint:'좌측 통행에서는 우회전이 어려운 회전입니다. 우회전 대기 차량이 직진 차로를 막고 있지 않은지 보세요.',stars:[567,612,650]},
  {id:'3-1',stage:3,title:'사라진 직진 신호',unlock:['split','cycle','phases'],
   phases:[{m:['NL','NT','NR'],g:22},{m:['SL','SR'],g:20},{m:['ET','ER','WT','WR'],g:20}],
   appr:{N:[700,10,10,'LT','TR'],S:[800,10,10,'LT','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
@@ -1049,6 +1097,16 @@ const LEVELS=[
   story:'남북 1차로는 좌회전과 직진을 함께 쓰는 겸용 차로입니다. 그런데 신호는 좌회전과 직진을 따로 내보냅니다. 맨 앞 차가 다른 신호를 기다리는 동안 뒤차가 막히고, 참다못한 차가 옆 차로로 끼어들다 사고가 납니다.',
   goal:'차로는 그대로 두고, 신호 구성을 바꿔 겸용 차로가 막히지 않게 하세요.',
   hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. 남북 현시를 접근로별로 나눠 보세요.',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
+ {id:'3-3',stage:3,title:'위험한 비보호 좌회전',unlock:['split','cycle','phases','perm'],perm:{N:1,S:1},
+  phases:[{m:['NT','NR','ST','SR'],g:30},{m:['ET','ER','WT','WR'],g:24}],
+  appr:{N:[700,30,10,'L','TR'],S:[750,30,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
+  story:'남북 차량의 30%가 좌회전하는데 좌회전 신호가 따로 없어서, 모두 맞은편 직진 차량 틈을 노려 비보호로 돕니다. 틈은 거의 없고, 무리하게 도는 차 때문에 사고 위험이 큽니다.',
+  goal:'현시를 설계해 좌회전에 안전한 신호를 주세요. 비보호 좌회전을 계속 쓸지도 정할 수 있습니다.',
+  hint:'남북 좌회전 둘은 서로 부딪히지 않습니다. 좌회전만 함께 나가는 현시를 하나 만들어 보세요. 그다음 비보호를 끄면 위험이 사라집니다.',goals:[{k:'risk',max:0.1},{k:'dly',max:26}],stars:[325,392,449]},
+ {id:'3-4',stage:3,real:'edirnekapi',title:'실제 교차로: 이스탄불 에디르네카프',unlock:['split','cycle','phases'],
+  story:'4장의 마지막은 이스탄불 구시가 성벽의 에디르네 문 앞 교차로입니다. 이스탄불은 INRIX 2025 기준 세계에서 정체가 가장 심한 도시입니다. 남북 직진은 지하차도로 빠지고, 지상에서는 동서 직진과 남북 좌회전이 신호를 나눠 씁니다. 지금은 신호 시간과 현시 구성만 바꿀 수 있습니다.',
+  goal:'현시 구성을 다시 설계해 흐름 점수를 올리세요.',
+  hint:'동서 직진이 시간당 2,000대가 넘습니다. 같은 현시에 함께 보낼 수 있는 이동류를 찾아 현시 수를 줄이거나 동서에 녹색을 더 주세요.',stars:[762,791,815]},
  {id:'4-1',stage:4,title:'돌아가야 하는 차들',unlock:['lanes','uturn','split'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:30,NS_L:12,EW_T:24},
   appr:{N:[800,10,10,'L','TR'],S:[750,12,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},pu:{N:15,S:6},
   story:'북쪽 길가에 대형 쇼핑몰 주차장 입구가 있어서, 북측에서 오는 차 중 15%가 교차로에서 유턴해 되돌아갑니다. 그런데 북측 1차로는 좌회전 전용이라 유턴을 할 수 없어, 이 차량들이 모두 블록을 돌아 우회합니다.',
@@ -1059,6 +1117,15 @@ const LEVELS=[
   story:'출근 시간 남북 도로는 북쪽 도심으로 가는 차가 몰립니다. 남측에서 시간당 2,000대가 2개 차로로 밀려드는데, 반대 방향(북측에서 오는 차)은 60대뿐입니다. 남측 반대편 2개 차로는 거의 비어 있습니다.',
   goal:'남북 도로를 북쪽으로만 가는 일방통행으로 바꿔 보세요. 남측은 \'들어오는 방향만\', 북측은 \'나가는 방향만\'으로 하면 양쪽 모두 4개 차로가 됩니다. 대신 남쪽으로 가려던 차량은 우회합니다.',
   hint:'남측만 바꾸면 4개 차로가 북쪽 출구 2개 차로로 몰려 다시 막힙니다. 북측도 함께 바꿔 출구를 넓히고, 늘어난 처리량에 맞춰 남북 신호 비중을 키워 보세요.',goals:[{k:'q',a:'S',max:40},{k:'dly',max:36}],stars:[322,442,544]},
+ {id:'4-3',stage:4,title:'한쪽으로 쏟아지는 대로',unlock:['oneway','uturn','lanes','split','cycle'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:26,NS_L:10,EW_T:30},
+  appr:{N:[500,5,5,'T','TR'],S:[600,10,5,'L','TR'],E:[1700,5,5,'T','TR'],W:[80,5,5,'T','TR']},pu:{S:12},
+  story:'저녁 퇴근길, 동서 대로는 서쪽 주거지로 가는 차가 동측에서 시간당 1,700대 몰려옵니다. 반대 방향은 80대뿐입니다. 남측 차량 12%는 길 건너 주유소로 유턴하려는데 1차로가 좌회전 전용이라 모두 돌아갑니다.',
+  goal:'5장에서 배운 일방통행과 유턴을 함께 써서 정체와 우회를 줄이세요.',
+  hint:'동측을 들어오는 방향만, 서측을 나가는 방향만으로 바꾸면 서쪽으로 4개 차로가 생깁니다. 남측 1차로는 좌회전 + 유턴으로 바꿔 보세요.',goals:[{k:'q',a:'E',max:15},{k:'det',max:30}],stars:[280,350,410]},
+ {id:'4-4',stage:4,real:'tokyo',title:'실제 교차로: 도쿄 오하라',unlock:['split','cycle','lanes','uturn','oneway'],
+  story:'5장의 마지막은 도쿄 환상7호선과 고슈가도가 만나는 오하라 교차로입니다. 2021년 일본에서 인신사고가 가장 많았던 교차로(29건)이고, 고슈가도 쪽 우회전 대기열이 직진 차로를 막는 정체로 알려져 있습니다. 일본은 좌측 통행입니다. 지금은 신호 시간, 차로, 유턴, 통행 방향만 바꿀 수 있습니다.',
+  goal:'차로와 통행 방향을 바꿔 우회전 대기열이 직진을 막지 않게 하고 흐름 점수를 올리세요.',
+  hint:'좌측 통행에서 우회전은 맞은편을 가로지르는 어려운 회전입니다. 우회전 전용 차로를 어디에 둘지 보세요.',stars:[239,341,428]},
  {id:'5-1',stage:5,title:'건너지 못하는 사람들',unlock:['split','cycle'],
   phases:[{m:['NT','NR','ST','SR'],g:46},{m:['ET','ER','WT','WR'],g:6}],
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},ped:{N:700,S:700,E:80,W:80},
@@ -1071,11 +1138,22 @@ const LEVELS=[
   story:'번화가 한복판 사거리입니다. 네 방향 모두 횡단보도마다 시간당 1,400명이 건너고, 차량 절반 가까이가 우회전해 상가 골목으로 들어갑니다. 우회전 차량이 끝없이 이어지는 보행자 앞에서 멈춰 서고, 뒤따르는 직진 차량까지 막힙니다.',
   goal:'보행 신호 방식을 바꿀 수 있습니다. 모든 차량을 세우고 사람만 건너는 보행 전용 현시(스크램블)를 넣어 보세요.',
   hint:'보행 전용 현시를 넣고 차량 신호와 함께 건너는 동시 횡단을 끄면, 우회전 차량은 보행자 없이 돌 수 있습니다. 대각선으로 가는 사람도 한 번에 건너서 대기가 줄어듭니다. 대신 주기가 길어지니 각 현시 시간을 다시 다듬으세요.',goals:[{k:'dly',max:28},{k:'risk',max:0.1}],stars:[482,711,907]},
+ {id:'5-3',stage:5,title:'너무 긴 보행 전용 신호',unlock:['split','cycle','ped'],pedConc:false,
+  phases:[{m:['NT','NR','ST','SR'],g:22},{m:['ET','ER','WT','WR'],g:20},{m:[],g:40,x:true}],
+  appr:{N:[600,0,35,'T','TR'],S:[600,0,35,'T','TR'],E:[550,0,35,'T','TR'],W:[550,0,35,'T','TR']},ped:{N:1000,S:1000,E:1000,W:1000},
+  story:'번화가 사거리에 보행 전용 신호(스크램블)를 넣었는데, 담당자가 넉넉하게 40초를 줬습니다. 사람들은 15초면 다 건너는데, 남은 시간 동안 모든 차가 빈 횡단보도 앞에서 서 있습니다.',
+  goal:'보행자가 안전하게 건널 만큼만 보행 전용 시간을 남기고, 나머지를 차량에 돌려주세요.',
+  hint:'횡단보도 길이를 걷는 속도(초당 1~1.5m)로 나누면 필요한 보행 시간이 나옵니다. 너무 줄이면 건너던 사람이 남아 위험이 생깁니다.',goals:[{k:'dly',max:24},{k:'pedW',max:35}],stars:[609,746,863]},
+ {id:'5-4',stage:5,real:'gangnam',title:'실제 교차로: 강남역 사거리, 사람과 함께',unlock:['split','cycle','ped'],
+  story:'마지막 장의 마지막은 다시 강남역 사거리입니다. 이번에는 횡단보도를 건너는 사람까지 함께 봅니다. 출근 시간 각 횡단보도로 시간당 650~750명이 건넌다고 추정했습니다(서울시 유동인구조사 기반). 지금은 신호 시간, 주기, 보행 신호 방식만 바꿀 수 있습니다.',
+  goal:'차량과 보행자 모두 덜 기다리게 해서 흐름 점수를 올리세요.',
+  hint:'주기가 길면 보행자도 오래 기다립니다. 보행 전용 현시가 이득인지, 동시 횡단이 나은지 비교해 보세요.',stars:[355,379,400]}
 ];
 function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,pl,pr]=s.appr[a];appr[a]={vph,pl,pr,lanes:['L','TR'],perm:false};}
   return{geo:clone(GEO2),phases:templatePhases('protL','protL',DEFAULT_PLAN),scheme:{NS:'protL',EW:'protL'},yellow:3,rtor:false,appr};}
-function levelCfg(lv){const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];}
-  if(lv.phases)return{geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};
+// lv.real: 장 마지막 스테이지(실제 교차로). 도로, 교통량, 신호는 실제 자료 그대로, 조작은 lv.unlock만 열림
+function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
+  if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
 </script>
 <script>
@@ -1097,7 +1175,8 @@ function setHand(on){on=!!on;MX=on?-1:1;NAME.E=on?'서측':'동측';NAME.W=on?'�
 let wideMap=false,mode={kind:'level',idx:0},scenKey='nsPeak',cfg,sim,baseline=null,running=true,speed=4,state='run',history=[],sessNo=1,PH=[];
 let prog={};
 const curLevel=()=>mode.kind==='level'?LEVELS[mode.idx]:null;
-const curReal=()=>mode.kind==='real'?REAL[mode.id]:null;
+// 실제 교차로 지도: 엔드게임(real)과 각 장 마지막 레벨(lv.real) 모두
+const curReal=()=>mode.kind==='real'?REAL[mode.id]:(mode.kind==='level'&&LEVELS[mode.idx]&&LEVELS[mode.idx].real?REAL[LEVELS[mode.idx].real]:null);
 const baseCfg=()=>mode.kind==='level'?levelCfg(curLevel()):mode.kind==='real'?realCfg(curReal()):cfgFor(scenKey);
 const modeId=()=>mode.kind==='level'?'L'+curLevel().id:mode.kind==='real'?'real-'+mode.id:'lab-'+scenKey;
 const unlocked=k=>mode.kind==='lab'||(mode.kind==='real'&&k!=='demand')||(mode.kind==='level'&&curLevel().unlock.includes(k));
@@ -1105,6 +1184,20 @@ const unlocked=k=>mode.kind==='lab'||(mode.kind==='real'&&k!=='demand')||(mode.k
 // ★1 = 시작점 + 30%, ★2 = + 65%, ★3 = + 95% (v0.18 보행자 반영. 시작점 335/738/269/529/152, 탐색 최고 469/819/338/710/361. 탐색: tools/opt.mjs, 보행 전용 현시 포함)
 const REAL_STARS={gangnam:[375,422,462],edirnekapi:[762,791,815],toronto:[290,314,335],london:[583,647,701],tokyo:[215,288,351]};
 function thresholds(){if(mode.kind==='level')return curLevel().stars;if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
+// 확정 기회: 스테이지마다 5번(실험실은 무제한). 다 쓰면 처음부터 다시. 이 브라우저에 저장
+const TRIES_MAX=5,limited=()=>mode.kind!=='lab';
+// 세션 = 3분 관찰 + 확정 1번. 점수는 관찰 시간과 별개로 5분 시뮬레이션 x 시드 3개(evalCfg)라 별 기준은 그대로
+const OBS_T=180;
+const sessLabel=()=>limited()?`세션 ${Math.min(TRIES_MAX,triesUsed()+1)}/${TRIES_MAX}`:`세션 ${sessNo}`;
+function triesUsed(){return(store.get('tries-v1')||{})[modeId()]||0;}
+function triesLeft(){return limited()?Math.max(0,TRIES_MAX-triesUsed()):Infinity;}
+function triesAdd(){const t=store.get('tries-v1')||{},k=modeId();t[k]=(t[k]||0)+1;store.set('tries-v1',t);return t[k];}
+function restartStage(){const t=store.get('tries-v1')||{};delete t[modeId()];store.set('tries-v1',t);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
+// 다음 스테이지: 레벨은 다음 레벨, 마지막 레벨 다음은 첫 실제 교차로, 실제 교차로는 다음 도시
+function nextTarget(){if(mode.kind==='level'){if(mode.idx+1<LEVELS.length){const l=LEVELS[mode.idx+1];return{m:{kind:'level',idx:mode.idx+1},name:lvLabel(l)+' '+l.title};}
+    const ids=Object.keys(REAL);return ids.length?{m:{kind:'real',id:ids[0]},name:'실제 교차로: '+REAL[ids[0]].title}:null;}
+  if(mode.kind==='real'){const ids=Object.keys(REAL),i=ids.indexOf(mode.id);if(i>=0&&i+1<ids.length)return{m:{kind:'real',id:ids[i+1]},name:'실제 교차로: '+REAL[ids[i+1]].title};}
+  return null;}
 function jammed(st){const lv=curLevel();return!!(lv&&lv.jam&&st&&st.peakQ>=lv.jam);}
 function starsOf(score,risk){const t=thresholds();let n=score>=t[2]?3:score>=t[1]?2:score>=t[0]?1:0;if(riskGrade(risk)===2)n=Math.min(n,1);return n;}
 // 시제품 기간: 모든 레벨 열어 둠. 출시 때 순서 잠금을 다시 켜려면 UNLOCK_ALL=false
@@ -1344,8 +1437,9 @@ function diffCfg(p,c){const out=[];
 function startSession(){closeModal();sim=warmSim(cfg,SEEDS[0]);state='run';running=true;sessNo=(history[0]?history[0].no:0)+1;
   $('play').textContent='일시정지';updateUI();}
 // 세션 끝: 점수 계산은 Web Worker에서(화면 멈춤 없음). evPre={cfg, score?, st?}: 확정 버튼처럼 지금 편집 중인 설정을 바로 평가할 때
-function finishSession(evPre){if(state==='calc')return;state='calc';running=false;const fc=evPre&&evPre.cfg?clone(evPre.cfg):clone(sim.cfg),first=evPre||sim.swapped?null:stats(sim);
-  calcOv(true);updateUI();(evPre&&evPre.score!=null?Promise.resolve(evPre):evalAsync(fc,first)).then(ev=>{calcOv(false);finishWith(fc,ev);}).catch(()=>{calcOv(false);state='run';running=true;});}
+function finishSession(evPre){if(state==='calc')return;
+  if(triesLeft()<=0){state='done';running=false;updateUI();openOutOfTries();return;}state='calc';running=false;const fc=evPre&&evPre.cfg?clone(evPre.cfg):clone(sim.cfg),first=evPre||sim.swapped?null:stats(sim);
+  calcOv(true);updateUI();(evPre&&evPre.score!=null?Promise.resolve(evPre):evalAsync(fc,first)).then(ev=>{calcOv(false);finishWith(fc,ev,!!evPre);}).catch(()=>{calcOv(false);state='run';running=true;});}
 // 설정 비교용 짧은 서명: 도로 기하(geo)는 크고 거의 안 바뀌므로 객체마다 한 번만 해시해서 넣음(0.15초마다 비교해도 가벼움)
 const GEOH=new WeakMap();
 function geoHash(g){let h=GEOH.get(g);if(h)return h;const s=JSON.stringify(g);let x=0;for(let i=0;i<s.length;i++)x=(x*31+s.charCodeAt(i))|0;h='g'+(x>>>0).toString(36)+'_'+s.length;GEOH.set(g,h);return h;}
@@ -1354,12 +1448,21 @@ function cfgSig(c){return c?JSON.stringify(c,(k,v)=>k==='geo'&&v&&typeof v==='ob
 const TIMING_KEYS=['phases','yellow','scheme','pedConc'];
 function timingOnly(a,b){const s=o=>cfgSig(Object.fromEntries(Object.entries(o).filter(([k])=>!TIMING_KEYS.includes(k))));return s(a)===s(b);}
 function hotSwap(){const n=sim.nextCfg;sim.nextCfg=null;for(const k of TIMING_KEYS){if(n[k]===undefined)delete sim.cfg[k];else sim.cfg[k]=clone(n[k]);}sim.swapped=true;}
+// 관찰 3분이 끝나면 멈추고 묻기: 확정(세션 1회 사용) 또는 3분 더 관찰(기회는 쓰지 않음)
+function obsEnd(){running=false;$('play').textContent='재생';if(triesLeft()<=0){state='done';openOutOfTries();return;}
+  openModal('관찰 시간 3분이 끝났습니다',[]);const L=triesLeft();
+  $('modalbody').innerHTML=`<p class="note" style="margin-top:0">지금 설정으로 확정하면 ${L===Infinity?'결과가 나옵니다':`세션 1번을 쓰고 결과가 나옵니다(남은 세션 ${L}번)`}. 설정을 더 바꾸거나 흐름을 더 보고 싶으면 3분을 다시 관찰하세요. 이때는 세션을 쓰지 않습니다.</p>
+  <div class="row2"><button type="button" class="primary" id="obsok">이 설정으로 확정</button><button type="button" id="obsmore">3분 더 관찰</button></div>`;
+  $('obsok').onclick=()=>{closeModal();$('skip').click();};$('obsmore').onclick=()=>{closeModal();resetCounters(sim);running=true;$('play').textContent='일시정지';updateUI();};}
+function openOutOfTries(){openModal('확정 기회를 모두 썼습니다',[]);$('modalbody').innerHTML=`<p class="note" style="margin-top:0">이 스테이지의 확정 ${TRIES_MAX}번을 모두 썼습니다. 지금까지 받은 별과 최고 기록은 그대로 남습니다. 처음 설정부터 다시 도전하세요.</p><button type="button" class="primary" id="restartbtn">처음부터 다시</button>`;$('restartbtn').onclick=restartStage;}
 function calcOv(on){let el=$('calcov');if(!el){el=document.createElement('div');el.id='calcov';el.className='calcov';el.textContent='결과 계산 중';$('stage').appendChild(el);}el.hidden=!on;}
-function finishWith(fc,ev){const base=baseCfg(),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
+// keep: 확정 버튼으로 낸 결과면 화면 시뮬레이션은 멈추지 않고 계속(다음 확정을 바로 할 수 있게)
+function finishWith(fc,ev,keep){const base=baseCfg(),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
   const changes=diffCfg(ref,fc),sameDemand=demandSig(fc)===demandSig(base),jam=jammed(st);
   const prevBest=history.filter(h=>h.sameDemand).reduce((m,h)=>Math.max(m,h.score),-Infinity);
   const stars=sameDemand&&!jam?starsOf(score,st.risk):0;
   const rec={no:sessNo,cfg:clone(fc),st,score,changes,sameDemand,stars,jam,record:sameDemand&&!jam&&score>prevBest&&history.length>0};
+  rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX-rec.try);}
   if(mode.kind==='real'&&sameDemand){const id='real-'+mode.id,p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
   if(mode.kind==='level'&&sameDemand){const id=curLevel().id,p=prog[id]||{stars:0,best:-1e9},nextLocked=mode.idx+1<LEVELS.length&&!levelUnlocked(mode.idx+1);
     prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);
@@ -1367,8 +1470,8 @@ function finishWith(fc,ev){const base=baseCfg(),st=ev.st,score=ev.score,prev=his
     if(stars>p.stars)rec.newStars=true;}
   if(fc.wx&&fc.wx!=='clear'&&demandSig({...fc,wx:0})===demandSig(base)){const wb=store.get('wxbest-v1')||{},k=modeId()+':'+fc.wx;rec.wxPrev=wb[k]??null;rec.wxBest=Math.max(score,wb[k]??-1e9);wb[k]=rec.wxBest;store.set('wxbest-v1',wb);}
   history.unshift(rec);if(history.length>30)history.pop();store.set(histKey(),history);
-  state='done';running=false;renderResult(rec,prev);renderHistory();renderLevels();updateUI();if(playMode)openResult();
-  try{window.dispatchEvent(new CustomEvent('session-done',{detail:{rec,stage:modeId(),title:(curReal()&&curReal().title)||(mode.kind==='level'?lvLabel(curLevel())+' '+curLevel().title:''),eligible:mode.kind!=='lab'&&!jam&&!!(rec.sameDemand||rec.wxBest!=null),weather:fc.wx||'clear'}}));}catch(e){}}
+  state='done';running=false;if(keep&&triesLeft()>0){cfg=clone(fc);syncControls();startSession();buildArms();}renderResult(rec,prev);renderHistory();renderLevels();updateUI();if(playMode)openResult();
+  try{window.dispatchEvent(new CustomEvent('session-done',{detail:{rec,stage:modeId(),title:mode.kind==='level'?lvLabel(curLevel())+' '+curLevel().title:(curReal()&&curReal().title)||'',eligible:mode.kind!=='lab'&&!jam&&!!(rec.sameDemand||rec.wxBest!=null),weather:fc.wx||'clear'}}));}catch(e){}}
 function deltaPill(cur,prev,better,fmt){if(prev==null)return'';const d=cur-prev;if(Math.abs(d)<1e-9)return'<span class="pill flat">변화 없음</span>';
   const good=better==='up'?d>0:d<0;return`<span class="pill ${good?'up':'down'}">${d>0?'+':''}${fmt(d)}</span>`;}
 function riskLine(st){const g=riskGrade(st.risk),top=Object.entries(st.riskBy).filter(x=>x[1]>0.005).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ${v.toFixed(2)}`).join(', ');
@@ -1428,7 +1531,7 @@ function apprMap(s,focus){if(!s.byA)return'';const col=d=>`hsl(${Math.round(130-
 function driversHTML(an){if(!an.drivers)return'';const mx=Math.max(...an.drivers.map(d=>Math.abs(d[1])),1);
   return`<div class="drv"><span class="lbl">이전 세션 대비 점수 변화의 출처</span>${an.drivers.map(([k,v])=>`<div class="dr"><span>${k}</span><div class="db"><i class="${v>=0?'p':'n'}" style="${v>=0?'left:50%':'right:50%'};width:${(Math.abs(v)/mx*50).toFixed(1)}%"></i></div><b class="${v>=0.5?'up':v<=-.5?'down':''}">${v>=0?'+':''}${Math.round(v)}</b></div>`).join('')}</div>`;}
 function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
-  if(!rec){box.innerHTML=`<div class="note" style="margin-top:0">5분 세션이 끝나면 결과와 이전 세션 대비 변화가 여기에 나옵니다. 시작 설정 점수는 <b>${baseline?baseline.score:'-'}</b>점입니다.</div>`;return;}
+  if(!rec){box.innerHTML=`<div class="note" style="margin-top:0">설정을 확정하면 결과와 이전 세션 대비 변화가 여기에 나옵니다. 시작 설정 점수는 <b>${baseline?baseline.score:'-'}</b>점입니다.</div>`;return;}
   const s=rec.st,p=prev?prev.st:null,pct=prev&&prev.score?((rec.score-prev.score)/Math.abs(prev.score)*100):null;
   const capped=riskGrade(s.risk)===2&&rec.score>=t[1];
   const next=rec.sameDemand&&rec.stars<3&&!capped?t[rec.stars]-rec.score:null;
@@ -1445,7 +1548,9 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
         ${pct!=null?`<span class="pill ${pct>=0?'up':'down'}">이전 세션 대비 ${pct>=0?'+':''}${pct.toFixed(1)}%</span>`:''}</div></div>
     ${rec.jam?`<div class="jamres"><b>정체 발생</b> 한 차로 대기열이 ${rec.st.peakQ}대까지 늘어 도로가 막혔습니다. 별을 받으려면 먼저 정체를 풀어야 합니다.</div>`:''}
     ${rec.sameDemand?scoreTrack(rec,prev,best,t):''}
-    ${rec.opened?`<div class="clear"><span>레벨 클리어. ${lvLabel(rec.opened)} ${rec.opened.title} 레벨이 열렸습니다.</span><button class="primary" data-go="${LEVELS.indexOf(rec.opened)}">다음 레벨로</button></div>`:''}
+    ${rec.triesLeft!=null?`<div class="tries ${rec.triesLeft?'':'out'}">${rec.triesLeft?`확정 기회 ${rec.triesLeft}번 남음 (${rec.try}/${TRIES_MAX})`:`확정 기회 ${TRIES_MAX}번을 모두 썼습니다. 받은 별과 최고 기록은 남습니다.`}${rec.triesLeft?'':'<button type="button" class="primary" data-restart="1">처음부터 다시</button>'}</div>`:''}
+    ${rec.sameDemand&&rec.stars>=2&&nextTarget()?`<div class="nextq"><b>별 ${rec.stars}개 달성! 다음 스테이지로 넘어갈까요?</b><span>${nextTarget().name}</span><div><button type="button" class="primary" data-next="1">다음 스테이지로</button><button type="button" data-stay="1">여기서 더 도전</button></div></div>`:''}
+    ${rec.opened&&!(rec.sameDemand&&rec.stars>=2)?`<div class="clear"><span>레벨 클리어. ${lvLabel(rec.opened)} ${rec.opened.title} 레벨이 열렸습니다.</span><button class="primary" data-go="${LEVELS.indexOf(rec.opened)}">다음 레벨로</button></div>`:''}
     ${!rec.sameDemand?(rec.wxBest!=null?`<div class="exp">날씨 도전 (${wxOf(rec.cfg).n}) 세션입니다. 이 날씨 최고 ${rec.wxBest}점${rec.wxPrev!=null&&rec.score>rec.wxPrev?' (새 기록)':''}. 별과 순위는 맑음 기준에서만 집계합니다.</div>`:'<div class="exp">교통량을 바꿔서 별과 최고 기록에는 반영하지 않았습니다.</div>'):capped?'<div class="nextstar">점수는 충분하지만 위험도가 높아 별은 1개까지만 받습니다. 위험 원인을 먼저 고치세요.</div>':next!=null?`<div class="nextstar">다음 별까지 <b>${next.toLocaleString()}</b>점 남았습니다.</div>`:rec.stars===3?'<div class="nextstar">별 3개 달성. 더 높은 점수에 도전해 보세요.</div>':''}
     <div class="dash">
       <div class="kpis">
@@ -1471,7 +1576,10 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
       <div><span class="k">실제 사고</span><b>${s.crash}<span class="u">건</span></b></div></div></details>
     <div class="chg"><b>${prev?'이전 세션에서 바꾼 것':'시작 설정에서 바꾼 것'}</b>${rec.changes.length?`<ul>${rec.changes.slice(0,8).map(x=>`<li>${x}</li>`).join('')}${rec.changes.length>8?`<li>외 ${rec.changes.length-8}건</li>`:''}</ul>`:'<div class="note" style="margin-top:0">바꾼 것 없음</div>'}</div>
     ${exp?`<div class="exp">다른 교차로로 넘긴 차량: ${exp}. 나중에 이웃 교차로를 맡은 유저에게 이 부담이 넘어가는 구조로 확장할 예정입니다.</div>`:''}`;}
-$('resbody').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){closeModal();loadMode({kind:'level',idx:+b.dataset.go});}});
+$('resbody').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){closeModal();loadMode({kind:'level',idx:+b.dataset.go});return;}
+  if(e.target.closest('[data-next]')){const n=nextTarget();closeModal();if(n)loadMode(n.m);return;}
+  if(e.target.closest('[data-stay]')){closeModal();return;}
+  if(e.target.closest('[data-restart]'))restartStage();});
 function renderHistory(){const tb=$('histbody');
   if(!history.length){tb.innerHTML='<tr><td colspan="6" style="color:var(--muted)">아직 끝난 세션이 없습니다.</td></tr>';return;}
   const best=history.filter(h=>h.sameDemand).reduce((m,h)=>Math.max(m,h.score),-Infinity);
@@ -1505,7 +1613,7 @@ function renderBrief(){const el=$('brief');$('labrow').hidden=mode.kind!=='lab';
     <div class="unl">열린 조작: ${lv.unlock.map(k=>CTRL_NAME[k]).join(', ')}</div>
     <button class="link" id="hintbtn" style="margin-top:6px;padding-left:0">힌트 보기</button><div class="hint" id="hint" hidden>${lv.hint}</div>`;
   $('hintbtn').addEventListener('click',()=>{$('hint').hidden=false;$('hintbtn').hidden=true;});}
-function loadMode(m){closePop();closeModal();mode=m.kind==='lab'?{kind:'lab'}:m;setHand(mode.kind==='real'&&REAL[mode.id]&&REAL[mode.id].lht);if(m.kind==='lab'&&m.scen)scenKey=m.scen;store.set('last-v3',mode.kind==='lab'?{kind:'lab',scen:scenKey}:mode);VIEW=mode.kind==='real'?(wideMap?190:84):72;$('mapzoom').hidden=mode.kind!=='real';$('mapzoom').textContent=wideMap?'교차로 확대':'지도 넓게 보기';
+function loadMode(m){closePop();closeModal();mode=m.kind==='lab'?{kind:'lab'}:m;setHand(!!(curReal()&&curReal().lht));if(m.kind==='lab'&&m.scen)scenKey=m.scen;store.set('last-v3',mode.kind==='lab'?{kind:'lab',scen:scenKey}:mode);VIEW=mode.kind==='real'?(wideMap?190:84):72;$('mapzoom').hidden=mode.kind!=='real';$('mapzoom').textContent=wideMap?'교차로 확대':'지도 넓게 보기';
   scenSel.value=scenKey;cfg=clone(baseCfg());syncControls();
   history=(store.get(histKey())||[]).filter(h=>h&&h.cfg&&h.cfg.geo&&h.cfg.phases&&h.st&&h.st.riskBy);
   baseline=evalCfg(baseCfg());renderLevels();renderBrief();renderResult(history[0]||null,history[1]);renderHistory();startSession();buildArms();}
@@ -1518,7 +1626,7 @@ let resetArm=0;$('resetcfg').addEventListener('click',()=>{const btn=$('resetcfg
   if(Date.now()>resetArm){resetArm=Date.now()+3000;btn.textContent='한 번 더 누르면 초기화';btn.classList.add('primary');setTimeout(()=>{if(Date.now()>=resetArm){btn.textContent='처음 설정으로';btn.classList.remove('primary');}},3100);return;}
   resetArm=0;btn.textContent='처음 설정으로';btn.classList.remove('primary');closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();});$('applynow').addEventListener('click',startSession);
 // 결과 바로 보기 = 지금 편집 중인 설정으로 확정(5분을 기다리지 않음). 예상 점수가 이미 계산돼 있으면 그대로 씀
-$('skip').addEventListener('click',()=>{if(state!=='run')return;const fc=clone(cfg),f=typeof fcGet==='function'?fcGet(fc):null;finishSession(f?{cfg:fc,score:f.score,st:f.st}:{cfg:fc});});
+$('skip').addEventListener('click',()=>{if(triesLeft()<=0){openOutOfTries();return;}if(state!=='run')return;const fc=clone(cfg),f=typeof fcGet==='function'?fcGet(fc):null;finishSession(f?{cfg:fc,score:f.score,st:f.st}:{cfg:fc});});
 document.querySelectorAll('[data-sp]').forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('on',x===b));}));
 
 // ---------- 그리기 ----------
@@ -1914,7 +2022,7 @@ function draw(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=geoDim
     ctx.fillStyle=COL.fg;ctx.font='600 12px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.fillText('N',x+Math.sin(ang)*28,y-Math.cos(ang)*28+4);
     ctx.fillStyle=COL.muted;ctx.font='400 11px "IBM Plex Sans KR",sans-serif';ctx.textAlign='left';ctx.fillText('© OpenStreetMap contributors',8,ch-10);}
   if(state==='done'){ctx.fillStyle='rgba(14,18,22,.55)';ctx.fillRect(0,0,cw,ch);ctx.fillStyle=COL.fg;ctx.font=`600 ${Math.round(cw/26)}px "IBM Plex Sans KR",sans-serif`;ctx.textAlign='center';
-    ctx.fillText(`세션 ${sessNo} 종료`,cw/2,ch/2-12);ctx.font=`400 ${Math.round(cw/44)}px "IBM Plex Sans KR",sans-serif`;ctx.fillStyle=COL.muted;ctx.fillText('설정을 바꾸고 새 세션을 시작하세요',cw/2,ch/2+18);}}
+    ctx.fillText(`${sessLabel()} 종료`,cw/2,ch/2-12);ctx.font=`400 ${Math.round(cw/44)}px "IBM Plex Sans KR",sans-serif`;ctx.fillStyle=COL.muted;ctx.fillText('설정을 바꾸고 새 세션을 시작하세요',cw/2,ch/2+18);}}
 
 // ---------- 플레이 화면: 조작을 교차로 위에 겹쳐 놓기 ----------
 let playMode=(()=>{try{const v=JSON.parse(localStorage.getItem('play-v1'));return v===null?true:v;}catch(e){return true;}})();
@@ -1965,7 +2073,7 @@ function positionArms(){if(!playMode||!cfg)return;const placed=[];for(const a of
     const {w}=moveStatus(a),lvl=w.some(x=>x[0]==='bad')?'bad':w.some(x=>x[0]==='risk')?'risk':'';const dot=b.querySelector('.w');dot.className='w '+lvl;dot.style.display=lvl?'':'none';}
   if(popArm&&!$('pop').hidden)placePop(...armAnchor(popArm));}
 function renderHud(){if(!playMode||!sim)return;const st=stats(sim),el=sim.t-sim.t0,t=thresholds();
-  $('hudtl').innerHTML=`<div class="t">세션 ${sessNo}${state==='done'?' 종료':''}  ${fmtT(Math.min(el,SESS_T))} / ${fmtT(SESS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/SESS_T*100)}%"></i></div>
+  $('hudtl').innerHTML=`<div class="t">${sessLabel()}${state==='done'?' 종료':''}  관찰 ${fmtT(Math.min(el,OBS_T))} / ${fmtT(OBS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/OBS_T*100)}%"></i></div>
     <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>${goalHTML(st)}`;
   const R=curReal(),lv=curLevel();
   $('lvchip').innerHTML=(lv?`${lvLabel(lv)} ${lv.title}`:R?R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
@@ -1981,8 +2089,8 @@ new ResizeObserver(()=>positionArms()).observe($('stage'));
 // ---------- 루프 ----------
 let last=performance.now(),acc=0,uiT=0,simCfgStr='';
 function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim),el=sim.t-sim.t0;
-  $('sessname').textContent=`세션 ${sessNo}${state==='done'?' (종료)':''}`;
-  $('sesstime').textContent=`${fmtT(Math.min(el,SESS_T))} / ${fmtT(SESS_T)}`;$('sessbar').style.width=Math.min(100,el/SESS_T*100)+'%';
+  $('sessname').textContent=`${sessLabel()}${state==='done'?' (종료)':''}`;
+  $('sesstime').textContent=`관찰 ${fmtT(Math.min(el,OBS_T))} / ${fmtT(OBS_T)}`;$('sessbar').style.width=Math.min(100,el/OBS_T*100)+'%';
   $('k-ppl').textContent=st.persons.toLocaleString();$('k-done').textContent=st.done;
   $('k-spd').innerHTML=st.spd.toFixed(1)+'<span class="u">km/h</span>';$('k-dly').innerHTML=st.dly.toFixed(0)+'<span class="u">초</span>';
   $('k-det').innerHTML=st.det+'<span class="u">대</span>';$('k-crash').innerHTML=st.crash+'<span class="u">건 / '+st.risk.toFixed(2)+'</span>';
@@ -1992,16 +2100,18 @@ function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim
   const iv=sim.curIv;if(iv){const left=Math.max(0,iv.e-sim.ct),typ=iv.type==='G'?'녹색':iv.type==='Y'?'황색':'전적색';
     $('sig').textContent=`${phName(iv.p)} ${typ} ${left.toFixed(0)}초`;
     const same=JSON.stringify(cfg.phases)===JSON.stringify(sim.cfg.phases)&&cfg.yellow===sim.cfg.yellow;
-    $('tlnow').textContent=same?`현재 ${phName(iv.p)} (${typ})`:sim.nextCfg?'바꾼 신호는 다음 주기부터 바로 적용됩니다':'변경된 계획은 새 세션부터 적용';
+    $('tlnow').textContent=same?`현재 ${phName(iv.p)} (${typ})`:sim.nextCfg?'바꾼 신호는 다음 주기부터 바로 적용됩니다':'바꾼 도로 구조는 관찰을 다시 시작하면 보입니다';
     const m=$('tlmark');if(m){m.hidden=!same;if(same&&sim.tl)m.style.left=(sim.ct/sim.tl.len*100)+'%';}}
   const cs=cfgSig(cfg),pend=cs!==cfgSig(sim.cfg),live=pend&&state==='run'&&timingOnly(cfg,sim.cfg);
   if(live&&cfgSig(sim.nextCfg)!==cs)sim.nextCfg=clone(cfg);else if(!live)sim.nextCfg=null;
   $('pending').hidden=!(pend&&!live&&state==='run');
-  $('newsess').classList.toggle('primary',state==='done');$('play').disabled=state!=='run';$('skip').disabled=state!=='run';}
+  $('newsess').classList.toggle('primary',state==='done');$('play').disabled=state!=='run';
+  {const L=triesLeft(),b=$('skip'),t=L===Infinity?'이 설정으로 확정':L>0?`이 설정으로 확정 (${L}회 남음)`:'처음부터 다시';if(b.textContent!==t)b.textContent=t;b.disabled=L>0&&state!=='run';b.classList.toggle('primary',L<=0);}}
 function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
-  if(running&&state==='run'){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
+  // 창(결과, 신호 구성, 접근로 등)이 열려 있는 동안은 관찰 시간이 흐르지 않음
+  if(running&&state==='run'&&$('modal').hidden&&$('pop').hidden&&introBox.hidden){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
       if(sim.nextCfg&&sim.ct<(sim.lastCt||0))hotSwap();sim.lastCt=sim.ct;
-      if(sim.t-sim.t0>=SESS_T){finishSession();acc=0;break;}}if(n>=80)acc=0;}
+      if(sim.t-sim.t0>=OBS_T){obsEnd();acc=0;break;}}if(n>=80)acc=0;}
   if(!window.__v3on){draw();if(window.__wxDraw)window.__wxDraw(real);}uiT+=real;if(uiT>.15){uiT=0;updateUI();}
   requestAnimationFrame(frame);}
 {const lastM=store.get('last-v3');let m={kind:'level',idx:0};
@@ -2075,14 +2185,14 @@ window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(
 {const mk=(id,label,key)=>{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML=`<input type="checkbox" id="${id}">${label}`;
     $('ctlbar').insertBefore(l,$('resetcfg'));const c=$(id);c.checked=FXP[key];c.addEventListener('change',()=>{FXP[key]=c.checked;fxSave();if(key==='snd'&&c.checked){fxAudio();fxSound('good');}});};
   mk('fxbub','말풍선 효과','bub');mk('fxsnd','효과음','snd');}
-// ---------- 흐름 계기판: 지금 편집 중인 설정의 점수를 바로 계산(Web Worker)해서 바늘로 보여 줌 ----------
-// 예상 점수 = 확정했을 때 받을 점수와 똑같은 계산(evalCfg, 시드 3개). 조작이 멈추고 0.25초 뒤 계산, 최근 60개 설정은 기억
+// ---------- 흐름 계기판: 확정한 점수만 바늘로 보여 줌(예상 점수는 보여 주지 않음: 게임이 너무 쉬워짐) ----------
+// 편집 중인 설정은 화면 밖(Web Worker)에서 미리 계산해 두기만 함: 확정 버튼을 누르면 바로 결과가 나오게. 최근 60개 설정 기억
 const FC={cache:new Map(),busy:false,want:null,wantAt:0,shown:null,mode:null,base:null};
 function fcKey(c){return cfgSig(c);}
 function fcGet(c){return FC.cache.get(fcKey(c))||null;}
 function fcPut(k,v){FC.cache.set(k,v);if(FC.cache.size>60)FC.cache.delete(FC.cache.keys().next().value);}
-function fcRun(){if(FC.busy||!FC.want)return;if(performance.now()-FC.wantAt<250)return;const k=FC.want;if(FC.cache.has(k)){FC.want=null;fcShow();return;}
-  FC.busy=true;const c=FC.wantCfg;evalAsync(c,null).then(ev=>{fcPut(k,{score:ev.score,st:ev.st});FC.busy=false;if(FC.want===k)FC.want=null;fcShow();});}
+function fcRun(){if(FC.busy||!FC.want)return;if(performance.now()-FC.wantAt<250)return;const k=FC.want;if(FC.cache.has(k)){FC.want=null;return;}
+  FC.busy=true;const c=FC.wantCfg;evalAsync(c,null).then(ev=>{fcPut(k,{score:ev.score,st:ev.st});FC.busy=false;if(FC.want===k)FC.want=null;});}
 const gauge=(()=>{const d=document.createElement('div');d.id='gauge';d.className='gauge';d.innerHTML=`<svg viewBox="0 0 200 112" aria-hidden="true"><g class="arcs"></g><g class="ticks"></g>
   <line class="ghost" x1="100" y1="100" x2="100" y2="22"/><line class="needle" x1="100" y1="100" x2="100" y2="18"/><circle cx="100" cy="100" r="6" class="hub"/></svg>
   <div class="gv"><b class="gs">-</b><span class="gd"></span></div><div class="gl">흐름 점수</div>`;$('hudtop').insertBefore(d,$('lvchip').nextSibling);return d;})();
@@ -2094,26 +2204,27 @@ function gDrawScale(){const {t,lo,hi}=gRange(),A=v=>gAng(v,lo,hi),seg=[[lo,t[0],
   gauge.querySelector('.ticks').innerHTML=t.map((v,i)=>{const a=A(v)*Math.PI/180,x=100+94*Math.sin(a),y=100-94*Math.cos(a);return`<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}">${'★'.repeat(i+1)}</text>`;}).join('');}
 function gSet(el,v){const {lo,hi}=gRange();el.style.transform=`rotate(${gAng(v,lo,hi)}deg)`;}
 // 결과 표시 + 소리: 좋아지면 오르는 음, 나빠지면 내려가는 음, 별 기준을 넘으면 종소리와 말풍선
-function fcShow(){const r=fcGet(cfg);gauge.classList.toggle('calc',!r);if(!r)return;
-  const jam=jammed(r.st),t=thresholds(),stars=jam?0:starsOf(r.score,r.st.risk),b=FC.base?FC.base.score:null;
-  gauge.classList.toggle('jam',jam);gSet(gauge.querySelector('.needle'),jam?-1e9:r.score);
+function fcShow(){const ra=(store.get('restart-v1')||{})[modeId()]||0,r=history.find(h=>(h.sameDemand||h.jam)&&(h.at||0)>ra)||null;gauge.classList.remove('calc');
+  const b=FC.base?FC.base.score:null,gd=gauge.querySelector('.gd'),tl=triesLeft(),tt=tl===Infinity?'':tl>0?`확정 ${tl}회 남음`:'확정 기회 없음';
+  gauge.querySelector('.gl').textContent=tt?'흐름 점수, '+tt:'흐름 점수';
+  if(!r){gauge.classList.remove('jam');gauge.classList.add('none');gauge.querySelector('.gs').textContent='?';gd.textContent='확정하면 점수가 나옵니다';gd.className='gd';
+    gSet(gauge.querySelector('.needle'),-1e9);gSet(gauge.querySelector('.ghost'),-1e9);FC.shown=null;return;}
+  gauge.classList.remove('none');const jam=!!r.jam;gauge.classList.toggle('jam',jam);
+  const key=r.no+':'+r.score;if(FC.shown&&FC.shown.key===key)return;const prev=FC.shown;FC.shown={key,score:r.score,jam};
+  gSet(gauge.querySelector('.needle'),jam?-1e9:r.score);gSet(gauge.querySelector('.ghost'),prev&&!prev.jam?prev.score:jam?-1e9:r.score);
   gauge.querySelector('.gs').textContent=jam?'정체':r.score.toLocaleString();
-  const d=b!=null&&!jam?(r.score-b)/Math.max(1,Math.abs(b))*100:null;const gd=gauge.querySelector('.gd');
-  gd.textContent=jam?`대기열 ${r.st.peakQ}대`:d==null?'':Math.abs(d)<.5?'시작 설정':`시작 대비 ${d>0?'+':''}${Math.round(d)}%`;gd.className='gd '+(jam||d<-.5?'down':d>.5?'up':'');
-  const prev=FC.shown;FC.shown={score:r.score,stars,jam,key:fcKey(cfg)};
-  if(prev&&prev.key!==FC.shown.key&&FC.mode===modeId()){const dd=r.score-prev.score;gSet(gauge.querySelector('.ghost'),prev.jam?-1e9:prev.score);gauge.classList.add('moved');
-    if(jam&&!prev.jam){fxSound('bad');fxBubble(cw/2,100,'정체 발생! 대기열이 넘칩니다','big');}
-    else if(stars>prev.stars){fxSound('fanfare');fxBubble(cw/2,100,`예상 별 ${stars}개`,'big');}
-    else if(dd>Math.max(2,Math.abs(prev.score)*.005))fxSound('up');else if(dd<-Math.max(2,Math.abs(prev.score)*.005))fxSound('down');}
-  else gSet(gauge.querySelector('.ghost'),jam?-1e9:r.score);
-  FC.mode=modeId();}
+  const d=b!=null&&!jam?(r.score-b)/Math.max(1,Math.abs(b))*100:null;
+  gd.textContent=jam?`대기열 ${r.st.peakQ}대`:d==null?'확정 점수':Math.abs(d)<.5?'시작 설정과 같음':`시작 대비 ${d>0?'+':''}${Math.round(d)}%`;gd.className='gd '+(jam||d<-.5?'down':d>.5?'up':'');}
+// 확정할 때만 소리: 이전 확정보다 좋아지면 오르는 음, 나빠지면 내려가는 음(별, 기록은 fx.js의 축하 효과)
+window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(!r)return;const p=history[1];setTimeout(fcShow,50);
+  if(r.jam){fxSound('bad');return;}if(r.newStars||r.record)return;if(p&&!p.jam){if(r.score>p.score)fxSound('up');else if(r.score<p.score)fxSound('down');}});
 SFX.up=()=>{fxTone(660,0,.12,'sine',.07);fxTone(880,.08,.18,'sine',.07);};
 SFX.down=()=>{fxTone(440,0,.14,'sine',.06);fxTone(349,.09,.22,'sine',.06);};
 // 0.15초마다: 레벨이 바뀌면 시작 설정 점수부터, 설정이 바뀌면 그 설정 점수를 요청
 setInterval(()=>{try{if(!cfg)return;const id=modeId();
-    if(FC.baseId!==id){FC.baseId=id;FC.base=null;FC.shown=null;const bc=baseCfg(),bk=fcKey(bc);const have=FC.cache.get(bk);if(have)FC.base=have;else evalAsync(bc,null).then(ev=>{fcPut(bk,{score:ev.score,st:ev.st});if(FC.baseId===id){FC.base={score:ev.score,st:ev.st};gDrawScale();fcShow();}});gDrawScale();}
-    const k=fcKey(cfg);if(!FC.cache.has(k)&&FC.want!==k){FC.want=k;FC.wantCfg=clone(cfg);FC.wantAt=performance.now();gauge.classList.add('calc');}
-    fcRun();if(FC.cache.has(k)&&(!FC.shown||FC.shown.key!==k))fcShow();}catch(e){}},150);
+    if(FC.baseId!==id){FC.baseId=id;FC.base=null;FC.shown=null;const bc=baseCfg(),bk=fcKey(bc);const have=FC.cache.get(bk);if(have)FC.base=have;else evalAsync(bc,null).then(ev=>{fcPut(bk,{score:ev.score,st:ev.st});if(FC.baseId===id){FC.base={score:ev.score,st:ev.st};gDrawScale();FC.shown=null;fcShow();}});gDrawScale();}
+    const k=fcKey(cfg);if(!FC.cache.has(k)&&FC.want!==k){FC.want=k;FC.wantCfg=clone(cfg);FC.wantAt=performance.now();}
+    fcRun();fcShow();}catch(e){}},150);
 // ---------- 익명 이용 통계: Supabase events 표에 쓰기만 함(읽기 불가) ----------
 // 개인 정보 없음: 브라우저마다 만든 무작위 id(cid)와 방문 id(vid), 기기 종류, 화면 크기, 레벨 진행만 보냄. '설정 더보기'에서 끌 수 있음
 // 이벤트: open, level_start, session_end, session_restart, skip, coach, leave, error
@@ -2139,7 +2250,7 @@ anTrack('open',anDevice());
 // 레벨(스테이지) 진입, 세션 시작과 중간 재시작
 const ANS={stage:null,sim:null,simWall:0,firstChange:null,changes:0,lastCfg:''};
 setInterval(()=>{const id=anStage();if(id&&id!==ANS.stage){ANS.stage=id;ANS.firstChange=null;ANS.enter=Date.now();anTrack('level_start',{mobile:document.body.classList.contains('mobile'),simple:document.body.classList.contains('simple')});}
-  if(sim&&sim!==ANS.sim){if(ANS.sim&&ANS.sim.t-ANS.sim.t0<SESS_T-1&&ANS.simState==='run')anTrack('session_restart',{el:Math.round(ANS.sim.t-ANS.sim.t0)});ANS.sim=sim;ANS.simWall=Date.now();}
+  if(sim&&sim!==ANS.sim){if(ANS.sim&&ANS.sim.t-ANS.sim.t0<OBS_T-1&&ANS.simState==='run')anTrack('session_restart',{el:Math.round(ANS.sim.t-ANS.sim.t0)});ANS.sim=sim;ANS.simWall=Date.now();}
   ANS.simState=state;
   // 처음 설정을 바꾼 시점(레벨 진입 후 초): 조작을 찾는 데 걸린 시간
   try{const c=cfgSig(cfg);if(c!==ANS.lastCfg){if(ANS.lastCfg&&ANS.firstChange==null)ANS.firstChange=Math.round((Date.now()-(ANS.enter||Date.now()))/1000);ANS.lastCfg=c;}}catch(e){}},1000);
@@ -2147,7 +2258,7 @@ $('skip').addEventListener('click',()=>{if(sim)anTrack('skip',{el:Math.round(sim
 window.addEventListener('session-done',ev=>{const d=ev.detail;if(!d)return;const r=d.rec,lv=curLevel(),G=lv&&lv.goals;
   anTrack('session_end',{score:r.score,stars:r.stars,same:!!r.sameDemand,wx:d.weather,changes:(r.changes||[]).length,record:!!r.record,
     goals:G?G.filter(g=>goalVal(g,r.st)<=g.max+1e-9).length:null,goalsN:G?G.length:null,wall:Math.round((Date.now()-ANS.simWall)/1000),first_change:ANS.firstChange,
-    spd:+r.st.spd.toFixed(1),risk:+r.st.risk.toFixed(2),peds:r.st.peds||0,sessNo:r.no,mobile:document.body.classList.contains('mobile')});});
+    spd:+r.st.spd.toFixed(1),risk:+r.st.risk.toFixed(2),peds:r.st.peds||0,sessNo:r.no,try:r.try||null,jam:!!r.jam,mobile:document.body.classList.contains('mobile')});});
 // 오류(같은 메시지는 한 번만)
 {const seen=new Set();addEventListener('error',e=>{const m=String(e.message||'').slice(0,200);if(!m||seen.has(m)||seen.size>10)return;seen.add(m);anTrack('error',{m,src:String(e.filename||'').split('/').pop(),line:e.lineno});});}
 // 떠날 때
@@ -2189,9 +2300,9 @@ window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!
 // 안내 말풍선: 레벨에 처음 들어왔을 때 새 조작을 가리킴. 대상이 화면에 나타날 때까지 기다렸다가 표시
 const COACH={
  '0-1':[{sel:'#tl .h',t:'이 손잡이를 좌우로 끌면 남북과 동서의 녹색 시간이 나뉩니다. 차가 많은 남북 쪽에 녹색을 더 주세요.'},
-        {sel:'#gauge',t:'바늘이 흐름 점수입니다. 손잡이를 움직이면 바로 다시 계산되고, 오른쪽 별 쪽으로 갈수록 좋습니다. 바꾼 신호는 다음 주기부터 화면에도 바로 적용돼요.'},
-        {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 5분을 기다리지 않아도 됩니다.'}],
- '0-4':[{sel:'#gauge',t:'계기판이 빨간 정체 상태입니다. 실제 토론토 교통량에 맞게 녹색을 다시 나눠 정체부터 풀어 보세요.'}],
+        {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 확정할 때마다 세션 1번을 씁니다. 스테이지마다 세션은 5번입니다.'},
+        {sel:'#gauge',t:'확정한 점수가 여기 바늘로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
+ '0-4':[{sel:'#tl .h',t:'실제 강남역 신호입니다. 네 현시 사이의 경계를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
  '1-1':[{sel:'#cyc',t:'이제 주기 길이를 바꿀 수 있습니다. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
  '2-1':[{sel:'#arm-N',t:'접근로 버튼을 누르면 차로마다 용도(좌회전, 직진, 우회전)를 바꿀 수 있습니다.'}],
  '3-1':[{sel:'#phbtn',t:'신호 구성 편집에서 현시마다 녹색을 줄 이동류를 고를 수 있습니다.'}],
@@ -2227,10 +2338,181 @@ const introBox=(()=>{const d=document.createElement('div');d.className='intro';d
   d.innerHTML=`<div class="ib"><h2>교통 관제 엔지니어가 되어 보세요</h2>
   <p>서울 강남역, 이스탄불, 토론토, 런던, 도쿄. 세계에서 손꼽히게 막히는 실제 교차로들이 기다리고 있습니다. 실제 교통량 자료로 만든 교차로의 신호와 차로를 바꿔 <b>정체를 푸는 것</b>이 최종 목표입니다.</p>
   <div class="road">${STAGES.map(s=>`<span>${s.name}</span>`).join('<i></i>')}<i></i><span class="end">실제 교차로 5곳</span></div>
-  <p class="sm">장마다 도구가 하나씩 늘어납니다. 화면 위 계기판 바늘을 별 쪽으로 보내면 됩니다.</p>
+  <p class="sm">장마다 도구가 하나씩 늘어납니다. 세션은 3분 관찰 후 확정, 스테이지마다 5번. 확정한 점수가 계기판 바늘로 나오고, 별 2개를 넘으면 다음 스테이지로 갈 수 있습니다.</p>
   <button type="button" class="primary">1장 시작</button></div>`;document.body.appendChild(d);
   d.querySelector('button').addEventListener('click',()=>{d.hidden=true;store.set('intro-v1',1);if(!curLevel()||curLevel().id!=='0-1')loadMode({kind:'level',idx:0});anTrack('coach',{id:'intro',step:1,n:1,skipped:false});});return d;})();
 if(!store.get('intro-v1'))introBox.hidden=false;
+// ---------- 시민 캐릭터: 레벨마다 민원을 내고, 확정 결과에 반응 ----------
+// 대사는 미리 써 둔 글(실행 중 AI 호출 없음). 등장인물은 모두 가상 인물
+// a: 이 사람이 다니는 접근로(auto = 교통량이 가장 많은 접근로), k: 이 사람이 체감하는 지표(dly 지연, q 대기열, det 우회, pedW 보행 대기, risk 사고 위험)
+// r: 결과별 반응. jam 정체, bad 시작보다 나쁨, ok 나아졌지만 별 2개 미만, good 별 2개, great 별 3개
+const CITIZENS={
+ '0-1':{who:'마을버스 기사',name:'오 기사님',a:'S',k:'dly',ask:'남쪽에서 올라오는 출근 차가 이렇게 많은데 신호는 동서랑 똑같이 줘요. 배차 시간을 못 맞추겠어요.',
+  r:{jam:'남쪽 줄이 끝도 없어요. 오늘 첫차부터 다 밀렸습니다.',bad:'오히려 더 오래 서 있었어요. 뭘 바꾸신 거예요?',ok:'조금 나아졌네요. 그래도 아직 한 번에 못 빠져요.',good:'오늘은 배차 시간 거의 맞췄어요. 고맙습니다!',great:'신호 한 번에 쭉 빠졌어요. 승객들이 다 놀라던데요!'}},
+ '0-2':{who:'택배 기사',name:'한 기사님',a:'E',k:'q',ask:'동서 대로가 메인 도로인데 남북에 신호를 더 줘요. 동쪽에서 들어올 때마다 줄 끝에 서요.',
+  r:{jam:'동쪽 줄이 화면 밖까지 늘었어요. 오늘 배송 다 늦겠네요.',bad:'동쪽 줄이 더 길어졌어요.',ok:'줄이 조금 짧아졌어요. 한 번 더 기다리긴 하지만요.',good:'이제 한두 번이면 통과해요. 배송이 빨라졌어요.',great:'녹색 한 번에 다 빠져요. 오늘은 칼퇴근입니다!'}},
+ '0-3':{who:'학원 차량 기사',name:'윤 선생님',a:'N',k:'q',ask:'북쪽에서만 차가 쏟아지는데 남북을 평균으로 맞춰 놨나 봐요. 아이들 등원이 늦어요.',
+  r:{jam:'북쪽이 꽉 막혔어요. 아이들이 지각했어요.',bad:'북쪽 줄이 더 길어졌어요.',ok:'조금 나아졌어요. 아직 아슬아슬해요.',good:'오늘은 수업 시작 전에 도착했어요!',great:'북쪽이 시원하게 뚫렸네요. 아이들이 박수 쳤어요.'}},
+ '0-4':{who:'강남역 출근 직장인',name:'정 대리',a:'auto',k:'dly',ask:'강남역 사거리는 매일 아침 지옥이에요. 주기는 못 바꾼다던데, 녹색이라도 제대로 나눠 주세요.',
+  r:{jam:'오늘도 사거리 한가운데서 꼼짝 못 했어요.',bad:'평소보다 더 막혔어요. 지각 처리됐습니다.',ok:'체감상 조금 빨라요. 아직 강남은 강남이네요.',good:'오늘은 9시 전에 자리에 앉았어요!',great:'강남역이 이렇게 뚫릴 수도 있군요. 팀장님도 놀라셨어요.'}},
+ '1-1':{who:'야간 택시 기사',name:'강 기사님',a:'N',k:'dly',ask:'새벽에 차 한 대 없는 사거리에서 빨간불 1분을 기다려요. 손님들이 답답해해요.',
+  r:{jam:'새벽인데 줄이 생겼어요. 이게 가능한가요?',bad:'더 오래 기다렸어요. 미터기만 올라가요.',ok:'조금 덜 기다려요. 아직 빈 도로 앞에서 서 있긴 해요.',good:'이제 금방 바뀌네요. 손님이 칭찬했어요.',great:'빨간불에 거의 안 걸려요. 새벽 운전이 즐거워요!'}},
+ '1-2':{who:'퇴근길 자가용',name:'서 과장',a:'auto',k:'dly',ask:'퇴근길에 신호가 너무 자주 바뀌어요. 출발할 만하면 또 빨간불이에요.',
+  r:{jam:'퇴근길이 주차장이 됐어요.',bad:'더 막혔어요. 저녁 약속에 늦었어요.',ok:'조금 나아졌어요. 그래도 몇 번은 서요.',good:'오늘은 저녁 약속에 늦지 않았어요!',great:'퇴근길이 이렇게 짧았나요? 놀랍네요.'}},
+ '1-3':{who:'통학 버스 기사',name:'문 기사님',a:'N',k:'q',ask:'주기가 너무 길어서 빈 도로 앞에서 1분 넘게 서 있고, 북쪽은 녹색이 끝나기도 전에 줄이 또 생겨요.',
+  r:{jam:'북쪽 줄이 끝이 안 보여요.',bad:'오늘은 더 오래 기다렸어요.',ok:'기다림이 조금 줄었어요.',good:'학생들이 오늘은 1교시에 늦지 않았대요!',great:'완벽해요. 기다리는 시간이 거의 없어요.'}},
+ '1-4':{who:'토론토 통근자',name:'프리야 씨',a:'E',k:'dly',ask:'레이크쇼어 대로 동쪽에서 매일 아침 시내로 들어가요. 파를러먼트 거리 앞에서 늘 두세 번은 신호를 기다려요.',
+  r:{jam:'레이크쇼어가 완전히 멈췄어요.',bad:'평소보다 더 막혔어요.',ok:'조금 나아졌어요. 아직 한 번은 기다려요.',good:'오늘은 회의 전에 커피까지 샀어요!',great:'호숫가 출근길이 이렇게 편할 줄이야!'}},
+ '2-1':{who:'오토바이 배달 라이더',name:'민 라이더',a:'N',k:'q',ask:'좌회전하는 차는 몇 대 없는데 1차로를 통째로 비워 둬요. 직진 차로만 꽉 막혀요.',
+  r:{jam:'북쪽이 꽉 막혀서 배달이 다 식었어요.',bad:'더 막혔어요. 배달 평점 떨어지겠어요.',ok:'조금 나아졌어요.',good:'배달 시간 단축! 오늘 콜이 더 많이 들어와요.',great:'차로가 딱 맞게 쓰이네요. 최고예요!'}},
+ '2-2':{who:'쇼핑몰 주차 안내원',name:'임 주임',a:'S',k:'q',ask:'남쪽에서 우회전해 들어오는 손님 차랑 직진 차가 한 차로에 섞여서 줄이 길어요.',
+  r:{jam:'남쪽 줄이 쇼핑몰 입구까지 막았어요.',bad:'손님들이 더 오래 기다렸어요.',ok:'조금 나아졌어요. 아직 섞이긴 해요.',good:'손님들이 쑥쑥 들어와요. 매출도 오를 것 같아요!',great:'우회전 차가 막힘 없이 들어와요. 사장님이 좋아하세요.'}},
+ '2-3':{who:'동네 상인회장',name:'백 회장님',a:'S',k:'q',ask:'네 방향 사정이 다 다른데 차로는 똑같이 나눠 놨어요. 남쪽 손님들이 가게 앞에서 줄만 서요.',
+  r:{jam:'사거리가 멈췄어요. 손님이 끊겼어요.',bad:'더 막혔어요.',ok:'조금 나아졌어요.',good:'손님들이 가게에 일찍 도착해요!',great:'네 방향이 다 시원해요. 상인회에서 감사패 드릴게요.'}},
+ '2-4':{who:'런던 블랙캡 기사',name:'톰 기사님',a:'auto',k:'dly',ask:'노스서큘러는 런던에서 손꼽히게 막혀요. 신호 시간만이라도 제대로 나눠 주세요.',
+  r:{jam:'A406이 다시 주차장이 됐어요.',bad:'오늘은 더 막혔어요.',ok:'조금 나아졌어요. 그래도 노스서큘러네요.',good:'손님이 오늘은 비행기 시간에 여유가 있대요!',great:'이런 노스서큘러는 처음이에요. 놀랍군요!'}},
+ '3-1':{who:'남쪽 동네 주민',name:'조 할머니',a:'S',k:'det',ask:'남쪽에서 직진하려는 차가 신호를 못 받아서 다 골목으로 돌아가요. 동네 골목이 차로 가득해요.',
+  r:{jam:'골목까지 꽉 막혔어요.',bad:'골목으로 도는 차가 더 많아졌어요.',ok:'골목 차가 조금 줄었어요.',good:'골목이 조용해졌어요. 손주랑 산책해도 되겠어요.',great:'이제 골목에 차가 안 다녀요. 고마워요!'}},
+ '3-2':{who:'보험사 사고 조사원',name:'노 조사원',a:'N',k:'risk',ask:'이 사거리는 끼어들기 사고 접수가 너무 많아요. 겸용 차로 맨 앞 차가 다른 신호를 기다리는 게 원인 같아요.',
+  r:{jam:'정체 때문에 접촉 사고가 또 났어요.',bad:'사고 위험이 더 커졌어요.',ok:'사고 접수가 조금 줄었어요.',good:'이번 주 사고 접수가 확 줄었어요!',great:'사고 접수 0건! 이런 주는 처음이에요.'}},
+ '3-3':{who:'초보 운전자',name:'유 씨',a:'N',k:'risk',ask:'좌회전 신호가 없어서 맞은편 차 사이로 비보호로 돌아야 해요. 매번 심장이 떨려요.',
+  r:{jam:'너무 막혀서 오늘은 아예 좌회전을 못 했어요.',bad:'더 무서워졌어요.',ok:'조금 덜 무서워요.',good:'좌회전이 편해졌어요. 운전 연습할 맛 나요!',great:'이제 안심하고 좌회전해요. 정말 고마워요!'}},
+ '3-4':{who:'이스탄불 돌무쉬 기사',name:'메흐메트 기사님',a:'auto',k:'dly',ask:'에디르네카프 성문 앞은 하루 종일 막혀요. 지상 신호를 잘 나누면 숨통이 트일 거예요.',
+  r:{jam:'성문 앞이 완전히 멈췄어요.',bad:'오늘은 더 막혔어요.',ok:'조금 나아졌어요.',good:'손님들이 오늘은 빨리 왔다고 하네요!',great:'성문 앞이 이렇게 뚫린 건 처음 봐요!'}},
+ '4-1':{who:'쇼핑몰 손님',name:'차 씨 가족',a:'N',k:'det',ask:'주차장에 들어가려면 사거리에서 유턴해야 하는데 1차로가 좌회전 전용이라 블록을 한 바퀴 돌아요.',
+  r:{jam:'유턴은커녕 사거리에 갇혔어요.',bad:'돌아가는 차가 더 많아졌어요.',ok:'조금 나아졌어요.',good:'바로 유턴해서 주차했어요. 아이들이 좋아해요!',great:'주차장까지 1분! 주말 쇼핑이 편해졌어요.'}},
+ '4-2':{who:'도심 출근 직장인',name:'남 대리',a:'S',k:'q',ask:'남쪽에서 도심으로 가는 차만 2,000대인데 반대편 차로는 텅 비어 있어요. 그 차로를 쓸 수는 없나요?',
+  r:{jam:'남쪽이 완전히 막혔어요.',bad:'오히려 더 막혔어요.',ok:'조금 나아졌어요.',good:'오늘은 엘리베이터 줄도 안 서고 출근했어요!',great:'출근길이 반으로 줄었어요. 대단해요!'}},
+ '4-3':{who:'주유소 사장',name:'황 사장님',a:'S',k:'det',ask:'남쪽 손님들이 주유소로 유턴을 못 해서 다 돌아가요. 동쪽 대로도 매일 꽉 막히고요.',
+  r:{jam:'대로가 막혀서 손님이 끊겼어요.',bad:'손님이 더 줄었어요.',ok:'유턴하는 손님이 조금 늘었어요.',good:'손님들이 바로 들어와요. 매출이 늘었어요!',great:'대로도 뚫리고 손님도 늘었어요. 최고예요!'}},
+ '4-4':{who:'도쿄 택시 기사',name:'사토 기사님',a:'auto',k:'dly',ask:'오하라 교차로는 우회전 대기열이 직진 차로까지 막아요. 사고도 많은 곳이라 늘 조마조마해요.',
+  r:{jam:'환7이 다시 멈췄어요.',bad:'오늘은 더 막혔어요.',ok:'조금 나아졌어요.',good:'손님이 시간 맞춰 도착했다고 기뻐해요!',great:'오하라가 이렇게 순조로운 건 처음이에요!'}},
+ '5-1':{who:'역으로 가는 대학생',name:'지 학생',a:'N',k:'pedW',ask:'역에 가려면 대로를 건너야 하는데 보행 신호가 너무 짧아요. 다 못 건너고 중간에 멈춰요.',
+  r:{jam:'차가 너무 막혀서 횡단보도까지 막혔어요.',bad:'더 오래 기다렸어요. 지하철을 놓쳤어요.',ok:'조금 덜 기다려요.',good:'한 번에 다 건넜어요. 지하철도 탔어요!',great:'기다림 없이 건너요. 1교시 출석 완료!'}},
+ '5-2':{who:'번화가 카페 사장',name:'하 사장님',a:'N',k:'pedW',ask:'사람도 차도 너무 많아서 우회전 차가 사람 앞에서 계속 서 있어요. 손님들이 건너기도 힘들어요.',
+  r:{jam:'사거리가 완전히 멈췄어요.',bad:'손님들이 더 오래 기다렸어요.',ok:'조금 나아졌어요.',good:'손님들이 대각선으로 바로 건너와요!',great:'사람도 차도 시원해요. 오늘 매출 최고예요!'}},
+ '5-3':{who:'배달 앱 라이더',name:'피 라이더',a:'auto',k:'dly',ask:'사람들은 15초면 다 건너는데 보행 전용 신호를 40초나 줘요. 빈 횡단보도 앞에서 서 있어요.',
+  r:{jam:'사거리가 꽉 막혔어요.',bad:'더 오래 서 있었어요.',ok:'조금 나아졌어요.',good:'배달이 빨라졌어요!',great:'신호가 딱 맞아요. 사람도 차도 기분 좋아요!'}},
+ '5-4':{who:'강남역 출근 직장인',name:'정 대리',a:'auto',k:'pedW',ask:'이번엔 걸어서 출근해요. 강남역 횡단보도에서 기다리는 시간이 차 타는 것만큼 길어요.',
+  r:{jam:'사거리가 막혀서 횡단보도도 엉망이에요.',bad:'더 오래 기다렸어요.',ok:'조금 덜 기다려요.',good:'오늘은 걸어서도 일찍 도착했어요!',great:'차도 사람도 시원한 강남역이라니!'}},
+ 'real-gangnam':{who:'강남역 출근 직장인',name:'정 대리',a:'auto',k:'dly',ask:'이제 모든 도구를 쓸 수 있대요. 강남역 출근길을 진짜로 풀어 주세요.',
+  r:{jam:'사거리 한가운데서 꼼짝 못 했어요.',bad:'평소보다 더 막혔어요.',ok:'조금 빨라요.',good:'9시 전에 자리에 앉았어요!',great:'강남역이 이렇게 뚫리다니요!'}},
+ 'real-edirnekapi':{who:'이스탄불 돌무쉬 기사',name:'메흐메트 기사님',a:'auto',k:'dly',ask:'모든 도구가 열렸다고요? 세계에서 가장 막히는 도시의 성문을 열어 주세요.',
+  r:{jam:'성문 앞이 멈췄어요.',bad:'더 막혔어요.',ok:'조금 나아졌어요.',good:'손님들이 빨리 왔대요!',great:'성문이 활짝 열렸어요!'}},
+ 'real-toronto':{who:'토론토 통근자',name:'프리야 씨',a:'E',k:'dly',ask:'이번엔 차로와 현시까지 바꿀 수 있대요. 레이크쇼어 출근길을 끝내 주세요.',
+  r:{jam:'레이크쇼어가 멈췄어요.',bad:'더 막혔어요.',ok:'조금 나아졌어요.',good:'회의 전에 커피까지 샀어요!',great:'호숫가 출근길이 최고예요!'}},
+ 'real-london':{who:'런던 블랙캡 기사',name:'톰 기사님',a:'auto',k:'dly',ask:'모든 도구로 노스서큘러를 풀어 보세요. 런던 기사들이 지켜보고 있어요.',
+  r:{jam:'A406이 주차장이 됐어요.',bad:'더 막혔어요.',ok:'조금 나아졌어요.',good:'손님이 비행기 시간에 여유가 있대요!',great:'이런 노스서큘러는 처음이에요!'}},
+ 'real-tokyo':{who:'도쿄 택시 기사',name:'사토 기사님',a:'auto',k:'dly',ask:'오하라 교차로를 모든 도구로 풀어 주세요. 사고도 줄면 더 좋고요.',
+  r:{jam:'환7이 멈췄어요.',bad:'더 막혔어요.',ok:'조금 나아졌어요.',good:'시간 맞춰 도착했어요!',great:'오하라가 이렇게 순조롭다니!'}}};
+// 자동 생성: node tools/rival.mjs (AI 라이벌 기록과 풀이. 엔진이나 레벨이 바뀌면 다시 실행)
+const RIVAL={"L0-1":{"score":679,"base":563,"risk":0.04,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":38},{"m":["ET","ER","WT","WR"],"g":26}]}},"L0-2":{"score":621,"base":379,"risk":0,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":18},{"m":["ET","ER","WT","WR"],"g":30}]}},"L0-3":{"score":690,"base":463,"risk":0.04,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":30},{"m":["ET","ER","WT","WR"],"g":31}]}},"L0-4":{"score":437,"base":335,"risk":0.466,"patch":{"phases":[{"m":["SL","ST","SR"],"g":34},{"m":["NL","NT","NR"],"g":32},{"m":["EL","ET","ER"],"g":52},{"m":["WL","WT","WR"],"g":26}]}},"L1-1":{"score":248,"base":195,"risk":0,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":74},{"m":["ET","ER","WT","WR"],"g":45}]}},"L1-2":{"score":921,"base":740,"risk":0.08,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":28},{"m":["ET","ER","WT","WR"],"g":24}]}},"L1-3":{"score":528,"base":410,"risk":0,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":90},{"m":["ET","ER","WT","WR"],"g":57}]}},"L1-4":{"score":304,"base":269,"risk":0.061,"patch":{"phases":[{"m":["EL","WL"],"g":19},{"m":["ET","ER","WT","WR"],"g":48},{"m":["NL","NT","NR","SL","ST","SR"],"g":23}]}},"L2-1":{"score":432,"base":200,"risk":0,"patch":{"phases":[{"m":["SL","ST","SR"],"g":13},{"m":["NL","NT","NR"],"g":15},{"m":["ET","ER","WT","WR"],"g":12}],"appr":{"N":{"vph":700,"pl":10,"pr":10,"lanes":["LT","TR"],"perm":false},"E":{"vph":300,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false},"S":{"vph":750,"pl":10,"pr":10,"lanes":["LT","TR"],"perm":false},"W":{"vph":300,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false}}}},"L2-2":{"score":440,"base":198,"risk":0,"patch":{"phases":[{"m":["SL","ST","SR"],"g":23},{"m":["NL","NT","NR"],"g":15},{"m":["ET","ER","WT","WR"],"g":20}],"appr":{"N":{"vph":500,"pl":10,"pr":10,"lanes":["LT","TR"],"perm":false},"E":{"vph":400,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false},"S":{"vph":900,"pl":10,"pr":40,"lanes":["LT","TR"],"perm":false},"W":{"vph":400,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false}}}},"L2-3":{"score":307,"base":71,"risk":0,"patch":{"phases":[{"m":["SL","ST","SR"],"g":18},{"m":["NL","NT","NR"],"g":12},{"m":["EL","ET","ER"],"g":16},{"m":["WL","WT","WR"],"g":14}],"appr":{"N":{"vph":600,"pl":35,"pr":10,"lanes":["LT","TR"],"perm":false},"E":{"vph":550,"pl":10,"pr":35,"lanes":["LT","TR"],"perm":false},"S":{"vph":700,"pl":5,"pr":10,"lanes":["LT","TR"],"perm":false},"W":{"vph":450,"pl":0,"pr":10,"lanes":["TR","TR"],"perm":false}}}},"L2-4":{"score":656,"base":529,"risk":0.742,"patch":{"phases":[{"m":["ET","WT"],"g":56},{"m":["EL","ET"],"g":5},{"m":["NL","NT","NR"],"g":18},{"m":["ST","SR"],"g":15}],"appr":{"N":{"vph":625,"pl":30,"pr":30,"lanes":["LT","TR","TR"],"perm":false,"ped":40},"E":{"vph":1098,"pl":9,"pr":11,"lanes":["LT","T","T"],"perm":false,"ped":25},"S":{"vph":426,"pl":0,"pr":50,"lanes":["T","TR"],"perm":false,"ped":40},"W":{"vph":1959,"pl":0,"pr":13,"lanes":["T","T","T"],"perm":false,"ped":25}}}},"L3-1":{"score":455,"base":165,"risk":0,"patch":{"phases":[{"m":["NL","NT","NR"],"g":16},{"m":["SL","ST","SR"],"g":20},{"m":["ET","ER","WT","WR"],"g":20}]}},"L3-2":{"score":477,"base":277,"risk":0.056,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":17},{"m":["SL","SR","NL","NR"],"g":8},{"m":["ET","ER","WT","WR"],"g":10}]}},"L3-3":{"score":433,"base":268,"risk":0.4,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":42},{"m":["ET","ER","WT","WR"],"g":24}]}},"L3-4":{"score":819,"base":738,"risk":0.202,"patch":{"phases":[{"m":["ET","ER","WT","WR"],"g":64},{"m":["NL","NR","SL","SR"],"g":16}]}},"L4-1":{"score":430,"base":320,"risk":0.04,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":43},{"m":["SL","SR","NL","NR"],"g":8},{"m":["ET","ER","WT","WR"],"g":24}],"appr":{"N":{"vph":800,"pl":10,"pr":10,"lanes":["LU","TR"],"perm":false,"pu":15},"E":{"vph":450,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false},"S":{"vph":750,"pl":12,"pr":10,"lanes":["LU","TR"],"perm":false,"pu":6},"W":{"vph":450,"pl":0,"pr":10,"lanes":["T","TR"],"perm":false}}}},"L4-2":{"score":562,"base":220,"risk":0.04,"patch":{"geo":{"LW":3.5,"nIn":{"N":0,"E":2,"S":4,"W":2},"nOut":{"N":4,"E":2,"S":0,"W":2},"slip":{},"off":{"S":-7},"oOff":{"N":-7}},"phases":[{"m":["ST","SR","NT","NR"],"g":45},{"m":["ET","ER","WT","WR"],"g":24}],"appr":{"N":{"vph":60,"pl":5,"pr":5,"lanes":[],"perm":false},"E":{"vph":450,"pl":2,"pr":10,"lanes":["LT","TR"],"perm":false},"S":{"vph":2000,"pl":5,"pr":5,"lanes":["T","T","T","TR"],"perm":false},"W":{"vph":450,"pl":10,"pr":2,"lanes":["LT","TR"],"perm":false}},"ow":{"S":"in","N":"out"}}},"L4-3":{"score":420,"base":220,"risk":0.008,"patch":{"phases":[{"m":["ST","SR","NT","NR"],"g":16},{"m":["SL","SR","NL","NR"],"g":5},{"m":["ET","ER","WT","WR"],"g":41}],"appr":{"N":{"vph":500,"pl":5,"pr":5,"lanes":["LT","TR"],"perm":false},"E":{"vph":1700,"pl":5,"pr":5,"lanes":["T","LT"],"perm":false},"S":{"vph":600,"pl":10,"pr":5,"lanes":["LT","TR"],"perm":false,"pu":12},"W":{"vph":80,"pl":5,"pr":5,"lanes":["T","TR"],"perm":false}}}},"L4-4":{"score":443,"base":152,"risk":0.288,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":45},{"m":["NL","NT","NR"],"g":5},{"m":["WT","WR","ET","ER"],"g":14},{"m":["EL","WL"],"g":5}],"appr":{"N":{"vph":1673,"pl":20,"pr":10,"lanes":["R","T","T","TR"],"perm":true,"ped":200},"E":{"vph":567,"pl":66,"pr":17,"lanes":["TR","L"],"perm":true,"ped":200},"S":{"vph":2189,"pl":12,"pr":12,"lanes":["LT","T","TR"],"perm":true,"ped":200},"W":{"vph":650,"pl":15,"pr":69,"lanes":["LT","U"],"perm":true,"ped":200}},"ow":{"W":"in"}}},"L5-1":{"score":879,"base":406,"risk":0.04,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":43},{"m":["ET","ER","WT","WR"],"g":17}]}},"L5-2":{"score":940,"base":285,"risk":0.077,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":22},{"m":["ET","ER","WT","WR"],"g":25},{"m":[],"g":15,"x":true}],"pedConc":false}},"L5-3":{"score":883,"base":491,"risk":0.035,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":25},{"m":["ET","ER","WT","WR"],"g":23},{"m":[],"g":13,"x":true}]}},"L5-4":{"score":403,"base":335,"risk":0.36,"patch":{"phases":[{"m":["SL","ST","SR"],"g":31},{"m":["NL","NT","NR"],"g":48},{"m":["EL","ET","ER"],"g":44},{"m":["WL","WT","WR"],"g":30}]}},"real-gangnam":{"score":469,"base":335,"risk":0.399,"patch":{"phases":[{"m":["SL","ST","SR"],"g":34},{"m":["NL","NT","NR"],"g":33},{"m":["EL","ET","ER"],"g":56},{"m":["WL","WT","WR"],"g":30}],"appr":{"N":{"vph":1910,"pl":12,"pr":15,"lanes":["B","L","L","T","T","T"],"perm":false,"ped":750},"E":{"vph":2650,"pl":12,"pr":15,"lanes":["LU","L","T","T","T"],"perm":false,"pu":2,"ped":650},"S":{"vph":1725,"pl":12,"pr":15,"lanes":["B","L","R","T","T","T"],"perm":false,"ped":750},"W":{"vph":1500,"pl":12,"pr":15,"lanes":["LU","L","T","T","T"],"perm":false,"pu":2,"ped":650}}}},"real-edirnekapi":{"score":819,"base":738,"risk":0.202,"patch":{"phases":[{"m":["ET","ER","WT","WR"],"g":64},{"m":["NL","NR","SL","SR"],"g":16}]}},"real-toronto":{"score":338,"base":269,"risk":0.061,"patch":{"phases":[{"m":["EL","WL"],"g":19},{"m":["ET","ER","WT","WR"],"g":48},{"m":["NL","NT","NR","SL","ST","SR"],"g":23}],"appr":{"N":{"vph":355,"pl":8,"pr":46,"lanes":["TR","R"],"perm":false,"ped":10},"E":{"vph":1326,"pl":28,"pr":3,"lanes":["T","T","TR"],"perm":false,"ped":14},"S":{"vph":322,"pl":1,"pr":50,"lanes":["TR","TR"],"perm":false,"ped":17},"W":{"vph":891,"pl":34,"pr":0,"lanes":["L","T","T"],"perm":false,"ped":44}}}},"real-london":{"score":710,"base":529,"risk":0.044,"patch":{"phases":[{"m":["ET","WT"],"g":46},{"m":["EL","ET"],"g":15},{"m":["NL","NT","NR"],"g":17},{"m":["ST","SR"],"g":15}],"appr":{"N":{"vph":625,"pl":30,"pr":30,"lanes":["LT","TR","TR"],"perm":false,"ped":40},"E":{"vph":1098,"pl":9,"pr":11,"lanes":["L","LT","T"],"perm":false,"ped":25},"S":{"vph":426,"pl":0,"pr":50,"lanes":["T","TR"],"perm":false,"ped":40},"W":{"vph":1959,"pl":0,"pr":13,"lanes":["T","T","T"],"perm":false,"ped":25}}}},"real-tokyo":{"score":361,"base":152,"risk":0.451,"patch":{"phases":[{"m":["NT","NR","ST","SR"],"g":78},{"m":["NL","NT","NR"],"g":12},{"m":["WT","WR","ET","ER"],"g":37},{"m":["EL","WL"],"g":12}],"appr":{"N":{"vph":1673,"pl":20,"pr":10,"lanes":["L","TR","TR","TR"],"perm":true,"ped":200},"E":{"vph":567,"pl":66,"pr":17,"lanes":["L","TR"],"perm":true,"ped":200},"S":{"vph":2189,"pl":12,"pr":12,"lanes":["T","T","TR"],"perm":true,"ped":200},"W":{"vph":650,"pl":15,"pr":69,"lanes":["LT","TR"],"perm":true,"ped":200}}}}};
+// ---------- AI 기능: 시민 캐릭터(민원과 반응), AI 라이벌 엔지니어, AI 해설 코치 ----------
+// 시민 대사: citizens.js(미리 쓴 글). 라이벌: rival_data.js(tools/rival.mjs가 자동 탐색 최고 설정을 지금 엔진으로 평가)
+// 코치: 해설 문장은 화면에서 바로 만들고(규칙 기반), 연결되면 Supabase Edge Function(coach)을 거쳐 Claude가 문장만 다듬음
+// 코치가 쓰는 숫자는 모두 시뮬레이션 결과. 위치 힌트는 엔진으로 실제로 돌려 좋아지는 것만 보여 줌(숫자는 숨김: 너무 쉬워지지 않게)
+const AIK={coachUrl:'https://qjguvtmkrkbtpvdnyelp.supabase.co/functions/v1/coach',llm:new Map(),probe:new Map(),on:true};
+try{AIK.on=localStorage.getItem('ai-off')!=='1';}catch(e){}
+const aiKey=()=>mode.kind==='level'?curLevel().id:modeId();
+const citOf=()=>CITIZENS[aiKey()]||null;
+const rivalOf=()=>(typeof RIVAL!=='undefined'&&RIVAL[modeId()])||null;
+function citA(c){if(c.a!=='auto')return c.a;const b=baseCfg();return APPR.slice().sort((x,y)=>((b.appr[y]||{}).vph||0)-((b.appr[x]||{}).vph||0))[0];}
+function citVal(c,st){const a=citA(c);if(!st)return null;return c.k==='dly'?(st.byA&&st.byA[a]?st.byA[a].dly:st.dly):c.k==='q'?(st.byA&&st.byA[a]?st.byA[a].q:st.peakQ):c.k==='det'?st.det:c.k==='pedW'?(st.pedW||0):st.risk;}
+function citLabel(c){const a=citA(c);return c.k==='dly'?[`${NAME[a]} 1인당 지연`,'초',0]:c.k==='q'?[`${NAME[a]} 최대 대기열`,'대',0]:c.k==='det'?['우회 차량','대',0]:c.k==='pedW'?['보행자 평균 대기','초',0]:['기대 사고','건',2];}
+const CIT_SAME='아직 그대로예요. 오늘 안에 바꿔 주실 거죠?';
+const citAv=c=>`<span class="cav" aria-hidden="true">${c.name.slice(0,1)}</span>`;
+function citMood(rec){if(rec.jam)return'jam';if(!rec.sameDemand)return null;const b=baseline?baseline.score:-1e9;if(Math.abs(rec.score-b)<1)return'same';if(rec.score<b)return'bad';return rec.stars>=3?'great':rec.stars>=2?'good':'ok';}
+function citResultHTML(rec){const c=citOf(),m=c&&citMood(rec);if(!m)return'';const [lab,u,dp]=citLabel(c),v=citVal(c,rec.st),v0=citVal(c,baseline&&baseline.st);
+  const f=x=>x==null?'-':(+x).toFixed(dp),better=v0!=null&&v!=null&&v<v0-1e-9;
+  return`<div class="cit m-${m}">${citAv(c)}<div><div class="cwho">${c.who} <b>${c.name}</b></div><p>${c.r[m]||CIT_SAME}</p>
+    <span class="cmet ${v0==null?'':better?'up':v>v0+1e-9?'down':''}">${lab} 시작 ${f(v0)}${u} → 이번 ${f(v)}${u}</span></div></div>`;}
+// 레벨 진입 때 민원 카드(화면 왼쪽 위). 15초 뒤나 닫기로 사라짐
+const citCard=(()=>{const d=document.createElement('div');d.className='citcard';d.hidden=true;$('stage').appendChild(d);d.addEventListener('click',e=>{if(e.target.closest('.cx'))d.hidden=true;});return d;})();
+const CIT={id:null,to:null};
+function citShow(){const c=citOf();clearTimeout(CIT.to);if(!c){citCard.hidden=true;return;}
+  citCard.innerHTML=`${citAv(c)}<div><div class="cwho">${c.who} <b>${c.name}</b><button type="button" class="cx" aria-label="닫기">×</button></div><p>${c.ask}</p></div>`;citCard.hidden=false;CIT.to=setTimeout(()=>{citCard.hidden=true;},15000);}
+setInterval(()=>{try{if(!$('modal').hidden&&!citCard.hidden)citCard.hidden=true;const id=modeId();if(id!==CIT.id&&introBox.hidden&&$('modal').hidden){CIT.id=id;citShow();}}catch(e){}},500);
+// 레벨 설명에도 민원과 AI 기록
+{const _rb=renderBrief;renderBrief=function(){_rb();const el=$('brief'),c=citOf(),R=rivalOf();if(mode.kind==='lab')return;
+  let h='';if(c)h+=`<div class="cit brief">${citAv(c)}<div><div class="cwho">${c.who} <b>${c.name}</b>의 민원</div><p>${c.ask}</p></div></div>`;
+  el.insertAdjacentHTML('afterbegin',h);const thr=el.querySelector('.thr');if(R&&thr)thr.insertAdjacentHTML('beforeend',`<span class="airv">AI 엔지니어 ${R.score}점</span>`);};}
+
+// ---- AI 라이벌 ----
+function rivalBeat(){return!!(store.get('rival-v1')||{})[modeId()];}
+function rivalHTML(rec){const R=rivalOf();if(!R||!rec.sameDemand)return'';const best=Math.max(rec.jam?-1e9:rec.score,...sameStageHist().map(h=>h.jam?-1e9:h.score),(prog[aiKey()]||{}).best??-1e9),won=best>=R.score,p=Math.max(0,Math.min(100,best/R.score*100));
+  const open=won||triesLeft()<=0||((prog[aiKey()]||{}).stars||0)>=3;
+  return`<div class="rival ${won?'won':''}"><div class="rh"><span class="aiav" aria-hidden="true">AI</span><div><b>AI 엔지니어</b><small>같은 도구만으로 자동 탐색한 최고 기록</small></div><em>${R.score.toLocaleString()}점</em></div>
+    <div class="rbar"><i style="width:${p.toFixed(1)}%"></i><span>내 최고 ${best.toLocaleString()}점</span></div>
+    <div class="rmsg">${won?'AI 엔지니어를 이겼습니다! AI 풀이와 비교해 보세요.':`AI까지 ${(R.score-best).toLocaleString()}점 남았습니다.`}</div>
+    ${open?'<button type="button" data-ai="sol">AI 풀이 불러와 보기</button>':'<small class="rlock">AI 풀이는 AI를 이기거나, 별 3개를 받거나, 확정 기회를 다 쓰면 열립니다.</small>'}</div>`;}
+function rivalLoad(){const R=rivalOf();if(!R)return;const c=clone(baseCfg());for(const k in R.patch)c[k]=clone(R.patch[k]);cfg=c;closeModal();syncControls();startSession();buildArms();updateUI();
+  fxBubble(cw/2,80,'AI 풀이를 불러왔습니다. 무엇이 다른지 관찰해 보세요','big');anTrack('rival_sol',{});}
+window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec,R=rivalOf();if(!r||!R||!r.sameDemand||r.jam)return;
+  if(r.score>=R.score&&!rivalBeat()){const s=store.get('rival-v1')||{};s[modeId()]=Date.now();store.set('rival-v1',s);r.beatAI=true;anTrack('rival_beat',{score:r.score,ai:R.score});
+    setTimeout(()=>{fxBubble(cw/2,ch/2-80,'AI 엔지니어를 이겼다!','big');fxConfetti();fxSound('fanfare');},900);}});
+// 계기판에 AI 기록 눈금
+{const _gd=gDrawScale;gDrawScale=function(){_gd();const R=rivalOf();if(!R)return;const {lo,hi}=gRange(),v=Math.min(R.score,hi),a=gAng(v,lo,hi)*Math.PI/180,x=100+70*Math.sin(a),y=100-70*Math.cos(a);
+  gauge.querySelector('.ticks').insertAdjacentHTML('beforeend',`<text class="aitk" x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}">AI</text>`);};}
+
+// ---- AI 해설 코치 ----
+const LANE_TXT={L:'좌회전 전용',LT:'좌회전과 직진',T:'직진 전용',TR:'직진과 우회전',R:'우회전 전용',LTR:'모든 방향',LU:'좌회전과 유턴',U:'유턴 전용'};
+// 규칙 기반 해설: 무엇이 바뀌었고, 어디가 가장 막히며, 왜 그런지
+function coachFacts(rec,prev){const an=analyze(rec,prev),s=rec.st,b=baseline,R=rivalOf(),t=thresholds();
+  const byA=s.byA?Object.fromEntries(APPR.filter(a=>rec.cfg.appr[a]&&rec.cfg.appr[a].vph>0).map(a=>[NAME[a],{지연초:Math.round(s.byA[a].dly),대기열:s.byA[a].q}])):{};
+  return{an,f:{레벨:mode.kind==='level'?lvLabel(curLevel())+' '+curLevel().title:(curReal()&&curReal().title)||'',점수:rec.score,이전점수:prev?prev.score:null,시작점수:b?b.score:null,별:rec.stars,별기준:t,정체:!!rec.jam,
+    점수변화요인:an.drivers?Object.fromEntries(an.drivers.map(([k,v])=>[k,Math.round(v)])):null,가장막힌곳:an.focus?NAME[an.focus]:null,접근로별:byA,
+    원인:an.causes.slice(0,2).map(c=>c.v),평균속도kmh:+s.spd.toFixed(1),기대사고:+s.risk.toFixed(2),보행대기초:s.peds?Math.round(s.pedW||0):null,AI기록:R?R.score:null,남은확정:rec.triesLeft??null}};}
+function coachLocal(rec,prev){const {an,f}=coachFacts(rec,prev),out=[];
+  if(rec.jam)out.push(`한 차로 대기열이 ${rec.st.peakQ}대까지 늘어 정체가 났어요. 점수보다 먼저 막힌 방향을 풀어야 해요.`);
+  else{const ref=prev?prev.score:f.시작점수,lab=prev?'이전 확정':'시작 설정';
+    if(ref!=null){const d=rec.score-ref;if(Math.abs(d)<1)out.push(`${lab}과 거의 같은 점수예요.`);
+      else{let why='';if(an.drivers){const s=an.drivers.slice().sort((x,y)=>d>0?y[1]-x[1]:x[1]-y[1])[0];if(s&&Math.abs(s[1])>=1)why=` 가장 크게 ${d>0?'도운':'깎은'} 것은 ${s[0]}이에요.`;}
+        out.push(`${lab}보다 ${d>0?'+':''}${Math.round(d)}점 ${d>0?'올랐어요':'내려갔어요'}.${why}`);}}}
+  if(an.focus&&rec.st.byA)out.push(`지금 가장 오래 기다리는 곳은 ${NAME[an.focus]}이에요(1인당 ${Math.round(rec.st.byA[an.focus].dly)}초).`);
+  if(an.causes[0])out.push(an.causes[0].v+'.');
+  return out.join(' ');}
+async function coachLLM(rec,prev,local){const k=rec.at||rec.no;if(AIK.dead)return null;if(AIK.llm.has(k))return AIK.llm.get(k);
+  const p=(async()=>{try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
+    const r=await fetch(AIK.coachUrl,{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json',apikey:AN.key,Authorization:'Bearer '+AN.key},
+      body:JSON.stringify({cid:AN.cid,citizen:citOf()?citOf().who:null,facts:coachFacts(rec,prev).f,draft:local})});clearTimeout(to);
+    if(r.status===503||r.status===429)AIK.dead=true;if(!r.ok)return null;const j=await r.json();return j&&typeof j.text==='string'&&j.text.length>5?j.text.slice(0,500):null;}catch(e){return null;}})();
+  AIK.llm.set(k,p);return p;}
+// 위치 힌트: 확정한 설정에서 한 걸음 바꾼 후보를 엔진으로 돌려 가장 좋아지는 것을 고름(열린 조작만)
+function probeCands(rec){const c0=rec.cfg,an=analyze(rec,null),a=an.focus,out=[];if(!a)return out;
+  const P=c0.phases.map((p,i)=>({p,i})).filter(x=>x.p.g>0&&!x.p.x),serve=x=>x.p.m.some(m=>m[0]===a&&(m[1]==='T'||m[1]==='L'));
+  if(unlocked('split')&&P.length>1){const T=P.filter(serve).sort((x,y)=>y.p.g-x.p.g).slice(0,2),D=P.filter(x=>!serve(x)).sort((x,y)=>y.p.g-x.p.g).slice(0,3);
+    for(const t of T)for(const d of D){if(d.p.g-4<5)continue;const c=clone(c0);c.phases[t.i].g+=4;c.phases[d.i].g-=4;out.push({c,txt:`${phName(t.p)} 현시에 녹색을 몇 초 더 주고, 그만큼 ${phName(d.p)} 현시에서 가져와 보세요.`});}}
+  if(unlocked('cycle'))for(const [k,w] of [[.85,'줄여'],[1.15,'늘려']]){const c=clone(c0);for(const p of c.phases)if(p.g>0)p.g=Math.max(5,Math.round(p.g*k));out.push({c,txt:`비중은 그대로 두고 주기 길이를 조금 ${w} 보세요.`});}
+  if(unlocked('lanes')){const L=c0.appr[a].lanes;if(L.length<=4)L.forEach((m0,i)=>{for(const m of ['L','LT','T','TR','R']){if(m===m0)continue;const c=clone(c0);c.appr[a].lanes[i]=m;out.push({c,txt:`${NAME[a]} ${i+1}차로를 '${LANE_TXT[m]}'로 바꿔 보세요.`});}});}
+  return out.slice(0,14);}
+function probeRun(rec,onp){const k=rec.at||rec.no;if(AIK.probe.has(k))return AIK.probe.get(k);
+  const p=(async()=>{const C=probeCands(rec);let best=null,i=0;for(const x of C){let ev;try{ev=await Promise.race([evalAsync(x.c,null),new Promise((_,rj)=>setTimeout(()=>rj('to'),25000))]);}catch(e){continue;}i++;onp&&onp(i,C.length);
+      if(jammed(ev.st))continue;if(ev.score>rec.score*1.005&&(!best||ev.score>best.score))best={...x,score:ev.score};}
+    anTrack('ai_hint',{lvl:2,n:C.length,found:!!best});return best;})();
+  AIK.probe.set(k,p);return p;}
+function coachHTML(rec,prev){const local=coachLocal(rec,prev),an=analyze(rec,prev),t2=limited()?(rec.try||0)>=2:true,dir=an.causes[0]?an.causes[0].dir:'';
+  return`<div class="aicoach" data-k="${rec.at||rec.no}"><div class="ach"><span class="aiav" aria-hidden="true">AI</span><b>AI 코치</b><small class="src">기본 해설</small></div>
+    <p class="act">${local}</p>
+    <div class="ahints"><button type="button" data-ai="h1">힌트 1: 방향</button><button type="button" data-ai="h2" ${t2?'':'disabled title="두 번째 확정부터 열립니다"'}>힌트 2: 위치${t2?'':' (2번째 확정부터)'}</button></div>
+    <div class="ahout" hidden data-dir="${dir.replace(/"/g,'&quot;')}"></div></div>`;}
+// 결과 화면에 붙이기
+{const _rr=renderResult;renderResult=function(rec,prev){_rr(rec,prev);if(!rec)return;const box=$('resbody'),top=box.querySelector('.dash')||box.querySelector('.res-top');if(!top)return;
+  top.insertAdjacentHTML(top.classList.contains('dash')?'beforebegin':'afterend',citResultHTML(rec)+coachHTML(rec,prev)+rivalHTML(rec));
+  // 최근 10분 안의 결과만 AI 문장 다듬기(오래된 기록을 열 때마다 부르지 않게)
+  if(AIK.on&&Date.now()-(rec.at||0)<600000){const k=String(rec.at||rec.no);coachLLM(rec,prev,coachLocal(rec,prev)).then(txt=>{if(!txt)return;const el=box.querySelector(`.aicoach[data-k="${k}"]`);if(!el)return;el.querySelector('.act').textContent=txt;el.querySelector('.src').textContent='Claude가 다듬은 해설';});}};}
+$('resbody').addEventListener('click',e=>{const b=e.target.closest('[data-ai]');if(!b)return;const k=b.dataset.ai,rec=history[0],box=b.closest('.aicoach'),out=box&&box.querySelector('.ahout');
+  if(k==='sol'){rivalLoad();return;}
+  if(!rec||!out)return;out.hidden=false;
+  if(k==='h1'){out.innerHTML=`<b>방향</b> ${out.dataset.dir||'가장 오래 기다리는 방향에 녹색을 몇 초씩 옮겨 보세요.'}`;anTrack('ai_hint',{lvl:1});return;}
+  if(k==='h2'){b.disabled=true;out.innerHTML='<b>위치</b> <span class="spin"></span> AI 코치가 설정을 몇 가지 바꿔 시험해 보는 중입니다…';
+    probeRun(rec,(i,n)=>{const s=out.querySelector('.spin');if(s)s.textContent=`${i}/${n}`;}).then(best=>{
+      out.innerHTML=best?`<b>위치</b> ${best.txt} <small>(시뮬레이션으로 확인한 방향입니다. 얼마나 바꿀지는 직접 찾아 보세요.)</small>`
+        :`<b>위치</b> 지금 설정에서 한 걸음 바꾸는 것으로는 더 좋아지지 않습니다. ${curLevel()&&curLevel().hint?curLevel().hint:'차로 배정이나 현시 구성처럼 구조를 바꿔 보세요.'}`;});}});
+// 설정: AI 문장 다듬기 끄기
+{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML='<input type="checkbox" id="aion">AI 코치 문장 다듬기(Claude)';$('ctlbar').insertBefore(l,$('resetcfg'));
+  const c=$('aion');c.checked=AIK.on;c.title='확정 결과의 숫자 요약을 보내 Claude가 해설 문장을 다듬습니다. 끄면 기본 해설만 보입니다.';
+  c.addEventListener('change',()=>{AIK.on=c.checked;try{localStorage.setItem('ai-off',c.checked?'0':'1');}catch(e){}});}
+renderBrief();
 })();
 </script>
 <script>
@@ -2329,7 +2611,7 @@ window.__wxDraw=dt=>{const s=g().sim;if(!s)return;const k=(s.cfg&&s.cfg.wx)||'cl
 // 랭킹: Supabase(익명 로그인 + scores 표). 공개 키만 씀(행 수준 보안으로 본인 점수만 올릴 수 있음)
 // 올린 기록은 '검증 대기'(pending)로 들어가고, GitHub Actions가 엔진으로 다시 계산해 '확정'(verified)한 기록만 랭킹에 보임
 (()=>{
-const URL_='https://qjguvtmkrkbtpvdnyelp.supabase.co',KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',VER='v0.19';
+const URL_='https://qjguvtmkrkbtpvdnyelp.supabase.co',KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',VER='v0.20';
 const $=id=>document.getElementById(id),g=()=>window.__g;
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
