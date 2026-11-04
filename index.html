@@ -182,7 +182,7 @@ body.play .stage{aspect-ratio:auto;height:min(86vh,940px);min-height:520px}
 body.play .stage{display:flex;flex-direction:column}
 body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
 .dock #sigcore{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;column-gap:16px;align-items:center}
-.dock #tl,.dock .tlcap{grid-column:1/-1}
+.dock #tl,.dock .tlcap,.dock .tlleg{grid-column:1/-1}
 .dock .splits,.dock #selname{display:none}
 .dock .nudge{margin:0;grid-row:1;grid-column:3}
 .dock .row{grid-template-columns:70px minmax(0,1fr) 44px}
@@ -421,6 +421,25 @@ body.mobile .gauge{width:136px;padding:4px 6px 5px}body.mobile .gauge .gs{font-s
 .airv{color:#9fd4ff}
 .gauge .ticks text.aitk{fill:#9fd4ff;font-size:7.5px}
 body.mobile .citcard{top:64px;font-size:12.5px}
+/* 신호 막대 현시 번호와 범례: 구간이 좁아도 어느 현시인지 보이게 */
+.tl .sg .pn{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;border-radius:8px;background:rgba(0,0,0,.35);font-style:normal;font-weight:700;font-size:10px;margin-right:4px;padding:0 3px}
+.tlleg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:5px;font-size:11.5px;color:var(--muted)}
+.tlleg span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.tlleg b{color:var(--fg)}
+.tlleg .sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+/* 모바일: 레벨 칩과 계기판, 민원 카드는 지도를 가리지 않게 지도 아래 줄로 */
+body.mobile .hud-top{position:static!important;order:1;transform:none!important;max-width:none!important;flex-direction:row!important;flex-wrap:wrap;align-items:center!important;justify-content:flex-start;gap:6px;padding:6px;background:var(--panel)!important;border-radius:0}
+body.mobile .hud-top .chip{text-align:left!important}
+body.mobile .hud-top .gauge{order:2}
+body.mobile .citcard{position:static!important;order:1;max-width:none!important;border-radius:0;box-shadow:none;margin:0;animation:none}
+body.mobile .hud-top{display:flex!important;flex-direction:row!important;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+body.mobile .hud-top .chip{white-space:nowrap!important;flex:none}
+body.mobile .hud-top .gauge{width:auto!important;display:flex;align-items:center;gap:6px;padding:3px 8px!important;flex:none;border-radius:99px}
+body.mobile .hud-top .gauge svg{display:none}
+body.mobile .hud-top .gauge .gv{margin-top:0!important;display:flex;align-items:baseline;gap:5px}
+body.mobile .hud-top .gauge .gs{font-size:15px!important}
+body.mobile .hud-top .gauge .gl{display:none}
+body.mobile .hud-top #coachbtn{flex:none}
+body.mobile .citcard{padding:6px 10px;font-size:12px}body.mobile .citcard .cav{width:26px;height:26px;font-size:12px}
 </style>
 
 <div class="wrap">
@@ -1253,12 +1272,15 @@ $('pedconc').addEventListener('change',e=>{if(e.target.checked)delete cfg.pedCon
 function buildTL(){const tl=timeline(PH,cfg.yellow),box=$('tl'),C=tl.len,foc=document.activeElement&&document.activeElement.classList.contains('h')?selH:null;box.innerHTML='';
   for(const iv of tl.iv){const d=document.createElement('div'),w=(iv.e-iv.s)/C*100;d.style.width=w+'%';
     d.className='sg '+(iv.type==='G'?'p'+iv.i:iv.type);
-    if(iv.type==='G'&&w>8)d.innerHTML=w>15?`${phName(iv.p)}<br>${iv.e-iv.s}초`:`${iv.e-iv.s}초`;box.appendChild(d);}
+    // 구간이 좁아도 어느 현시인지 알 수 있게: 번호는 항상(아주 좁으면 번호만), 이름은 아래 범례에 항상 표시
+    if(iv.type==='G'){const n=`<i class="pn">${iv.i+1}</i>`,sec=`${iv.e-iv.s}초`;d.innerHTML=w>15?`${n}${phName(iv.p)}<br>${sec}`:w>6?`${n}${sec}`:w>2?n:'';d.title=`${iv.i+1} ${phName(iv.p)} ${sec}`;}box.appendChild(d);}
   for(let j=0;j<PH.length-1;j++){const h=document.createElement('button');h.type='button';h.className='h'+(j===selH?' sel':'');h.dataset.j=j;
     h.style.left=(boundary(j)/C*100)+'%';h.setAttribute('aria-label',`${phName(PH[j])}와 ${phName(PH[j+1])} 사이 경계, 방향키로 1초씩 이동`);box.appendChild(h);}
   const m=document.createElement('div');m.className='mark';m.id='tlmark';box.appendChild(m);
   if(foc!==null){const h=box.querySelector(`.h[data-j="${foc}"]`);if(h)h.focus();}
-  $('tlcyc').textContent='주기 '+C+'초';}
+  $('tlcyc').textContent='주기 '+C+'초';
+  let lg=$('tlleg');if(!lg){lg=document.createElement('div');lg.id='tlleg';lg.className='tlleg';box.insertAdjacentElement('afterend',lg);}
+  lg.innerHTML=PH.map((p,i)=>p.g>0?`<span><i class="sw p${i}"></i><b>${i+1}</b> ${phName(p)} ${p.g}초</span>`:'').join('');}
 const tlBox=$('tl');let drag=null;
 tlBox.addEventListener('pointerdown',e=>{const r=tlBox.getBoundingClientRect(),C=cycleLen(),t=(e.clientX-r.left)/r.width*C;
   let best=[],bd=1e9;for(let j=0;j<PH.length-1;j++){const d=Math.abs(boundary(j)-t);if(d<bd-1e-6){bd=d;best=[j];}else if(Math.abs(d-bd)<1e-6)best.push(j);}
@@ -2012,7 +2034,12 @@ function draw(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=geoDim
   for(const a of APPR){const d=HEAD[a],r=rightOf(d);let n=0;
     sim.net.inL[a].forEach((sg,i)=>{n+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.s<L-VIEW+2)n++;});
     ctx.font=`600 ${Math.max(11,Math.round(cw/48))}px "IBM Plex Mono",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
-    if(n>0){const p=add(mul(r,W*Math.min(2,G.nIn[a])),mul(d,-VIEW+5)),x=cw/2+MX*p[0]*sc,y=ch/2-p[1]*sc,t='+'+n,w=ctx.measureText(t).width+12;
+    // 화면 밖 대기 차량 수: 도로를 가리지 않게 진입 차로 바깥쪽(길가)에 표시
+    if(n>0){const DD=geoDims(G),lat=DD.off(a)+DD.nAll(a)*G.LW,p=add(mul(r,lat),mul(d,-VIEW+5)),t='+'+n,w=ctx.measureText(t).width+12,hz=Math.abs(r[0])>.5,o=(hz?w/2:11)+6;
+      const at=(P,s)=>{let X=cw/2+MX*(P[0]*sc+s*r[0]*o),Y=ch/2-(P[1]*sc+s*r[1]*o);return[Math.max(w/2+4,Math.min(cw-w/2-4,X)),Math.max(15,Math.min(ch-15,Y))];};
+      let [x,y]=at(p,1);
+      // 패널 밑에 가려지면 도로 건너편(나가는 차로 바깥쪽)에 표시
+      if(typeof hudBlock==='function'&&hudBlock(x-w/2,y-11,x+w/2,y+11)){const q=add(mul(r,-(DD.oOff(a)+G.nOut[a]*G.LW)),mul(d,-VIEW+5));[x,y]=at(q,-1);}
       ctx.fillStyle='rgba(239,90,80,.92)';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x-w/2,y-11,w,22,11);else ctx.rect(x-w/2,y-11,w,22);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(t,x,y+1);}
     const off=add(mul(d,-VIEW+14),mul(r,-G.nOut[a]*W-6));ctx.fillStyle=COL.muted;ctx.font=`500 ${Math.max(11,Math.round(cw/52))}px "IBM Plex Sans KR",sans-serif`;
     ctx.fillText(R?R.arm[a].split(' ')[0]:NAME[a],cw/2+MX*off[0]*sc,ch/2-off[1]*sc);}
@@ -2513,6 +2540,81 @@ $('resbody').addEventListener('click',e=>{const b=e.target.closest('[data-ai]');
   const c=$('aion');c.checked=AIK.on;c.title='확정 결과의 숫자 요약을 보내 Claude가 해설 문장을 다듬습니다. 끄면 기본 해설만 보입니다.';
   c.addEventListener('change',()=>{AIK.on=c.checked;try{localStorage.setItem('ai-off',c.checked?'0':'1');}catch(e){}});}
 renderBrief();
+// ---------- 화면 배치: 정보와 조작 UI가 도로를 가리지 않게 ----------
+// 도로 = 교차로를 지나는 남북, 동서 띠(시뮬레이션 도로 폭 + 여유). 그 밖의 네 귀퉁이(사분면)에만 패널을 둠
+// 왼쪽 위: 세션 HUD, 민원 카드 / 오른쪽 위: 재생 패널, 레벨 칩과 계기판(자리가 없으면 다른 사분면)
+// 접근로 버튼, 말풍선, 차로 편집 창도 도로 띠에 걸치면 바깥으로 밀어냄
+function roadBand(){if(!cfg||!cw)return null;const G=cfg.geo,D=geoDims(G),sc=Math.min(cw,ch)/(2*VIEW),m=1.5;
+  const half=ax=>Math.max(...(ax==='NS'?['N','S']:['E','W']).map(a=>Math.max(Math.abs(D.off(a))+D.nAll(a)*G.LW,Math.abs(D.oOff(a))+G.nOut[a]*G.LW)))+m;
+  const hx=half('NS')*sc,hy=half('EW')*sc,cx=cw/2,cy=ch/2;
+  return{cx,cy,x0:cx-hx,x1:cx+hx,y0:cy-hy,y1:cy+hy,
+    Q:{tl:[0,0,cx-hx,cy-hy],tr:[cx+hx,0,cw,cy-hy],bl:[0,cy+hy,cx-hx,ch],br:[cx+hx,cy+hy,cw,ch]}};}
+const onRoad=(B,r)=>{const vert=r[2]>B.x0&&r[0]<B.x1,hor=r[3]>B.y0&&r[1]<B.y1;return vert||hor;};
+// 점(x, y)에 놓일 폭 w, 높이 h 상자를 도로 밖으로: 가까운 쪽 가장자리 바깥으로 이동
+function offRoad(B,x,y,w,h,pad){pad=pad||8;let r=[x-w/2,y-h/2,x+w/2,y+h/2];
+  if(r[2]>B.x0-2&&r[0]<B.x1+2){x=x<B.cx?B.x0-w/2-pad:B.x1+w/2+pad;}
+  r=[x-w/2,y-h/2,x+w/2,y+h/2];if(r[3]>B.y0-2&&r[1]<B.y1+2){y=y<B.cy?B.y0-h/2-pad:B.y1+h/2+pad;}
+  return[Math.max(w/2+4,Math.min(cw-w/2-4,x)),Math.max(h/2+4,Math.min(ch-h/2-4,y))];}
+const LAY={last:'',panels:[]};
+// 캔버스 위 표시(화면 밖 대기 차량 수 등)가 패널 밑에 숨는지
+function hudBlock(l,t,r,b){return LAY.panels.some(p=>r>p[0]-4&&l<p[2]+4&&b>p[1]-4&&t<p[3]+4);}
+function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand();if(!B)return;const mob=document.body.classList.contains('mobile');
+  const tl=$('hudtl'),tr=$('hudtr'),top=$('hudtop'),g=8;
+  // 모바일 CSS가 !important로 자리를 정해 두어서 같은 우선순위로 덮어씀
+  const sp=(el,k,v)=>el.style.setProperty(k,v,'important');
+  const put=(el,q,x,y,alignR,maxW)=>{sp(el,'box-sizing','border-box');sp(el,'max-width',Math.max(100,maxW)+'px');sp(el,'transform','none');sp(el,'bottom','auto');
+    if(alignR){sp(el,'left','auto');sp(el,'right',(cw-x)+'px');}else{sp(el,'right','auto');sp(el,'left',x+'px');}sp(el,'top',y+'px');};
+  const Q=B.Q,qw=q=>q[2]-q[0]-2*g,qh=q=>q[3]-q[1]-2*g;
+  // 1) 세션 HUD: 왼쪽 위
+  let yL=g;if(tl&&!tl.hidden){put(tl,Q.tl,g,g,false,qw(Q.tl));const h=tl.offsetHeight,k=Math.min(1,(qh(Q.tl)+g)/Math.max(1,h));
+    sp(tl,'transform-origin','top left');sp(tl,'transform',k<.999?`scale(${Math.max(.55,k).toFixed(3)})`:'none');yL=g+h*Math.min(1,Math.max(.55,k))+g;}
+  // 2) 재생 패널: 오른쪽 위(모바일은 지도 아래에 따로 있음)
+  let yR=g;if(tr&&!mob&&!tr.hidden){put(tr,Q.tr,cw-g,g,true,qw(Q.tr));yR=g+tr.offsetHeight+g;}
+  // 3) 레벨 칩과 계기판(모바일은 지도 아래 줄에 따로 둠: CSS)
+  if(mob){for(const el of [top,typeof citCard!=='undefined'?citCard:null])if(el)for(const k of ['left','right','top','bottom','max-width','transform','max-height'])el.style.removeProperty(k);}
+  // 데스크톱: 들어갈 수 있는 첫 사분면(오른쪽 위 아래쪽, 왼쪽 위 아래쪽, 오른쪽 아래, 왼쪽 아래)
+  else
+  if(top){sp(top,'align-items','flex-end');const h=top.offsetHeight,w=Math.min(top.scrollWidth,360);
+    const cand=[[Q.tr,yR,true],[Q.tl,yL,false],[Q.br,Q.br[1]+g,true],[Q.bl,Q.bl[1]+g,false]];
+    let c=cand.find(([q,y])=>qw(q)>=Math.min(w,220)&&y+h<=q[3]-g)||cand.reduce((a,b)=>(b[0][3]-b[1])>(a[0][3]-a[1])?b:a);
+    const [q,y,R]=c;sp(top,'align-items',R?'flex-end':'flex-start');put(top,q,R?q[2]-g:q[0]+g,y,R,qw(q));
+    // 어느 사분면에도 다 안 들어가면(작은 화면) 줄여서 맞춤
+    const k=Math.min(1,(q[3]-g-y)/Math.max(1,h));sp(top,'transform-origin',R?'top right':'top left');sp(top,'transform',k<.999?`scale(${Math.max(.6,k).toFixed(3)})`:'none');
+    if(c[0]===Q.tr)yR=y+h+g;else if(c[0]===Q.tl)yL=y+h+g;}
+  // 4) 민원 카드: 왼쪽 위 남은 칸, 안 되면 왼쪽 아래(모바일은 지도 아래)
+  if(!mob&&typeof citCard!=='undefined'&&!citCard.hidden){citCard.style.removeProperty('max-height');const h=citCard.offsetHeight;const fits=yL+h<=Q.tl[3]-g;const q=fits?Q.tl:Q.bl;
+    // 남은 높이보다 길면 잘라서 스크롤(작은 화면)
+    sp(citCard,'max-height',Math.max(60,(fits?Q.tl[3]-yL:qh(q)))+'px');sp(citCard,'overflow-y','auto');
+    sp(citCard,'left',(q[0]+g)+'px');sp(citCard,'top',(fits?yL:q[1]+g)+'px');sp(citCard,'box-sizing','border-box');sp(citCard,'max-width',Math.max(100,qw(q))+'px');}
+  // 5) 접근로 버튼: 도로에 걸치면 바깥으로, 패널과 겹치면 도로를 따라 비켜 감
+  const S0=S.getBoundingClientRect(),panels=[tl,mob?null:tr,mob?null:top,typeof citCard!=='undefined'&&!mob?citCard:null].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[r.left-S0.left,r.top-S0.top,r.right-S0.left,r.bottom-S0.top];});
+  LAY.panels=panels.slice();
+  const hit=(r)=>panels.some(p=>r[2]>p[0]-4&&r[0]<p[2]+4&&r[3]>p[1]-4&&r[1]<p[3]+4);
+  for(const a of APPR){const b=$('arm-'+a);if(!b||b.hidden)continue;const x=parseFloat(b.style.left),y=parseFloat(b.style.top);if(isNaN(x))continue;
+    const w=b.offsetWidth,h=b.offsetHeight;let [nx,ny]=offRoad(B,x,y,w,h);const ax=HEAD[a][0]===0?'y':'x',box=(X,Y)=>[X-w/2,Y-h/2,X+w/2,Y+h/2];
+    if(hit(box(nx,ny))){let best=null;
+      // 같은 쪽 길가를 따라 먼저 찾고, 없으면 도로 건너편 길가에서 찾음
+      const other=ax==='y'?[nx>B.cx?B.x0-w/2-8:B.x1+w/2+8,ny]:[nx,ny>B.cy?B.y0-h/2-8:B.y1+h/2+8];
+      // 접근로 쪽 절반(북측 버튼은 교차로 위쪽 등)을 벗어나지 않고, 가장 적게 움직이는 자리
+      const half=ax==='y'?(Y=>Math.sign(Y-B.cy)===Math.sign(ny-B.cy)):(X=>Math.sign(X-B.cx)===Math.sign(nx-B.cx));
+      for(let k=0;k<=50&&!best;k++)for(const [sx,sy] of [[nx,ny],other]){for(const sg of k?[1,-1]:[1]){const X=ax==='x'?sx+sg*k*8:sx,Y=ax==='y'?sy+sg*k*8:sy,r=box(X,Y);
+          if(r[0]<2||r[1]<2||r[2]>cw-2||r[3]>ch-2||onRoad(B,r)||hit(r)||!half(ax==='y'?Y:X))continue;best=[X,Y];break;}if(best)break;}
+      // 그래도 없으면(작은 화면) 반대 축으로도 비켜 봄
+      if(!best)for(let k=1;k<=30&&!best;k++)for(const sg of [1,-1]){const X=ax==='y'?nx+sg*k*8:nx,Y=ax==='x'?ny+sg*k*8:ny,r=box(X,Y);
+        if(r[0]<2||r[1]<2||r[2]>cw-2||r[3]>ch-2||onRoad(B,r)||hit(r))continue;best=[X,Y];break;}
+      if(best)[nx,ny]=best;}
+    panels.push(box(nx,ny));
+    if(Math.abs(nx-x)>.5||Math.abs(ny-y)>.5){b.style.left=nx+'px';b.style.top=ny+'px';}}
+  // 6) 차로 편집 창
+  const P=$('pop');if(P&&!P.hidden&&!mob){const L=P.offsetLeft,T=P.offsetTop,w=P.offsetWidth,h=P.offsetHeight;if(onRoad(B,[L,T,L+w,T+h])){
+    const qs=Object.values(Q).filter(q=>qw(q)>=w&&qh(q)>=h);if(qs.length){const q=qs.sort((p,r)=>Math.hypot((p[0]+p[2])/2-L,(p[1]+p[3])/2-T)-Math.hypot((r[0]+r[2])/2-L,(r[1]+r[3])/2-T))[0];
+      P.style.left=Math.max(q[0]+g,Math.min(q[2]-w-g,L))+'px';P.style.top=Math.max(q[1]+g,Math.min(q[3]-h-g,T))+'px';}}}}
+// 말풍선도 도로 밖에서 뜨게
+{const _fb=fxBubble;fxBubble=function(x,y,text,kind,snd){const B=roadBand();if(B){const w=Math.min(260,text.length*13+30),h=kind==='big'?40:30;[x,y]=offRoad(B,x,y,w,h,4);}return _fb(x,y,text,kind,snd);};}
+{const _pa=positionArms;positionArms=function(){_pa();try{layoutUI();}catch(e){}};}
+{const _pp=placePop;placePop=function(x,y){_pp(x,y);try{layoutUI();}catch(e){}};}
+window.__band=()=>{const B=roadBand();return B&&[B.x0|0,B.x1|0,B.y0|0,B.y1|0];};
+addEventListener('resize',()=>{try{layoutUI();}catch(e){}});setInterval(()=>{try{layoutUI();}catch(e){}},300);
 })();
 </script>
 <script>
