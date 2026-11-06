@@ -495,6 +495,12 @@ h1.brand span{color:#4fe08a}h1.brand small{font-family:var(--f-display);font-siz
 @keyframes tl2{0%,69%,84%,100%{background:#444a54;box-shadow:none}70%,83%{background:#ffc94a;box-shadow:0 0 14px #ffc94a}}
 @keyframes tl1{0%,84%{background:#444a54;box-shadow:none}85%,99%{background:#ff5a5a;box-shadow:0 0 14px #ff5a5a}100%{background:#444a54;box-shadow:none}}
 .lcwarn{background:rgba(243,181,49,.12);border:1px solid rgba(243,181,49,.45);border-radius:8px;padding:8px 10px;margin-top:0}
+/* 실시간 카메라 작은 창 */
+.lcpip{position:absolute;z-index:3;background:rgba(14,18,22,.9);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.lcpip .lph{display:flex;align-items:center;gap:6px;padding:5px 6px 5px 9px;font-size:11.5px}.lcpip .lpt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcpip .lph button{padding:2px 7px;font-size:11px;line-height:1.4}.lcpip .lpx{font-size:14px!important;padding:0 7px!important}
+.lcpip .lpm{aspect-ratio:16/9;background:#000}.lcpip .lpm img,.lcpip .lpm video,.lcpip .lpm iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
+.lcpip .lpd{font-size:10.5px;color:var(--accent);padding:3px 9px 5px}
 </style>
 
 <div class="wrap">
@@ -2632,6 +2638,26 @@ function openLiveCam(){const k=lcKey();if(!k)return;const L=LIVECAM[k],R=curReal
 // 버튼: 실제 교차로 스테이지에서만, 레벨 칩 묶음(도움말 옆)에
 {const b=document.createElement('button');b.type='button';b.id='lcbtn';b.className='chip lcbtn';b.innerHTML='<i class="lcdot"></i>실시간 카메라';b.hidden=true;$('hudtop').appendChild(b);b.addEventListener('click',openLiveCam);
   setInterval(()=>{try{const k=lcKey(),n=k?LIVECAM[k].cams.length:0;b.hidden=!k;b.classList.toggle('none',!n);b.title=n?'이 교차로 근처 공개 카메라 보기':'이 교차로의 공개 카메라는 아직 없습니다';}catch(e){}},500);}
+// ---- 작은 창(PiP): 실제 교차로 스테이지에서 지도 귀퉁이(도로 밖)에 첫 번째 카메라를 띄움. 위치는 layout.js가 정함 ----
+// 공개 주소에서만(미리보기는 외부 사진이 막힘), 모바일은 화면이 좁아 띄우지 않음(버튼으로 크게 보기). 끄면 기억함
+const PIP=(()=>{const d=document.createElement('div');d.id='lcpip';d.className='lcpip';d.hidden=true;
+  d.innerHTML='<div class="lph"><i class="lcdot"></i><span class="lpt"></span><button type="button" class="lpbig" title="크게 보기">크게</button><button type="button" class="lpx" title="닫기">×</button></div><div class="lpm"></div><div class="lpd"></div>';
+  $('stage').appendChild(d);return d;})();
+const PS={key:null,timer:null,off:(()=>{try{return localStorage.getItem('lcpip-off')==='1';}catch(e){return false;}})()};
+function pipFill(k){const c=LIVECAM[k].cams[0],m=PIP.querySelector('.lpm'),ts=Date.now();clearInterval(PS.timer);
+  PIP.querySelector('.lpt').textContent='실시간 '+c.title;PIP.querySelector('.lpd').textContent=c.dist;
+  m.innerHTML=c.kind==='yt'?`<iframe src="https://www.youtube-nocookie.com/embed/${c.id}?autoplay=1&mute=1&playsinline=1&controls=0" title="${c.title}" allow="autoplay; encrypted-media" loading="lazy"></iframe>`
+    :c.kind==='video'?`<video src="${c.src}?t=${ts}" poster="${c.poster}?t=${ts}" autoplay muted loop playsinline></video>`:`<img src="${c.src}?t=${ts}" alt="${c.title} 실시간 사진">`;
+  if(c.kind==='img')PS.timer=setInterval(()=>{const im=m.querySelector('img');if(im)im.src=c.src+'?t='+Date.now();},60000);
+  if(c.kind==='video')PS.timer=setInterval(()=>{const v=m.querySelector('video');if(v){v.src=c.src+'?t='+Date.now();v.play&&v.play().catch(()=>{});}},300000);}
+function pipUpdate(){const k=lcKey(),ok=k&&LIVECAM[k].cams.length&&lcPub()&&!document.body.classList.contains('mobile')&&playMode&&!PS.off&&!document.body.classList.contains('titleon');
+  if(!ok){if(!PIP.hidden){PIP.hidden=true;PIP.querySelector('.lpm').innerHTML='';clearInterval(PS.timer);PS.key=null;}return;}
+  if(PS.key!==k){PS.key=k;pipFill(k);}PIP.hidden=false;}
+PIP.querySelector('.lpx').addEventListener('click',()=>{PS.off=true;try{localStorage.setItem('lcpip-off','1');}catch(e){}pipUpdate();});
+PIP.querySelector('.lpbig').addEventListener('click',openLiveCam);
+// 버튼: 작은 창이 꺼져 있으면 다시 켜고, 켜져 있거나 띄울 수 없으면 크게 보기
+{const b=$('lcbtn');b.removeEventListener('click',openLiveCam);b.addEventListener('click',()=>{const k=lcKey();if(PS.off&&k&&LIVECAM[k].cams.length&&lcPub()&&!document.body.classList.contains('mobile')){PS.off=false;try{localStorage.removeItem('lcpip-off');}catch(e){}pipUpdate();}else openLiveCam();});}
+setInterval(()=>{try{pipUpdate();}catch(e){}},500);
 // ---------- 화면 배치: 정보와 조작 UI가 도로를 가리지 않게 ----------
 // 도로 = 교차로를 지나는 남북, 동서 띠(시뮬레이션 도로 폭 + 여유). 그 밖의 네 귀퉁이(사분면)에만 패널을 둠
 // 왼쪽 위: 세션 HUD, 민원 카드 / 오른쪽 위: 재생 패널, 레벨 칩과 계기판(자리가 없으면 다른 사분면)
@@ -2678,8 +2704,16 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
     // 남은 높이보다 길면 잘라서 스크롤(작은 화면)
     sp(citCard,'max-height',Math.max(60,(fits?Q.tl[3]-yL:qh(q)))+'px');sp(citCard,'overflow-y','auto');
     sp(citCard,'left',(q[0]+g)+'px');sp(citCard,'top',(fits?yL:q[1]+g)+'px');sp(citCard,'box-sizing','border-box');sp(citCard,'max-width',Math.max(100,qw(q))+'px');}
+  // 4-1) 실시간 카메라 작은 창: 아래쪽 귀퉁이부터 도로 밖 빈 자리(livecam.js)
+  const pip=$('lcpip');if(pip&&!pip.hidden&&!mob){const used=[tl,tr,top,typeof citCard!=='undefined'?citCard:null].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect(),s0=S.getBoundingClientRect();return[r.left-s0.left,r.top-s0.top,r.right-s0.left,r.bottom-s0.top];});
+    const cands=[[Q.bl,'bl'],[Q.br,'br'],[Q.tl,'tl'],[Q.tr,'tr']];let done=false;
+    for(const [q] of cands){const w=Math.min(280,qw(q));if(w<170)continue;sp(pip,'width',w+'px');const h=pip.offsetHeight;
+      // 귀퉁이 바깥쪽(화면 가장자리)에 붙이고, 다른 패널과 겹치면 안쪽으로 비켜 봄
+      const L=q===Q.bl||q===Q.tl?q[0]+g:q[2]-g-w;for(const T of (q===Q.bl||q===Q.br)?[q[3]-g-h,q[1]+g]:[q[3]-g-h]){if(T<q[1]+g)continue;const r=[L,T,L+w,T+h];
+        if(used.some(p=>r[2]>p[0]-4&&r[0]<p[2]+4&&r[3]>p[1]-4&&r[1]<p[3]+4))continue;sp(pip,'left',L+'px');sp(pip,'top',T+'px');done=true;break;}if(done)break;}
+    pip.style.visibility=done?'visible':'hidden';}
   // 5) 접근로 버튼: 도로에 걸치면 바깥으로, 패널과 겹치면 도로를 따라 비켜 감
-  const S0=S.getBoundingClientRect(),panels=[tl,mob?null:tr,mob?null:top,typeof citCard!=='undefined'&&!mob?citCard:null].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[r.left-S0.left,r.top-S0.top,r.right-S0.left,r.bottom-S0.top];});
+  const S0=S.getBoundingClientRect(),panels=[tl,mob?null:tr,mob?null:top,typeof citCard!=='undefined'&&!mob?citCard:null,mob?null:$('lcpip')].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[r.left-S0.left,r.top-S0.top,r.right-S0.left,r.bottom-S0.top];});
   LAY.panels=panels.slice();
   const hit=(r)=>panels.some(p=>r[2]>p[0]-4&&r[0]<p[2]+4&&r[3]>p[1]-4&&r[1]<p[3]+4);
   for(const a of APPR){const b=$('arm-'+a);if(!b||b.hidden)continue;const x=parseFloat(b.style.left),y=parseFloat(b.style.top);if(isNaN(x))continue;
