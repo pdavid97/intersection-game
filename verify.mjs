@@ -10,7 +10,9 @@ const MAX_ROWS=+(process.env.MAX_ROWS||40),TIME_BUDGET=+(process.env.TIME_BUDGET
 
 // ---------- 설정 검사: 화면에서 할 수 있는 조작만으로 만든 설정인지 ----------
 const MODES=new Set(['L','LU','U','LT','T','TR','R','B']);
-const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+// 순서 무관 비교: Supabase(jsonb)가 객체 키를 정렬해 저장하므로 키 순서를 맞춘 뒤 비교(예전에는 이 때문에 모든 기록이 '도로 모양이 기본값과 다름'으로 거절됨)
+const canon=v=>Array.isArray(v)?v.map(canon):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canon(v[k])])):v;
+const same=(a,b)=>JSON.stringify(canon(a))===JSON.stringify(canon(b));
 export function baseOf(stage){
   if(stage.startsWith('real-')){const R=E.REAL[stage.slice(5)];if(!R)return null;return{base:E.realCfg(R),unlock:null};}
   if(stage.startsWith('L')){const lv=E.LEVELS.find(l=>'L'+l.id===stage);if(!lv)return null;return{base:E.levelCfg(lv),unlock:new Set(lv.unlock)};}
