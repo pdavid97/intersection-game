@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261105214526">
+<meta name="gl-build" content="20261105221220">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -504,12 +504,61 @@ h1.brand span{color:#4fe08a}h1.brand small{font-family:var(--f-display);font-siz
 .lcpip .lpd{font-size:10.5px;color:var(--accent);padding:3px 9px 5px}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:6000;background:#1b2229;color:var(--fg);border:1px solid var(--accent);border-radius:99px;padding:8px 10px 8px 16px;font-size:13px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .updbar button{padding:5px 12px;font-size:12.5px;border-radius:99px}
+
+/* ===== 플레이 화면 v2(PC): 지도 | 옆 칸. 지도 위에는 패널을 두지 않음 ===== */
+body.pv2 .stage{display:grid!important;grid-template-columns:minmax(0,1fr) 312px;grid-template-rows:minmax(0,1fr) auto}
+body.pv2 .stage canvas{grid-column:1;grid-row:1;width:100%;height:100%;min-height:0}
+body.pv2 .stage .dock{grid-column:1;grid-row:2}
+body.pv2 .side{grid-column:2;grid-row:1/span 2;display:flex;flex-direction:column;gap:10px;padding:12px;overflow-y:auto;border-left:1px solid var(--line);background:var(--panel)}
+.side{display:none}body.pv2 .side{display:flex}
+body.pv2 .side>*{position:static!important;transform:none!important;max-width:none!important;width:auto!important;margin:0!important;box-shadow:none}
+body.pv2 .side .hud-top{display:flex!important;flex-direction:row!important;flex-wrap:wrap;justify-content:center;align-items:center!important;gap:8px;background:none;border:0;padding:0}
+body.pv2 .side .hud-top #lvchip{flex-basis:100%;text-align:center;white-space:normal;line-height:1.35}
+body.pv2 .side .hud-top .gauge{flex-basis:100%;width:auto;max-width:230px;margin:0 auto}
+body.pv2 .side .hud-top .pending{flex-basis:100%}
+body.pv2 .side .sgoal{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:13px;line-height:1.45}
+body.pv2 .side .sgoal b{font-size:12px;color:var(--accent)}body.pv2 .side .sgoal small{color:var(--muted);font-size:11.5px}
+body.pv2 .side .citcard{font-size:12.5px;padding:9px 11px;animation:none}
+body.pv2 .side .hud-tl{min-width:0;padding:10px 12px;border-radius:12px;background:var(--panel2)}
+body.pv2 .side .hud-tr{padding:0;background:none;border:0}
+body.pv2 .side .hud-tr .bar{display:flex;flex-wrap:wrap;gap:6px}
+body.pv2 .side .hud-tr #skip{order:-2;flex-basis:100%;font-size:15px;padding:11px 12px;font-weight:700}
+body.pv2 .side .hud-tr #play{order:-1}
+body.pv2 .side .lcpip{border-radius:12px}
+.sgoal{display:none}
+
+/* ===== 노을 도시 화면 테마: 조작 버튼, 패널 색을 시작 화면과 맞춤 ===== */
+body.sk-sunset{--bg:#1c1524;--panel:#271d31;--panel2:#33263f;--line:#4a3a55;--fg:#fff3e6;--muted:#c9aebd;--accent:#ffd35a}
+body.sk-sunset{background:var(--bg)}
+body.sk-sunset button,body.sk-sunset select{background:#3a2c47;border-color:#5a4668;color:var(--fg);border-radius:99px}
+body.sk-sunset button:hover{background:#46365a}
+body.sk-sunset button.primary,body.sk-sunset #skip{background:#ffd35a;color:#3a2313;border-color:#ffd35a;box-shadow:0 3px 0 #c98f22;font-weight:700}
+body.sk-sunset button.primary:hover,body.sk-sunset #skip:hover{background:#ffdf7e}
+body.sk-sunset button.on{border-color:#ffd35a;color:#ffd35a}
+body.sk-sunset .seg{border-radius:99px;border-color:#5a4668}body.sk-sunset .seg button{border-radius:0;border:0}
+body.sk-sunset .chip{background:rgba(51,38,63,.92);border-color:#5a4668}
+body.sk-sunset .gauge{background:rgba(51,38,63,.95);border-color:#5a4668}
+body.sk-sunset .hud-tl,body.sk-sunset .hud-tr,body.sk-sunset .dock,body.sk-sunset .pop{background:rgba(39,29,49,.94);border-color:#4a3a55}
+body.sk-sunset .dock{background:var(--panel)}
+body.sk-sunset .modalbox{background:#271d31;border-color:#4a3a55}
+body.sk-sunset .armbtn{background:rgba(39,29,49,.9);border-color:#5a4668}
+body.sk-sunset h1.brand small{color:var(--muted)}
+/* 모바일: 세션, 목표 상자도 지도 밖(재생 줄 아래)으로 */
+body.mobile .hud-tl{position:static!important;order:2;border-radius:0;border-width:1px 0 0;max-width:none!important;min-width:0;padding:6px 10px}
+body.mobile .hud-tl .grid2{grid-template-columns:repeat(4,auto)}
+body.mobile.play .stage{height:auto!important}
+body.mobile.play .stage canvas{flex:none!important;height:min(96vw,58dvh)!important}
+/* 모바일 순서: 지도 → 신호 막대(핵심 조작) → 확정과 재생 → 레벨과 점수 → 목표 → 민원 */
+body.mobile.play .stage canvas{order:1}body.mobile.play .dock{order:2}body.mobile.play .hud-tr{order:3}
+body.mobile.play .hud-top{order:4}body.mobile.play .hud-tl{order:5}body.mobile.play .citcard{order:6}
+body.mobile.play .hud-tr .bar{flex-wrap:wrap!important;overflow:visible!important}
+body.mobile.play .hud-tr #skip{order:-2;flex:1 1 100%!important;font-size:15px;padding:10px}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.20. 교차로 위에서 바로 조작하세요. 접근로 버튼은 차로, 교차로 가운데는 신호 구성, 아래 막대는 신호 시간입니다.</div>
+    <div class="sub">프로토타입 v0.20. 아래 신호 막대로 녹색 시간을 나누고, 오른쪽 확정 버튼으로 결과를 확인하세요.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -1736,7 +1785,7 @@ const CAR_PAINT={paint:['#d64545','#2f6fe0','#f4f4f4','#23272e','#9aa4ad','#e6b4
 // 노을 도시 건물 색(시작 화면과 같은 파스텔): [지붕, 그림자 쪽 벽]
 const SUN_BLD=[['#f6c9a8','#d48f70'],['#f3dca2','#cfa866'],['#bfdccf','#80ab99'],['#cdd3ee','#8f98c6'],['#f2b8c0','#c97f8b'],['#e9e2d6','#bcae9a']];
 let skin='sunset',showSpeed=false,COL={...COL0};
-function applySkin(id){skin=SKINS[id]?id:'sunset';COL={...COL0,head:'#0b0e11',headEdge:'#3a444e',...SKINS[skin].col};
+function applySkin(id){skin=SKINS[id]?id:'sunset';document.body.classList.toggle('sk-sunset',skin==='sunset');COL={...COL0,head:'#0b0e11',headEdge:'#3a444e',...SKINS[skin].col};
   try{localStorage.setItem('skin-v2',JSON.stringify({skin,showSpeed}));}catch(e){}
   $('skinsel').value=skin;$('spdcol').checked=showSpeed;}
 // 기본 스킨: 노을 도시(v0.20부터). 예전 저장값(skin-v1)은 무시하고 한 번 새 기본으로 시작
@@ -2707,8 +2756,12 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
   const put=(el,q,x,y,alignR,maxW)=>{sp(el,'box-sizing','border-box');sp(el,'max-width',Math.max(100,maxW)+'px');sp(el,'transform','none');sp(el,'bottom','auto');
     if(alignR){sp(el,'left','auto');sp(el,'right',(cw-x)+'px');}else{sp(el,'right','auto');sp(el,'left',x+'px');}sp(el,'top',y+'px');};
   const Q=B.Q,qw=q=>q[2]-q[0]-2*g,qh=q=>q[3]-q[1]-2*g;
+  // 플레이 화면 v2(playui.js): 패널은 지도 밖 옆 칸에 있으므로 접근로 버튼, 차로 편집 창만 배치
+  const PVON=document.body.classList.contains('pv2');
+  if(!PVON){
   // 1) 세션 HUD: 왼쪽 위
-  let yL=g;if(tl&&!tl.hidden){put(tl,Q.tl,g,g,false,qw(Q.tl));const h=tl.offsetHeight,k=Math.min(1,(qh(Q.tl)+g)/Math.max(1,h));
+  let yL=g;if(mob&&tl){for(const k of ['left','right','top','bottom','max-width','transform','transform-origin','box-sizing'])tl.style.removeProperty(k);}
+  if(tl&&!tl.hidden&&!mob){put(tl,Q.tl,g,g,false,qw(Q.tl));const h=tl.offsetHeight,k=Math.min(1,(qh(Q.tl)+g)/Math.max(1,h));
     sp(tl,'transform-origin','top left');sp(tl,'transform',k<.999?`scale(${Math.max(.55,k).toFixed(3)})`:'none');yL=g+h*Math.min(1,Math.max(.55,k))+g;}
   // 2) 재생 패널: 오른쪽 위(모바일은 지도 아래에 따로 있음)
   let yR=g;if(tr&&!mob&&!tr.hidden){put(tr,Q.tr,cw-g,g,true,qw(Q.tr));yR=g+tr.offsetHeight+g;}
@@ -2736,8 +2789,9 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
       const L=q===Q.bl||q===Q.tl?q[0]+g:q[2]-g-w;for(const T of (q===Q.bl||q===Q.br)?[q[3]-g-h,q[1]+g]:[q[3]-g-h]){if(T<q[1]+g)continue;const r=[L,T,L+w,T+h];
         if(used.some(p=>r[2]>p[0]-4&&r[0]<p[2]+4&&r[3]>p[1]-4&&r[1]<p[3]+4))continue;sp(pip,'left',L+'px');sp(pip,'top',T+'px');done=true;break;}if(done)break;}
     pip.style.visibility=done?'visible':'hidden';}
+  }
   // 5) 접근로 버튼: 도로에 걸치면 바깥으로, 패널과 겹치면 도로를 따라 비켜 감
-  const S0=S.getBoundingClientRect(),panels=[tl,mob?null:tr,mob?null:top,typeof citCard!=='undefined'&&!mob?citCard:null,mob?null:$('lcpip')].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[r.left-S0.left,r.top-S0.top,r.right-S0.left,r.bottom-S0.top];});
+  const S0=S.getBoundingClientRect(),panels=PVON?[]:[tl,mob?null:tr,mob?null:top,typeof citCard!=='undefined'&&!mob?citCard:null,mob?null:$('lcpip')].filter(e=>e&&!e.hidden&&e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[r.left-S0.left,r.top-S0.top,r.right-S0.left,r.bottom-S0.top];});
   LAY.panels=panels.slice();
   const hit=(r)=>panels.some(p=>r[2]>p[0]-4&&r[0]<p[2]+4&&r[3]>p[1]-4&&r[1]<p[3]+4);
   for(const a of APPR){const b=$('arm-'+a);if(!b||b.hidden)continue;const x=parseFloat(b.style.left),y=parseFloat(b.style.top);if(isNaN(x))continue;
@@ -2765,6 +2819,30 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
 {const _pp=placePop;placePop=function(x,y){_pp(x,y);try{layoutUI();}catch(e){}};}
 window.__band=()=>{const B=roadBand();return B&&[B.x0|0,B.x1|0,B.y0|0,B.y1|0];};
 addEventListener('resize',()=>{try{layoutUI();}catch(e){}});setInterval(()=>{try{layoutUI();}catch(e){}},300);
+// ---------- 플레이 화면 v2: 지도(교차로와 차량)는 아무것도 가리지 않고, 정보와 조작은 지도 밖 옆 칸(PC)이나 아래 줄(모바일)에 둠 ----------
+// 옆 칸 순서: 스테이지와 목표 → 점수 계기판 → 관찰 시간과 재생 → 확정 → 핵심 지표와 목표 체크 → 더보기(도움말, 카메라, 설정 등)
+// 지도 위에 남는 것: 접근로 버튼(차로 바꾸기), 화면 밖 대기 차량 수, 잠깐 뜨는 말풍선(모두 도로 밖 길가)
+const PV2S={side:null,goal:null,on:false};
+function pvBuild(){if(PV2S.side)return;const s=document.createElement('aside');s.id='side';s.className='side';
+  s.innerHTML='<div class="sgoal" id="sgoal"></div>';$('stage').appendChild(s);PV2S.side=s;PV2S.goal=s.querySelector('#sgoal');}
+const PV_EL=()=>[$('hudtop'),typeof citCard!=='undefined'?citCard:null,$('hudtl'),$('hudtr'),$('lcpip')].filter(Boolean);
+const PV_PROPS=['left','right','top','bottom','max-width','transform','transform-origin','box-sizing','max-height','width','align-items','visibility','overflow-y'];
+function pvClear(el){for(const k of PV_PROPS)el.style.removeProperty(k);}
+function pvApply(){const want=playMode&&!document.body.classList.contains('mobile');
+  if(want===PV2S.on)return;PV2S.on=want;document.body.classList.toggle('pv2',want);pvBuild();
+  if(want){const [top,cit,tl,tr,pip]=[$('hudtop'),typeof citCard!=='undefined'?citCard:null,$('hudtl'),$('hudtr'),$('lcpip')];
+    // 옆 칸 순서대로 옮김(이벤트 처리는 그대로 유지)
+    PV2S.side.appendChild(top);PV2S.side.appendChild(PV2S.goal);if(cit)PV2S.side.appendChild(cit);PV2S.side.appendChild(tl);PV2S.side.appendChild(tr);if(pip)PV2S.side.appendChild(pip);
+    PV_EL().forEach(pvClear);}
+  else{const st=$('stage'),cv=$('cv');for(const el of PV_EL())st.insertBefore(el,cv.nextSibling);PV_EL().forEach(pvClear);}
+  requestAnimationFrame(()=>{try{resize();positionArms();}catch(e){}});}
+// 목표 한 줄: 레벨의 목표 문장(실제 교차로는 짧은 안내)
+function pvGoal(){if(!PV2S.goal)return;const lv=curLevel(),R=curReal(),t=thresholds();
+  const g=lv?lv.goal:R?'모든 도구로 이 교차로의 흐름 점수를 최대한 올리세요.':'자유롭게 실험해 보세요.';
+  const k=modeId()+'|'+g;if(PV2S.goal.dataset.k===k)return;PV2S.goal.dataset.k=k;
+  PV2S.goal.innerHTML=`<b>할 일</b><span>${g}</span><small>별 ★${t[0]} ★★${t[1]} ★★★${t[2]}점, 확정하면 점수가 나옵니다</small>`;}
+setInterval(()=>{try{pvApply();pvGoal();}catch(e){}},300);
+{const _sp=setPlayMode;setPlayMode=function(on){_sp(on);try{pvApply();}catch(e){}};}
 // ---------- 시작 화면: 노을 지는 도시 교차로를 비스듬히 내려다본 장면(움직이는 차, 신호, 보행자) ----------
 // 그림은 모두 코드로 그림(이미지 파일 없음). 누르거나 Enter/Space를 누르면 본게임으로. 주소에 #notitle이 있으면 건너뜀(시험용)
 const TTL=(()=>{const d=document.createElement('div');d.id='title';d.className='title';
