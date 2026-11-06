@@ -440,6 +440,31 @@ body.mobile .hud-top .gauge .gs{font-size:15px!important}
 body.mobile .hud-top .gauge .gl{display:none}
 body.mobile .hud-top #coachbtn{flex:none}
 body.mobile .citcard{padding:6px 10px;font-size:12px}body.mobile .citcard .cav{width:26px;height:26px;font-size:12px}
+/* 시작 화면 */
+body.titleon{overflow:hidden}
+.title{position:fixed;inset:0;z-index:5000;cursor:pointer;overflow:hidden;background:#f4a98a;transition:opacity .55s ease,transform .55s ease}
+.title.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.title canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.title .tsh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,22,48,.62) 0%,rgba(40,22,48,.18) 38%,rgba(40,22,48,0) 55%,rgba(40,22,48,.35) 100%);pointer-events:none}
+.title .tbox{position:absolute;left:50%;top:7%;transform:translateX(-50%);width:min(92vw,720px);text-align:center;color:#fff8ee}
+.title .tlogo{display:flex;align-items:center;justify-content:center;gap:14px}
+.title h1{font-family:var(--f-display);font-size:clamp(38px,7.2vw,78px);line-height:1;letter-spacing:.01em;text-shadow:0 4px 0 #8a4b4b,0 10px 28px rgba(40,10,40,.45)}
+.title h1 em{font-style:normal;color:#ffd35a}
+.title .tlamp{display:inline-flex;flex-direction:column;gap:5px;padding:8px 7px;background:#2b2f36;border-radius:14px;box-shadow:0 6px 0 #1a1d22,0 10px 24px rgba(0,0,0,.35)}
+.title .tlamp i{width:clamp(12px,2.2vw,20px);height:clamp(12px,2.2vw,20px);border-radius:50%;background:#444a54}
+.title .tlamp i:nth-child(1){animation:tl1 6s infinite}.title .tlamp i:nth-child(2){animation:tl2 6s infinite}.title .tlamp i:nth-child(3){animation:tl3 6s infinite}
+@keyframes tl1{0%,55%{background:#444a54;box-shadow:none}60%,100%{background:#ff5a5a;box-shadow:0 0 14px #ff5a5a}}
+@keyframes tl2{0%,45%,60%,100%{background:#444a54;box-shadow:none}48%,57%{background:#ffc94a;box-shadow:0 0 14px #ffc94a}}
+@keyframes tl3{0%,45%{background:#4fe08a;box-shadow:0 0 14px #4fe08a}48%,100%{background:#444a54;box-shadow:none}}
+.title .tsub{margin:14px 0 12px;font-size:clamp(14px,2.1vw,19px);font-weight:500;text-shadow:0 2px 8px rgba(40,10,40,.55)}
+.title .tcity{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.title .tcity span{padding:4px 11px;border-radius:99px;background:rgba(255,248,238,.18);border:1px solid rgba(255,248,238,.45);font-size:13px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.title .tgo{position:fixed;left:50%;bottom:12%;transform:translateX(-50%);font-family:var(--f-display);font-size:clamp(20px,3vw,28px);padding:14px 44px;border-radius:99px;border:0;color:#3a2313;background:#ffd35a;box-shadow:0 6px 0 #c98f22,0 14px 30px rgba(60,20,40,.4);animation:tgo 1.6s ease-in-out infinite;cursor:pointer}
+.title .tgo:hover{background:#ffdf7e}
+@keyframes tgo{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+.title .thint{position:fixed;left:0;right:0;bottom:calc(12% - 34px);text-align:center;color:#fff8ee;font-size:12.5px;opacity:.9;text-shadow:0 1px 6px rgba(40,10,40,.7)}
+.title .tver{position:fixed;right:12px;bottom:8px;color:rgba(255,248,238,.75);font-size:11px}
+@media (prefers-reduced-motion:reduce){.title .tgo,.title .tlamp i{animation:none}}
 </style>
 
 <div class="wrap">
@@ -2136,7 +2161,7 @@ function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim
   {const L=triesLeft(),b=$('skip'),t=L===Infinity?'이 설정으로 확정':L>0?`이 설정으로 확정 (${L}회 남음)`:'처음부터 다시';if(b.textContent!==t)b.textContent=t;b.disabled=L>0&&state!=='run';b.classList.toggle('primary',L<=0);}}
 function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
   // 창(결과, 신호 구성, 접근로 등)이 열려 있는 동안은 관찰 시간이 흐르지 않음
-  if(running&&state==='run'&&$('modal').hidden&&$('pop').hidden&&introBox.hidden){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
+  if(running&&state==='run'&&$('modal').hidden&&$('pop').hidden&&introBox.hidden&&!document.body.classList.contains('titleon')){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
       if(sim.nextCfg&&sim.ct<(sim.lastCt||0))hotSwap();sim.lastCt=sim.ct;
       if(sim.t-sim.t0>=OBS_T){obsEnd();acc=0;break;}}if(n>=80)acc=0;}
   if(!window.__v3on){draw();if(window.__wxDraw)window.__wxDraw(real);}uiT+=real;if(uiT>.15){uiT=0;updateUI();}
@@ -2346,7 +2371,7 @@ function coachNext(){coach.i++;coachBox.hidden=true;if(!coach.steps||coach.i>=co
 coachBox.querySelector('.cnext').addEventListener('click',coachNext);coachBox.querySelector('.cskip').addEventListener('click',()=>coachDone(true));
 document.addEventListener('pointerdown',e=>{if(coach.steps&&coach.el&&!coachBox.hidden&&coach.el.contains(e.target))setTimeout(coachNext,250);},true);
 function coachTick(){const id=curLevel()?curLevel().id:null;if(id!==coach.id){coachStart(id);tutSimple();}
-  if(!coach.steps||!introBox.hidden)return;
+  if(!coach.steps||!introBox.hidden||document.body.classList.contains('titleon'))return;
   const st=coach.steps[coach.i];if(!st)return;const el=document.querySelector(st.sel);
   const r=el&&el.getBoundingClientRect(),vis=r&&r.width>0&&r.height>0&&el.offsetParent!==null&&r.bottom>0&&r.top<innerHeight&&($('modal').hidden||$('modal').contains(el));
   if(!vis){coachBox.hidden=true;coach.el=null;return;}
@@ -2368,7 +2393,8 @@ const introBox=(()=>{const d=document.createElement('div');d.className='intro';d
   <p class="sm">장마다 도구가 하나씩 늘어납니다. 세션은 3분 관찰 후 확정, 스테이지마다 5번. 확정한 점수가 계기판 바늘로 나오고, 별 2개를 넘으면 다음 스테이지로 갈 수 있습니다.</p>
   <button type="button" class="primary">1장 시작</button></div>`;document.body.appendChild(d);
   d.querySelector('button').addEventListener('click',()=>{d.hidden=true;store.set('intro-v1',1);if(!curLevel()||curLevel().id!=='0-1')loadMode({kind:'level',idx:0});anTrack('coach',{id:'intro',step:1,n:1,skipped:false});});return d;})();
-if(!store.get('intro-v1'))introBox.hidden=false;
+// 첫 방문 소개는 시작 화면을 닫은 뒤에 보여 줌(title.js)
+const INTRO_PEND=!store.get('intro-v1');
 // ---------- 시민 캐릭터: 레벨마다 민원을 내고, 확정 결과에 반응 ----------
 // 대사는 미리 써 둔 글(실행 중 AI 호출 없음). 등장인물은 모두 가상 인물
 // a: 이 사람이 다니는 접근로(auto = 교통량이 가장 많은 접근로), k: 이 사람이 체감하는 지표(dly 지연, q 대기열, det 우회, pedW 보행 대기, risk 사고 위험)
@@ -2458,7 +2484,7 @@ const citCard=(()=>{const d=document.createElement('div');d.className='citcard';
 const CIT={id:null,to:null};
 function citShow(){const c=citOf();clearTimeout(CIT.to);if(!c){citCard.hidden=true;return;}
   citCard.innerHTML=`${citAv(c)}<div><div class="cwho">${c.who} <b>${c.name}</b><button type="button" class="cx" aria-label="닫기">×</button></div><p>${c.ask}</p></div>`;citCard.hidden=false;CIT.to=setTimeout(()=>{citCard.hidden=true;},15000);}
-setInterval(()=>{try{if(!$('modal').hidden&&!citCard.hidden)citCard.hidden=true;const id=modeId();if(id!==CIT.id&&introBox.hidden&&$('modal').hidden){CIT.id=id;citShow();}}catch(e){}},500);
+setInterval(()=>{try{if(!$('modal').hidden&&!citCard.hidden)citCard.hidden=true;const id=modeId();if(id!==CIT.id&&introBox.hidden&&$('modal').hidden&&!document.body.classList.contains('titleon')){CIT.id=id;citShow();}}catch(e){}},500);
 // 레벨 설명에도 민원과 AI 기록
 {const _rb=renderBrief;renderBrief=function(){_rb();const el=$('brief'),c=citOf(),R=rivalOf();if(mode.kind==='lab')return;
   let h='';if(c)h+=`<div class="cit brief">${citAv(c)}<div><div class="cwho">${c.who} <b>${c.name}</b>의 민원</div><p>${c.ask}</p></div></div>`;
@@ -2615,6 +2641,104 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
 {const _pp=placePop;placePop=function(x,y){_pp(x,y);try{layoutUI();}catch(e){}};}
 window.__band=()=>{const B=roadBand();return B&&[B.x0|0,B.x1|0,B.y0|0,B.y1|0];};
 addEventListener('resize',()=>{try{layoutUI();}catch(e){}});setInterval(()=>{try{layoutUI();}catch(e){}},300);
+// ---------- 시작 화면: 노을 지는 도시 교차로를 비스듬히 내려다본 장면(움직이는 차, 신호, 보행자) ----------
+// 그림은 모두 코드로 그림(이미지 파일 없음). 누르거나 Enter/Space를 누르면 본게임으로. 주소에 #notitle이 있으면 건너뜀(시험용)
+const TTL=(()=>{const d=document.createElement('div');d.id='title';d.className='title';
+  d.innerHTML=`<canvas id="ttlcv" aria-hidden="true"></canvas><div class="tsh"></div>
+  <div class="tbox"><div class="tlogo"><span class="tlamp"><i></i><i></i><i></i></span><h1>교차로 신호 <em>퍼즐</em></h1></div>
+    <p class="tsub">세계에서 가장 막히는 실제 교차로, 신호 하나로 풀어 보세요</p>
+    <div class="tcity"><span>서울 강남역</span><span>토론토</span><span>런던</span><span>이스탄불</span><span>도쿄</span></div>
+    </div><button type="button" class="tgo">게임 시작</button><small class="thint">화면 아무 곳이나 눌러도 시작합니다</small>
+  <small class="tver"></small>`;document.body.appendChild(d);return d;})();
+TTL.querySelector('.tver').textContent=((document.querySelector('header .sub')||{}).textContent||'').match(/v[0-9]+(\.[0-9]+)*/)?.[0]||'';
+const TS={on:true,t:0,last:0,cars:[],peds:[],bld:[],trees:[],spawn:{},cv:$('ttlcv')};
+TS.ctx=TS.cv.getContext('2d');
+// 무작위(고정 씨앗): 매번 같은 도시
+let tsSeed=7;const trnd=()=>(tsSeed=(tsSeed*16807)%2147483647)/2147483647;
+const PAL={bld:[['#f6c9a8','#e6a987','#d48f70'],['#f3dca2','#e3c27f','#cfa866'],['#bfdccf','#9cc4b3','#80ab99'],['#cdd3ee','#aab3dc','#8f98c6'],['#f2b8c0','#df98a3','#c97f8b'],['#e9e2d6','#d3c9b8','#bcae9a']],
+  car:['#ef6f6c','#f6c453','#5fb8e6','#7bd389','#f49ac1','#ffffff','#9b8cf2','#ff9f5a'],roof:'#7b6a5d',glass:'#2e4a63'};
+// 도시 배치: 네 블록에 건물, 한 블록은 공원
+(function build(){for(const [sx,sy] of [[1,1],[-1,1],[1,-1],[-1,-1]]){const park=sx<0&&sy>0;
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){const x0=13+i*12,y0=13+j*12;
+    if(park){if(trnd()<.8)TS.trees.push({x:sx*(x0+4+trnd()*4),y:sy*(y0+4+trnd()*4),r:2.2+trnd()*1.6});continue;}
+    if(trnd()<.12){TS.trees.push({x:sx*(x0+5),y:sy*(y0+5),r:2.6});continue;}
+    const near=sx>0&&sy>0,w=7+trnd()*3,dd=7+trnd()*3,h=near?3.5+trnd()*(i+j>3?9:4):(i+j<2?8:6)+trnd()*(i+j>3?26:16),p=PAL.bld[Math.floor(trnd()*PAL.bld.length)];
+    const a=[sx*x0,sx*(x0+w)].sort((u,v)=>u-v),b=[sy*y0,sy*(y0+dd)].sort((u,v)=>u-v);TS.bld.push({x0:a[0],x1:a[1],y0:b[0],y1:b[1],h,p,win:trnd()<.5});}}
+  // 길가 가로수
+  for(const s of [-1,1])for(let k=14;k<60;k+=9){TS.trees.push({x:k*s,y:9.8*(k%18<9?1:-1),r:1.6});TS.trees.push({x:9.8*(k%18<9?-1:1),y:k*s,r:1.6});}})();
+// 비스듬한 투영(등각): 화면 x = (x - y) 쪽, 화면 y = (x + y) 쪽, 높이 z는 위로
+function tsP(x,y,z){const s=TS.s;return[TS.cx+(x-y)*.866*s,TS.cy+(x+y)*.5*s-(z||0)*s];}
+function tsPoly(pts,fill,stroke){const c=TS.ctx;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
+function tsQuad(x0,y0,x1,y1,z,fill){tsPoly([tsP(x0,y0,z),tsP(x1,y0,z),tsP(x1,y1,z),tsP(x0,y1,z)],fill);}
+// 상자: 윗면과 보이는 두 옆면(x1 면, y1 면)
+function tsBox(x0,y0,x1,y1,z0,z1,top,fx,fy){tsPoly([tsP(x0,y1,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x0,y1,z1)],fy);tsPoly([tsP(x1,y0,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x1,y0,z1)],fx);tsQuad(x0,y0,x1,y1,z1,top);}
+function tsSig(t){const c=t%16;return c<6?['G','R']:c<7.5?['Y','R']:c<8?['R','R']:c<14?['R','G']:c<15.5?['R','Y']:['R','R'];}
+const LANES=[];for(const [ax,dir] of [['x',1],['x',-1],['y',1],['y',-1]])for(const o of [1.75,5.25])LANES.push({ax,dir,off:(ax==='x'?-dir:dir)*o});
+function tsStep(dt){const t=TS.t,[sx,sy]=tsSig(t);
+  for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]||trnd()*3)-dt;const q=TS.cars.filter(c=>c.li===li);
+    if(TS.spawn[li]<=0){const last=q.reduce((m,c)=>Math.min(m,c.s*L.dir),1e9);if(last>-58){TS.cars.push({li,ax:L.ax,dir:L.dir,off:L.off,s:-70*L.dir,v:9,len:trnd()<.12?7:4.2,col:PAL.car[Math.floor(trnd()*PAL.car.length)],bus:false});}TS.spawn[li]=1.6+trnd()*3.2;}}
+  for(const c of TS.cars){const sig=c.ax==='x'?sx:sy,front=c.s*c.dir+c.len/2,stop=-10.5,lead=TS.cars.filter(o=>o.li===c.li&&o!==c&&o.s*c.dir>c.s*c.dir).sort((a,b)=>a.s*c.dir-b.s*c.dir)[0];
+    let gap=1e9;if(lead)gap=lead.s*c.dir-lead.len/2-front-2.2;if(sig!=='G'&&front<stop+.5&&front>stop-30&&!(sig==='Y'&&front>stop-6))gap=Math.min(gap,stop-front);
+    const vt=Math.max(0,Math.min(11,gap*1.4));c.v+=Math.max(-14,Math.min(5,(vt-c.v)*2))*dt;c.v=Math.max(0,c.v);c.s+=c.v*c.dir*dt;}
+  TS.cars=TS.cars.filter(c=>Math.abs(c.s)<75);
+  // 보행자: 차가 서 있는 쪽 횡단보도를 건너고, 아니면 보도를 걸음
+  if(TS.peds.length<26&&trnd()<dt*3){const cross=trnd()<.45,k=trnd()<.5?1:-1;TS.peds.push(cross?{cw:trnd()<.5?'x':'y',k,u:-9.5*(trnd()<.5?1:-1),dirn:0,col:PAL.car[Math.floor(trnd()*8)],wait:true}:{side:trnd()<.5?'x':'y',k,u:(trnd()<.5?-1:1)*(12+trnd()*45),dirn:trnd()<.5?1:-1,col:PAL.car[Math.floor(trnd()*8)]});}
+  for(const p of TS.peds){if(p.cw){const ok=p.cw==='x'?sy==='G':sx==='G';if(p.wait&&ok){p.wait=false;p.dirn=-Math.sign(p.u)||1;}if(!p.wait)p.u+=p.dirn*1.4*dt;if(!p.wait&&Math.abs(p.u)>9.6&&Math.sign(p.u)===p.dirn)p.gone=true;}
+    else{p.u+=p.dirn*1.2*dt;if(Math.abs(p.u)>60||Math.abs(p.u)<10.5)p.gone=true;}}
+  TS.peds=TS.peds.filter(p=>!p.gone);}
+function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTransform(TS.dpr,0,0,TS.dpr,0,0);
+  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#ffcf9a');g.addColorStop(.5,'#f4a98a');g.addColorStop(1,'#b98aa8');c.fillStyle=g;c.fillRect(0,0,W,H);
+  // 땅, 블록, 보도, 도로
+  tsQuad(-90,-90,90,90,0,'#a9cf8f');
+  for(const [a,b] of [[1,1],[-1,1],[1,-1],[-1,-1]]){const x=[a*7,a*80].sort((u,v)=>u-v),y=[b*7,b*80].sort((u,v)=>u-v);tsQuad(x[0],y[0],x[1],y[1],0,'#efe0c6');
+    const x2=[a*11,a*80].sort((u,v)=>u-v),y2=[b*11,b*80].sort((u,v)=>u-v);tsQuad(x2[0],y2[0],x2[1],y2[1],.05,a<0&&b>0?'#9fd18a':'#d9ccb4');}
+  tsQuad(-90,-7,90,7,.02,'#4f5866');tsQuad(-7,-90,7,90,.02,'#4f5866');tsQuad(-7,-7,7,7,.03,'#4a5260');
+  // 차선: 가운데 노란 겹선, 흰 점선, 정지선, 횡단보도
+  for(let s=-88;s<88;s+=6){if(Math.abs(s)<12)continue;for(const o of [-3.5,3.5]){tsQuad(s,o-.12,s+3,o+.12,.04,'rgba(255,255,255,.75)');tsQuad(o-.12,s,o+.12,s+3,.04,'rgba(255,255,255,.75)');}}
+  for(const o of [-.25,.25]){tsQuad(-90,o-.1,-12,o+.1,.04,'#f3c74b');tsQuad(12,o-.1,90,o+.1,.04,'#f3c74b');tsQuad(o-.1,-90,o+.1,-12,.04,'#f3c74b');tsQuad(o-.1,12,o+.1,90,.04,'#f3c74b');}
+  for(let k=-6.3;k<6.5;k+=1.4){tsQuad(-12.3,k,-8.9,k+.75,.05,'#f4f1ea');tsQuad(8.9,k,12.3,k+.75,.05,'#f4f1ea');tsQuad(k,-12.3,k+.75,-8.9,.05,'#f4f1ea');tsQuad(k,8.9,k+.75,12.3,.05,'#f4f1ea');}
+  // 깊이 순서로 그릴 것들(그림자 먼저)
+  const items=[];
+  for(const b of TS.bld){items.push({d:b.x1+b.y1,f:()=>{tsPoly([tsP(b.x1,b.y0,0),tsP(b.x1+b.h*.35,b.y0+b.h*.1,0),tsP(b.x1+b.h*.35,b.y1+b.h*.1,0),tsP(b.x1,b.y1,0)],'rgba(70,40,60,.18)');
+    tsBox(b.x0,b.y0,b.x1,b.y1,0,b.h,b.p[0],b.p[1],b.p[2]);
+    // 창문: 보이는 두 면에 줄지어(노을빛으로 몇 개는 켜짐)
+    for(let z=2.2;z<b.h-1;z+=2.6){for(let u=b.x0+1;u<b.x1-1;u+=2.2){const on=((u*7+z*3)|0)%5===0;tsPoly([tsP(u,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z+1.3),tsP(u,b.y1+.01,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.55)');}
+      for(let u=b.y0+1;u<b.y1-1;u+=2.2){const on=((u*5+z*7)|0)%6===0;tsPoly([tsP(b.x1+.01,u,z),tsP(b.x1+.01,u+1.1,z),tsP(b.x1+.01,u+1.1,z+1.3),tsP(b.x1+.01,u,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.45)');}}
+    tsQuad(b.x0+.6,b.y0+.6,b.x1-.6,b.y1-.6,b.h+.01,'rgba(0,0,0,.06)');}});}
+  for(const tr of TS.trees)items.push({d:tr.x+tr.y,f:()=>{const [px,py]=tsP(tr.x,tr.y,0),r=tr.r*TS.s;c.fillStyle='rgba(60,40,50,.18)';c.beginPath();c.ellipse(px+r*.5,py+r*.1,r*1.1,r*.5,0,0,7);c.fill();
+    c.fillStyle='#8a6248';c.fillRect(px-r*.12,py-r*1.4,r*.24,r*1.4);const [qx,qy]=tsP(tr.x,tr.y,tr.r*1.9);c.fillStyle='#6fb36b';c.beginPath();c.arc(qx,qy,r,0,7);c.fill();c.fillStyle='#8fcf7f';c.beginPath();c.arc(qx-r*.3,qy-r*.3,r*.55,0,7);c.fill();}});
+  for(const car of TS.cars){const L=car.len,Wd=1.9,cx=car.ax==='x'?car.s:car.off,cy=car.ax==='x'?car.off:car.s,hx=car.ax==='x'?L/2:Wd/2,hy=car.ax==='x'?Wd/2:L/2,bus=L>5;
+    items.push({d:cx+cy+.5,f:()=>{const x0=cx-hx,x1=cx+hx,y0=cy-hy,y1=cy+hy,sh=(u)=>{const m=/^#/.test(u)?u:'#999';return m;};
+      tsQuad(x0+.3,y0+.3,x1+.5,y1+.5,.03,'rgba(30,20,40,.28)');
+      tsBox(x0,y0,x1,y1,.35,bus?2.6:1.15,car.col,shade(car.col,-.18),shade(car.col,-.3));
+      if(!bus){const k=.22,ix0=car.ax==='x'?x0+L*k:x0+.15,ix1=car.ax==='x'?x1-L*k:x1-.15,iy0=car.ax==='x'?y0+.15:y0+L*k,iy1=car.ax==='x'?y1-.15:y1-L*k;tsBox(ix0,iy0,ix1,iy1,1.15,1.85,shade(car.col,.15),PAL.glass,'#3b5b78');}
+      else{for(let u=0;u<4;u++){const a=car.ax==='x'?[x0+.8+u*1.5,y1+.01]:[x1+.01,y0+.8+u*1.5];if(car.ax==='x')tsPoly([tsP(a[0],a[1],1.5),tsP(a[0]+1,a[1],1.5),tsP(a[0]+1,a[1],2.2),tsP(a[0],a[1],2.2)],PAL.glass);else tsPoly([tsP(a[0],a[1],1.5),tsP(a[0],a[1]+1,1.5),tsP(a[0],a[1]+1,2.2),tsP(a[0],a[1],2.2)],PAL.glass);}}
+      // 전조등, 미등
+      const fr=car.dir>0,hl=(u,v,col)=>{const [p,q]=tsP(u,v,.75);c.fillStyle=col;c.beginPath();c.arc(p,q,.28*TS.s,0,7);c.fill();};
+      if(car.ax==='x'){const fx=fr?x1:x0,bx=fr?x0:x1;hl(fx,y0+.45,'#fff6c8');hl(fx,y1-.45,'#fff6c8');hl(bx,y1-.45,car.v<1?'#ff5a5a':'#c9474a');}
+      else{const fy=fr?y1:y0,by=fr?y0:y1;hl(x0+.45,fy,'#fff6c8');hl(x1-.45,fy,'#fff6c8');hl(x1-.45,by,car.v<1?'#ff5a5a':'#c9474a');}}});}
+  for(const p of TS.peds){const [x,y]=p.cw?(p.cw==='x'?[p.k*10.6,p.u]:[p.u,p.k*10.6]):(p.side==='x'?[p.u,p.k*9.2]:[p.k*9.2,p.u]);
+    items.push({d:x+y+.2,f:()=>{const [a,b]=tsP(x,y,0),s=TS.s,bob=Math.abs(Math.sin(TS.t*8+x))*s*.12;c.fillStyle='rgba(30,20,40,.25)';c.beginPath();c.ellipse(a,b,s*.5,s*.22,0,0,7);c.fill();
+      c.fillStyle=p.col;c.beginPath();c.ellipse(a,b-s*.9-bob,s*.38,s*.7,0,0,7);c.fill();c.fillStyle='#f6d2b5';c.beginPath();c.arc(a,b-s*1.95-bob,s*.36,0,7);c.fill();}});}
+  // 신호등(네 귀퉁이): 각 접근로를 마주 봄
+  for(const [x,y,ax] of [[-9.5,-9.5,'x'],[9.5,9.5,'x'],[9.5,-9.5,'y'],[-9.5,9.5,'y']])items.push({d:x+y+.3,f:()=>{const st=ax==='x'?sx:sy,[a,b]=tsP(x,y,0),[a2,b2]=tsP(x,y,6.2),s=TS.s;
+    c.strokeStyle='#3a3f48';c.lineWidth=Math.max(1.5,s*.28);c.beginPath();c.moveTo(a,b);c.lineTo(a2,b2);c.stroke();c.fillStyle='#2b2f36';c.beginPath();if(c.roundRect)c.roundRect(a2-s*.55,b2-s*2.6,s*1.1,s*2.8,s*.4);else c.rect(a2-s*.55,b2-s*2.6,s*1.1,s*2.8);c.fill();
+    [['R','#ff5a5a'],['Y','#ffc94a'],['G','#4fe08a']].forEach(([k,col],i)=>{const on=st===k,yy=b2-s*2.15+i*s*.85;if(on){c.fillStyle=col+'55';c.beginPath();c.arc(a2,yy,s*.85,0,7);c.fill();}c.fillStyle=on?col:'#444a54';c.beginPath();c.arc(a2,yy,s*.32,0,7);c.fill();});}});
+  items.sort((p,q)=>p.d-q.d).forEach(i=>i.f());
+  // 노을빛과 가장자리 어둡게
+  const v=c.createRadialGradient(W/2,H*.55,Math.min(W,H)*.25,W/2,H*.55,Math.max(W,H)*.75);v.addColorStop(0,'rgba(255,190,140,0)');v.addColorStop(1,'rgba(60,30,60,.45)');c.fillStyle=v;c.fillRect(0,0,W,H);}
+function shade(hex,k){const n=parseInt(hex.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(k<0?v*(1+k):v+(255-v)*k)));return'#'+[n>>16,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,'0')).join('');}
+function tsResize(){const r=TTL.getBoundingClientRect();TS.w=r.width;TS.h=r.height;TS.dpr=Math.min(2,devicePixelRatio||1);TS.cv.width=Math.round(TS.w*TS.dpr);TS.cv.height=Math.round(TS.h*TS.dpr);
+  TS.s=Math.max(TS.w/150,TS.h/100);TS.cx=TS.w/2;TS.cy=TS.h*.56;}
+function tsFrame(now){if(!TS.on)return;const dt=Math.min(.05,(now-(TS.last||now))/1000);TS.last=now;TS.t+=dt;tsStep(dt);tsDraw();requestAnimationFrame(tsFrame);}
+// 미리 몇 초 돌려 차가 깔린 상태로 시작
+for(let i=0;i<300;i++){TS.t+=.05;tsStep(.05);}
+function titleClose(){if(!TS.on)return;TS.on=false;TTL.classList.add('out');document.body.classList.remove('titleon');setTimeout(()=>{TTL.remove();},600);
+  try{fxAudio();}catch(e){}if(INTRO_PEND)introBox.hidden=false;try{anTrack('title_start',{sec:Math.round(TS.t-15)});}catch(e){}
+  requestAnimationFrame(()=>{try{resize();positionArms();}catch(e){}});}
+if(/notitle/.test(location.hash)){TS.on=false;TTL.remove();if(INTRO_PEND)introBox.hidden=false;}
+else{document.body.classList.add('titleon');tsResize();addEventListener('resize',()=>{if(TS.on)tsResize();});requestAnimationFrame(tsFrame);
+  TTL.addEventListener('click',titleClose);addEventListener('keydown',e=>{if(TS.on&&(e.key==='Enter'||e.key===' ')){e.preventDefault();titleClose();}});}
 })();
 </script>
 <script>
