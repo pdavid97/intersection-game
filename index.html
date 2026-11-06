@@ -494,6 +494,7 @@ h1.brand span{color:#4fe08a}h1.brand small{font-family:var(--f-display);font-siz
 @keyframes tl3{0%,68%{background:#4fe08a;box-shadow:0 0 14px #4fe08a}70%,100%{background:#444a54;box-shadow:none}}
 @keyframes tl2{0%,69%,84%,100%{background:#444a54;box-shadow:none}70%,83%{background:#ffc94a;box-shadow:0 0 14px #ffc94a}}
 @keyframes tl1{0%,84%{background:#444a54;box-shadow:none}85%,99%{background:#ff5a5a;box-shadow:0 0 14px #ff5a5a}100%{background:#444a54;box-shadow:none}}
+.lcwarn{background:rgba(243,181,49,.12);border:1px solid rgba(243,181,49,.45);border-radius:8px;padding:8px 10px;margin-top:0}
 </style>
 
 <div class="wrap">
@@ -2611,17 +2612,20 @@ const LIVECAM={
  gangnam:{cams:[],note:'강남역 사거리를 비추는 공개 실시간 카메라는 찾지 못했습니다. Tomarigi 지도에서 가장 가까운 것도 4km 넘게 떨어진 한강 카메라입니다. 서울시 교통 CCTV는 서울 TOPIS에서 볼 수 있지만, 다른 사이트에 넣으려면 국가교통정보센터 인증 키가 필요합니다.',link:'https://topis.seoul.go.kr/'},
  edirnekapi:{cams:[],note:'에디르네카프 교차로를 비추는 공개 실시간 카메라는 찾지 못했습니다(Tomarigi 지도 기준 반경 5km 안에 없음). 이스탄불시 교통 카메라는 İBB CepTrafik 앱에서 볼 수 있습니다.'}};
 const LC={timer:null,open:false};
+// 공개 주소(GitHub Pages)나 로컬이 아니면 외부 사진, 영상이 막혔을 수 있음(예: claude.ai 미리보기)
+const LC_PUB='https://pdavid97.github.io/intersection-game/';
+const lcPub=()=>/github\.io$|^localhost$|^127\.|^$/.test(location.hostname);
 function lcKey(){const R=curReal();return R&&LIVECAM[R.id]?R.id:null;}
 function lcMedia(c,i){const ts=Date.now();
   if(c.kind==='yt')return`<div class="lcm yt"><iframe src="https://www.youtube-nocookie.com/embed/${c.id}?autoplay=1&mute=1&playsinline=1" title="${c.title}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
   if(c.kind==='video')return`<div class="lcm"><video src="${c.src}?t=${ts}" poster="${c.poster}?t=${ts}" autoplay muted loop playsinline></video></div>`;
   return`<div class="lcm"><img data-lci="${i}" src="${c.src}?t=${ts}" alt="${c.title} 실시간 사진" loading="lazy"><span class="lcts" data-lct="${i}">불러오는 중</span></div>`;}
 function openLiveCam(){const k=lcKey();if(!k)return;const L=LIVECAM[k],R=curReal();openModal(`실시간 카메라: ${R.title}`,[]);LC.open=true;
-  $('modalbody').innerHTML=`${L.cams.length?L.cams.map((c,i)=>`<div class="lcc">${lcMedia(c,i)}<div class="lci"><b>${c.title}</b><span class="lcd">${c.dist}</span><small>${c.by} <a href="${c.link}" target="_blank" rel="noopener">원본 보기</a></small></div></div>`).join(''):''}
+  $('modalbody').innerHTML=`${!lcPub()&&L.cams.length?`<p class="note lcwarn">지금 보고 있는 화면(Claude 미리보기)은 보안 때문에 외부 카메라 사진과 영상을 불러오지 못합니다. <a href="${LC_PUB}" target="_blank" rel="noopener">공개 주소에서 열기</a>를 누르면 실시간 화면이 보입니다.</p>`:''}${L.cams.length?L.cams.map((c,i)=>`<div class="lcc">${lcMedia(c,i)}<div class="lci"><b>${c.title}</b><span class="lcd">${c.dist}</span><small>${c.by} <a href="${c.link}" target="_blank" rel="noopener">원본 보기</a></small></div></div>`).join(''):''}
     ${L.note?`<p class="note">${L.note}${L.link?` <a href="${L.link}" target="_blank" rel="noopener">서울 TOPIS</a>`:''}</p>`:''}
     <p class="note sm">게임의 교통량은 실측 자료로 만든 평일 출근 시간 값이라, 지금 카메라 화면과 다를 수 있습니다. 다른 도시 카메라는 <a href="https://tomarigi.me/world" target="_blank" rel="noopener">Tomarigi 세계 라이브카메라 지도</a>에서 볼 수 있습니다.</p>`;
   const stamp=()=>{$('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{const t=$('modalbody').querySelector(`[data-lct="${im.dataset.lci}"]`);if(t)t.textContent='받은 시각 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});});};
-  $('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{im.onload=stamp;im.onerror=()=>{const t=$('modalbody').querySelector(`[data-lct="${im.dataset.lci}"]`);if(t)t.textContent='지금은 사진을 받을 수 없습니다';};});
+  $('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{im.onload=stamp;im.onerror=()=>{const t=$('modalbody').querySelector(`[data-lct="${im.dataset.lci}"]`);if(t)t.innerHTML=lcPub()?'지금은 사진을 받을 수 없습니다':'이 미리보기에서는 외부 사진이 막혀 있습니다';};});
   clearInterval(LC.timer);LC.timer=setInterval(()=>{if($('modal').hidden){clearInterval(LC.timer);LC.open=false;return;}
     $('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{const c=L.cams[+im.dataset.lci];im.src=c.src+'?t='+Date.now();});},60000);
   try{anTrack('livecam',{city:k,n:L.cams.length});}catch(e){}}
