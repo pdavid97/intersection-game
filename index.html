@@ -1718,6 +1718,7 @@ const css=getComputedStyle(document.documentElement),C=n=>css.getPropertyValue(n
 const COL0={island:C('--island'),park:C('--map-park'),bld:C('--map-bld'),bldEdge:C('--map-bld-edge'),mapRoad:C('--map-road'),mapCase:C('--map-case'),mapLabel:C('--map-label'),metro:C('--metro'),ground:C('--ground'),asphalt:C('--asphalt'),paint:C('--paint'),y:C('--ypaint'),go:C('--go'),stop:C('--stop'),warn:C('--accent'),fg:C('--fg'),muted:C('--muted'),bus:C('--bus')};
 // ---------- 스킨: 교차로 화면(캔버스)만 바꾼다. 조작 패널은 그대로 ----------
 const SKINS={
+ sunset:{name:'노을 도시',car:'sunset',col:{ground:'#a9cf8f',asphalt:'#4f5866',paint:'#f4f1ea',y:'#f3c74b',island:'#d9ccb4',bld:'#f3dca2',bldEdge:'#cfa866',park:'#9fd18a',mapRoad:'#5a6370',mapCase:'#e6d6bb',mapLabel:'#4a3346',bus:'#ef6f6c',head:'#2b2f36',headEdge:'#444a54',muted:'#5a4458',fg:'#3a2840',wall:'#b98a6a'}},
  control:{name:'관제실',car:'speed',speed:true,col:{}},
  day:{name:'한낮 도시',car:'paint',col:{ground:'#cdd7c1',asphalt:'#70767d',paint:'#ffffff',y:'#f2c230',island:'#a3c48a',bld:'#e8e2d6',bldEdge:'#c9c1b2',park:'#a9d08f',mapRoad:'#f5f2ec',mapCase:'#d2cbbe',mapLabel:'#3b4148',bus:'#2f6fe0',head:'#22262b',headEdge:'#5d646c',muted:'#4a525b',fg:'#1d2228'}},
  night:{name:'야경',car:'night',col:{ground:'#05070a',asphalt:'#13161b',paint:'#6f7782',y:'#8c7224',island:'#0b120e',bld:'#0d1118',bldEdge:'#1a2130',park:'#09140e',mapRoad:'#15191f',mapCase:'#1f252d',mapLabel:'#7f8896',bus:'#27467d',head:'#000000',headEdge:'#262b33'}},
@@ -1727,14 +1728,18 @@ const SKINS={
  toy:{name:'장난감 마을',car:'toy',col:{ground:'#bfe3a6',asphalt:'#8e93ab',paint:'#fffaf0',y:'#ffd166',island:'#7cc576',bld:'#ffd9b3',bldEdge:'#e8a87c',park:'#8fd17c',mapRoad:'#f7e3c2',mapCase:'#e0c79d',mapLabel:'#6b4f3a',bus:'#ef6f6c',head:'#5b4636',headEdge:'#3d2e23',muted:'#5d4a3a',fg:'#3d2e23'}}};
 const CAR_PAINT={paint:['#d64545','#2f6fe0','#f4f4f4','#23272e','#9aa4ad','#e6b422','#3a9d5d','#7b4fa0','#c9cdd2','#f4f4f4','#23272e'],
   story:['#f4a3a8','#9ccbe8','#f6d47a','#a8d8a0','#c9b3e6','#f7b98b','#8fd3c7','#fbe3a1'],
-  pixel:['#ff5ea8','#3ee0d0','#ffd23f','#7cff6b','#ff8a3d','#b18cff'],toy:['#ff8fa3','#7ec8e3','#ffd166','#95d5b2','#c3a6ff','#ffb48f']};
-let skin='control',showSpeed=true,COL={...COL0};
-function applySkin(id){skin=SKINS[id]?id:'control';COL={...COL0,head:'#0b0e11',headEdge:'#3a444e',...SKINS[skin].col};
-  try{localStorage.setItem('skin-v1',JSON.stringify({skin,showSpeed}));}catch(e){}
+  pixel:['#ff5ea8','#3ee0d0','#ffd23f','#7cff6b','#ff8a3d','#b18cff'],toy:['#ff8fa3','#7ec8e3','#ffd166','#95d5b2','#c3a6ff','#ffb48f'],
+  sunset:['#ef6f6c','#f6c453','#5fb8e6','#7bd389','#f49ac1','#ffffff','#9b8cf2','#ff9f5a','#ffffff','#5fb8e6']};
+// 노을 도시 건물 색(시작 화면과 같은 파스텔): [지붕, 그림자 쪽 벽]
+const SUN_BLD=[['#f6c9a8','#d48f70'],['#f3dca2','#cfa866'],['#bfdccf','#80ab99'],['#cdd3ee','#8f98c6'],['#f2b8c0','#c97f8b'],['#e9e2d6','#bcae9a']];
+let skin='sunset',showSpeed=false,COL={...COL0};
+function applySkin(id){skin=SKINS[id]?id:'sunset';COL={...COL0,head:'#0b0e11',headEdge:'#3a444e',...SKINS[skin].col};
+  try{localStorage.setItem('skin-v2',JSON.stringify({skin,showSpeed}));}catch(e){}
   $('skinsel').value=skin;$('spdcol').checked=showSpeed;}
-{let st=null;try{st=JSON.parse(localStorage.getItem('skin-v1'));}catch(e){}
+// 기본 스킨: 노을 도시(v0.20부터). 예전 저장값(skin-v1)은 무시하고 한 번 새 기본으로 시작
+{let st=null;try{st=JSON.parse(localStorage.getItem('skin-v2'));}catch(e){}
   const sel=$('skinsel');for(const k in SKINS){const o=document.createElement('option');o.value=k;o.textContent=SKINS[k].name;sel.appendChild(o);}
-  if(st){showSpeed=!!st.showSpeed;applySkin(st.skin);}else applySkin('control');
+  if(st){showSpeed=!!st.showSpeed;applySkin(st.skin);}else applySkin('sunset');
   sel.addEventListener('change',e=>{showSpeed=!!SKINS[e.target.value].speed;applySkin(e.target.value);});
   $('spdcol').addEventListener('change',e=>{showSpeed=e.target.checked;applySkin(skin);});}
 const hashPick=(id,arr)=>arr[((id*2654435761)>>>0)%arr.length];
@@ -1780,6 +1785,7 @@ function paintVehicle(v,p,now){const L=v.len,Wd=v.w,st=SKINS[skin].car,sp=Math.m
   ctx.save();ctx.translate(x,y);ctx.rotate(ang);
   const body=v.crashed?'#7c8691':null;
   if(st==='speed'||st==='paint'){const c=body||(v.cls==='bus'?(v.id%3?'#2f6fe0':'#3fae49'):hashPick(v.id,CAR_PAINT.paint));drawCarReal(v,L,Wd,c,braking,blink);}
+  else if(st==='sunset'){const c=body||(showSpeed?speedCol:v.cls==='bus'?(v.id%2?'#ef6f6c':'#7bd389'):hashPick(v.id,CAR_PAINT.sunset));drawCarReal(v,L,Wd,c,braking,blink);}
   else if(st==='speed_old'){ctx.fillStyle=body||speedCol;rrect(-L/2,-Wd/2,L,Wd,.5);ctx.fill();
     ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(L/2-1.5,-Wd/2+.25,.9,Wd-.5);
     if(v.cls==='bus'){ctx.fillStyle='rgba(255,255,255,.55)';for(let q=-L/2+1;q<L/2-2;q+=1.6)ctx.fillRect(q,-Wd/2+.15,1,.3),ctx.fillRect(q,Wd/2-.45,1,.3);}
@@ -1878,8 +1884,21 @@ function storyDecor(stage){if(!sim)return;const G=sim.cfg.geo,ink='#6b4a33',real
       for(const [ox,oy,r] of [[0,0,10],[8,2,8],[-8,1,7],[3,-5,7]]){ctx.beginPath();ctx.arc(x+ox-3,y+oy-3,r,0,Math.PI*2);ctx.fill();}}
     ctx.restore();}}
 // 스킨별 배경 장식
+// 노을 도시: 레벨(가상 교차로)에는 보도, 파스텔 건물(그림자), 가로수를 그림. 실제 교차로는 지도 건물을 파스텔로(drawContext)
+function sunsetDecor(stage){if(stage!=='ground'||!sim||curReal())return;const G=sim.cfg.geo,D=geoDims(G),hx=D.hNS+Math.max(...APPR.map(a=>Math.abs(D.off(a))))+.5,hy=D.hEW+Math.max(...APPR.map(a=>Math.abs(D.off(a))))+.5,W=VIEW+10,SW=4.5;
+  ctx.fillStyle='#efe0c6';ctx.fillRect(-hx-SW,-W,2*(hx+SW),2*W);ctx.fillRect(-W,-hy-SW,2*W,2*(hy+SW));
+  let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  for(const [sx,sy] of [[1,1],[-1,1],[1,-1],[-1,-1]]){const park=sx<0&&sy>0;
+    for(let i=0;i<5;i++)for(let j=0;j<5;j++){const x0=hx+SW+2+i*13,y0=hy+SW+2+j*13;if(x0>W||y0>W)continue;
+      if(park||rnd()<.15){for(let k=0;k<(park?2:1);k++){const tx=sx*(x0+3+rnd()*7),ty=sy*(y0+3+rnd()*7),r=2+rnd()*1.4;ctx.fillStyle='rgba(60,40,50,.18)';ctx.beginPath();ctx.arc(tx+.9,ty-.9,r,0,7);ctx.fill();ctx.fillStyle='#6fb36b';ctx.beginPath();ctx.arc(tx,ty,r,0,7);ctx.fill();ctx.fillStyle='#8fcf7f';ctx.beginPath();ctx.arc(tx-r*.3,ty+r*.3,r*.5,0,7);ctx.fill();}continue;}
+      const w=8+rnd()*3,h=8+rnd()*3,P=SUN_BLD[Math.floor(rnd()*SUN_BLD.length)],x=sx>0?x0:-x0-w,y=sy>0?y0:-y0-h,ht=1.2+rnd()*1.8;
+      ctx.fillStyle='rgba(70,40,60,.2)';ctx.fillRect(x+ht,y-ht,w,h);ctx.fillStyle=P[1];ctx.fillRect(x+ht*.5,y-ht*.5,w,h);ctx.fillStyle=P[0];ctx.fillRect(x,y,w,h);
+      ctx.fillStyle='rgba(0,0,0,.07)';ctx.fillRect(x+w*.62,y+h*.6,w*.22,h*.2);}}
+  // 길가 가로수
+  for(const s of [-1,1])for(let t=Math.max(hx,hy)+SW+6;t<W;t+=11)for(const [tx,ty] of [[s*t,hy+SW-1.3],[s*t,-hy-SW+1.3],[hx+SW-1.3,s*t],[-hx-SW+1.3,s*t]]){ctx.fillStyle='rgba(60,40,50,.18)';ctx.beginPath();ctx.arc(tx+.7,ty-.7,1.5,0,7);ctx.fill();ctx.fillStyle='#6fb36b';ctx.beginPath();ctx.arc(tx,ty,1.5,0,7);ctx.fill();}}
 function decorate(stage){const sk=skin,W=VIEW;
   if(sk==='story'){storyDecor(stage);return;}
+  if(sk==='sunset'){sunsetDecor(stage);return;}
   if(stage==='ground'&&sk==='blueprint'){ctx.strokeStyle='rgba(232,241,255,.08)';ctx.lineWidth=.12;ctx.beginPath();for(let g=-Math.ceil(W/10)*10;g<=W;g+=10){ctx.moveTo(g,-W-5);ctx.lineTo(g,W+5);ctx.moveTo(-W-5,g);ctx.lineTo(W+5,g);}ctx.stroke();}
   if(stage==='ground'&&sk==='toy'&&!curReal()){const trees=[[-30,30],[-45,22],[-26,48],[34,30],[50,40],[28,52],[-32,-30],[-48,-42],[-24,-52],[30,-34],[46,-24],[40,-52],[-60,58],[62,-60]];
     for(const [tx,ty] of trees){ctx.fillStyle='#6a4b35';ctx.fillRect(tx-.4,ty-2.6,.8,2);ctx.fillStyle='#5fb35a';ctx.beginPath();ctx.arc(tx,ty,2.6,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#3e7a3b';ctx.lineWidth=.25;ctx.stroke();}}
@@ -1907,7 +1926,8 @@ function arrowHead(x,y,ang){const s=.9;ctx.moveTo(x,y);ctx.lineTo(x-s*Math.cos(a
 function drawContext(R){const X=R.ctx;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   const poly=(a,close)=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)ctx.lineTo(a[i],a[i+1]);if(close)ctx.closePath();};
   ctx.fillStyle=COL.park;for(const b of X.parks||[]){poly(b,true);ctx.fill();}
-  ctx.fillStyle=COL.bld;ctx.strokeStyle=COL.bldEdge;ctx.lineWidth=.6;for(const b of X.blds){poly(b,true);ctx.fill();ctx.stroke();}
+  if(skin==='sunset'){X.blds.forEach((b,i)=>{const P=SUN_BLD[i%SUN_BLD.length],sh=b.map((v,j)=>v+(j%2?-1.4:1.4));ctx.fillStyle='rgba(70,40,60,.2)';poly(sh,true);ctx.fill();ctx.fillStyle=P[0];ctx.strokeStyle=P[1];ctx.lineWidth=.7;poly(b,true);ctx.fill();ctx.stroke();});}
+  else{ctx.fillStyle=COL.bld;ctx.strokeStyle=COL.bldEdge;ctx.lineWidth=.6;for(const b of X.blds){poly(b,true);ctx.fill();ctx.stroke();}}
   const wid={p:16,s:11,r:7,v:4,l:4.5};
   ctx.save();ctx.strokeStyle=COL.wall||'#9b7d57';ctx.globalAlpha=.85;ctx.lineWidth=3.6;for(const w of X.roads){if(w.c!=='w')continue;poly(w.p,false);ctx.stroke();}ctx.setLineDash([1.2,1.6]);ctx.lineWidth=5.4;ctx.globalAlpha=.6;for(const w of X.roads){if(w.c!=='w')continue;poly(w.p,false);ctx.stroke();}ctx.restore();
   for(const pass of [0,1])for(const w of X.roads){if(w.c==='l'||w.c==='w')continue;const ww=wid[w.c]||4;ctx.lineWidth=pass?ww:ww+2.4;ctx.strokeStyle=pass?COL.mapRoad:COL.mapCase;poly(w.p,false);ctx.stroke();}
@@ -2020,7 +2040,8 @@ function drawBeyond(sim,LV,visX,visY,now){
     const x=e[0]+dx/l*d,y=e[1]+dy/l*d;if(Math.abs(x)>visX+10||Math.abs(y)>visY+10||d>LV||armCut(x,y)<=0)return false;
     let ga=APPR[0],gb=-1e9;for(const a2 of APPR){const o=-HEAD[a2][0]*dx-HEAD[a2][1]*dy;if(o>gb){gb=o;ga=a2;}}const q=shift(ga,x,y);
     paint({len:g.v.len,w:g.v.w,cls:g.v.cls,v:g.sp,id:g.v.id,move:'T'},q[0],q[1],Math.atan2(dy,dx));return true;});}
-function draw(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=geoDims(G),W=G.LW,R=curReal();
+function draw(){drawMain();if(skin==='sunset'&&cw){ctx.setTransform(dpr,0,0,dpr,0,0);const g=ctx.createRadialGradient(cw/2,ch/2,Math.min(cw,ch)*.35,cw/2,ch/2,Math.max(cw,ch)*.75);g.addColorStop(0,'rgba(255,190,140,0)');g.addColorStop(1,'rgba(120,60,90,.22)');ctx.fillStyle=g;ctx.fillRect(0,0,cw,ch);}}
+function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=geoDims(G),W=G.LW,R=curReal();
   {const vx=VIEW*cw/Math.min(cw,ch)+5,vy=VIEW*ch/Math.min(cw,ch)+5;ctx.fillStyle=COL.ground;ctx.fillRect(-vx,-vy,2*vx,2*vy);}decorate('ground');
   if(R)drawContext(R);
   ctx.fillStyle=COL.asphalt;ctx.fillRect(-D.stopD('W'),-D.stopD('S'),D.stopD('W')+D.stopD('E'),D.stopD('S')+D.stopD('N'));
