@@ -465,6 +465,15 @@ body.titleon{overflow:hidden}
 .title .thint{position:fixed;left:0;right:0;bottom:calc(12% - 34px);text-align:center;color:#fff8ee;font-size:12.5px;opacity:.9;text-shadow:0 1px 6px rgba(40,10,40,.7)}
 .title .tver{position:fixed;right:12px;bottom:8px;color:rgba(255,248,238,.75);font-size:11px}
 @media (prefers-reduced-motion:reduce){.title .tgo,.title .tlamp i{animation:none}}
+/* 실시간 카메라 */
+.lcbtn{display:inline-flex;align-items:center;gap:6px}.lcbtn .lcdot{width:8px;height:8px;border-radius:50%;background:#ef5a50;box-shadow:0 0 0 0 rgba(239,90,80,.6);animation:lcp 1.6s infinite}
+.lcbtn.none .lcdot{background:#6b7480;animation:none}
+@keyframes lcp{0%{box-shadow:0 0 0 0 rgba(239,90,80,.6)}70%{box-shadow:0 0 0 7px rgba(239,90,80,0)}100%{box-shadow:0 0 0 0 rgba(239,90,80,0)}}
+.lcc{margin:0 0 14px}.lcm{position:relative;background:#000;border-radius:8px;overflow:hidden;aspect-ratio:16/9}
+.lcm img,.lcm video,.lcm iframe{width:100%;height:100%;object-fit:contain;display:block;border:0}
+.lcts{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(0,0,0,.6);color:#fff;padding:2px 7px;border-radius:99px}
+.lci{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:6px}.lci .lcd{color:var(--accent);font-size:12.5px}.lci small{flex-basis:100%;color:var(--muted)}
+.lci a,.note a{color:var(--accent)}
 </style>
 
 <div class="wrap">
@@ -2566,6 +2575,39 @@ $('resbody').addEventListener('click',e=>{const b=e.target.closest('[data-ai]');
   const c=$('aion');c.checked=AIK.on;c.title='확정 결과의 숫자 요약을 보내 Claude가 해설 문장을 다듬습니다. 끄면 기본 해설만 보입니다.';
   c.addEventListener('change',()=>{AIK.on=c.checked;try{localStorage.setItem('ai-off',c.checked?'0':'1');}catch(e){}});}
 renderBrief();
+// ---------- 실시간 카메라: 실제 교차로 스테이지에서 그 교차로(또는 가까운 곳)를 비추는 공개 카메라를 보여 줌 ----------
+// 카메라 목록은 2026-11-06에 확인한 값. 찾은 곳: Tomarigi 세계 라이브카메라 지도(tomarigi.me/world), TfL JamCam 공개 API, 토론토시 교통 카메라 공개 자료
+// dist: 게임 교차로 중심에서 카메라까지 거리. 같은 교차로가 아니면 그렇게 적음
+const LIVECAM={
+ london:{cams:[
+   {kind:'video',title:'A406 노스서큘러 / 바운즈그린 로드(A109)',dist:'이 교차로(약 10m)',src:'https://s3-eu-west-1.amazonaws.com/jamcams.tfl.gov.uk/00001.09060.mp4',poster:'https://s3-eu-west-1.amazonaws.com/jamcams.tfl.gov.uk/00001.09060.jpg',
+    by:'TfL JamCam(런던교통공사 공개 자료). 몇 분마다 짧은 영상으로 바뀝니다',link:'https://tfl.gov.uk/traffic/status/'},
+   {kind:'img',title:'A406 / 텔퍼드 로드 / 보우스 로드',dist:'동쪽 약 0.7km',src:'https://s3-eu-west-1.amazonaws.com/jamcams.tfl.gov.uk/00001.09061.jpg',by:'TfL JamCam',link:'https://tfl.gov.uk/traffic/status/'}]},
+ toronto:{cams:[
+   {kind:'img',title:'레이크쇼어 대로 / 파를러먼트 거리',dist:'이 교차로(약 30m)',src:'https://opendata.toronto.ca/transportation/tmc/rescucameraimages/CameraImages/loc9301.jpg',by:'토론토시 교통관리센터 공개 카메라. 1~2분마다 새 사진',link:'https://www.toronto.ca/services-payments/streets-parking-transportation/road-restrictions-closures/traffic-cameras/'},
+   {kind:'img',title:'가디너 고속도로 / 파를러먼트 거리',dist:'교차로 바로 위 고가도로',src:'https://opendata.toronto.ca/transportation/tmc/rescucameraimages/CameraImages/loc9201.jpg',by:'토론토시 교통관리센터 공개 카메라',link:'https://www.toronto.ca/services-payments/streets-parking-transportation/road-restrictions-closures/traffic-cameras/'}]},
+ tokyo:{cams:[
+   {kind:'yt',title:'환7 방남정(方南町) 교차로',dist:'같은 환7 도로, 북쪽 약 1.3km(오하라 교차로 아님)',id:'lrpZAKk-WDE',by:'방남FM 유튜브 라이브(Tomarigi 지도에서 찾음)',link:'https://www.youtube.com/watch?v=lrpZAKk-WDE'}]},
+ gangnam:{cams:[],note:'강남역 사거리를 비추는 공개 실시간 카메라는 찾지 못했습니다. Tomarigi 지도에서 가장 가까운 것도 4km 넘게 떨어진 한강 카메라입니다. 서울시 교통 CCTV는 서울 TOPIS에서 볼 수 있지만, 다른 사이트에 넣으려면 국가교통정보센터 인증 키가 필요합니다.',link:'https://topis.seoul.go.kr/'},
+ edirnekapi:{cams:[],note:'에디르네카프 교차로를 비추는 공개 실시간 카메라는 찾지 못했습니다(Tomarigi 지도 기준 반경 5km 안에 없음). 이스탄불시 교통 카메라는 İBB CepTrafik 앱에서 볼 수 있습니다.'}};
+const LC={timer:null,open:false};
+function lcKey(){const R=curReal();return R&&LIVECAM[R.id]?R.id:null;}
+function lcMedia(c,i){const ts=Date.now();
+  if(c.kind==='yt')return`<div class="lcm yt"><iframe src="https://www.youtube-nocookie.com/embed/${c.id}?autoplay=1&mute=1&playsinline=1" title="${c.title}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+  if(c.kind==='video')return`<div class="lcm"><video src="${c.src}?t=${ts}" poster="${c.poster}?t=${ts}" autoplay muted loop playsinline></video></div>`;
+  return`<div class="lcm"><img data-lci="${i}" src="${c.src}?t=${ts}" alt="${c.title} 실시간 사진" loading="lazy"><span class="lcts" data-lct="${i}">불러오는 중</span></div>`;}
+function openLiveCam(){const k=lcKey();if(!k)return;const L=LIVECAM[k],R=curReal();openModal(`실시간 카메라: ${R.title}`,[]);LC.open=true;
+  $('modalbody').innerHTML=`${L.cams.length?L.cams.map((c,i)=>`<div class="lcc">${lcMedia(c,i)}<div class="lci"><b>${c.title}</b><span class="lcd">${c.dist}</span><small>${c.by} <a href="${c.link}" target="_blank" rel="noopener">원본 보기</a></small></div></div>`).join(''):''}
+    ${L.note?`<p class="note">${L.note}${L.link?` <a href="${L.link}" target="_blank" rel="noopener">서울 TOPIS</a>`:''}</p>`:''}
+    <p class="note sm">게임의 교통량은 실측 자료로 만든 평일 출근 시간 값이라, 지금 카메라 화면과 다를 수 있습니다. 다른 도시 카메라는 <a href="https://tomarigi.me/world" target="_blank" rel="noopener">Tomarigi 세계 라이브카메라 지도</a>에서 볼 수 있습니다.</p>`;
+  const stamp=()=>{$('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{const t=$('modalbody').querySelector(`[data-lct="${im.dataset.lci}"]`);if(t)t.textContent='받은 시각 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});});};
+  $('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{im.onload=stamp;im.onerror=()=>{const t=$('modalbody').querySelector(`[data-lct="${im.dataset.lci}"]`);if(t)t.textContent='지금은 사진을 받을 수 없습니다';};});
+  clearInterval(LC.timer);LC.timer=setInterval(()=>{if($('modal').hidden){clearInterval(LC.timer);LC.open=false;return;}
+    $('modalbody').querySelectorAll('img[data-lci]').forEach(im=>{const c=L.cams[+im.dataset.lci];im.src=c.src+'?t='+Date.now();});},60000);
+  try{anTrack('livecam',{city:k,n:L.cams.length});}catch(e){}}
+// 버튼: 실제 교차로 스테이지에서만, 레벨 칩 묶음(도움말 옆)에
+{const b=document.createElement('button');b.type='button';b.id='lcbtn';b.className='chip lcbtn';b.innerHTML='<i class="lcdot"></i>실시간 카메라';b.hidden=true;$('hudtop').appendChild(b);b.addEventListener('click',openLiveCam);
+  setInterval(()=>{try{const k=lcKey(),n=k?LIVECAM[k].cams.length:0;b.hidden=!k;b.classList.toggle('none',!n);b.title=n?'이 교차로 근처 공개 카메라 보기':'이 교차로의 공개 카메라는 아직 없습니다';}catch(e){}},500);}
 // ---------- 화면 배치: 정보와 조작 UI가 도로를 가리지 않게 ----------
 // 도로 = 교차로를 지나는 남북, 동서 띠(시뮬레이션 도로 폭 + 여유). 그 밖의 네 귀퉁이(사분면)에만 패널을 둠
 // 왼쪽 위: 세션 HUD, 민원 카드 / 오른쪽 위: 재생 패널, 레벨 칩과 계기판(자리가 없으면 다른 사분면)
