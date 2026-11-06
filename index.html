@@ -3,6 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<meta name="gl-build" content="20261105212036">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -501,6 +502,8 @@ h1.brand span{color:#4fe08a}h1.brand small{font-family:var(--f-display);font-siz
 .lcpip .lph button{padding:2px 7px;font-size:11px;line-height:1.4}.lcpip .lpx{font-size:14px!important;padding:0 7px!important}
 .lcpip .lpm{aspect-ratio:16/9;background:#000}.lcpip .lpm img,.lcpip .lpm video,.lcpip .lpm iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
 .lcpip .lpd{font-size:10.5px;color:var(--accent);padding:3px 9px 5px}
+.updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:6000;background:#1b2229;color:var(--fg);border:1px solid var(--accent);border-radius:99px;padding:8px 10px 8px 16px;font-size:13px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.updbar button{padding:5px 12px;font-size:12.5px;border-radius:99px}
 </style>
 
 <div class="wrap">
@@ -2896,6 +2899,12 @@ else{document.body.classList.add('titleon');tsResize();addEventListener('resize'
   // 게임 시작 버튼으로만 시작(버튼에 초점이 있으면 Enter/Space도 됨)
   const go=TTL.querySelector('.tgo');go.addEventListener('click',e=>{e.stopPropagation();titleClose();});setTimeout(()=>{try{go.focus({preventScroll:true});}catch(e){}},300);
   champLoad();}
+// ---------- 새 버전 알림: 공개 주소에서 5분마다 배포본의 빌드 번호를 확인해, 바뀌었으면 새로고침 안내 ----------
+// GitHub Pages는 페이지를 10분까지 캐시하므로, 열어 둔 화면이 옛 버전인 채로 남는 것을 막음
+{const me=(document.querySelector('meta[name="gl-build"]')||{}).content;
+  async function chk(){if(!/github\.io$/.test(location.hostname)||!me)return;try{const t=await (await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'})).text(),m=/name="gl-build" content="(\d+)"/.exec(t);
+    if(m&&m[1]!==me&&!document.getElementById('updbar')){const d=document.createElement('div');d.id='updbar';d.className='updbar';d.innerHTML='새 버전이 나왔습니다. <button type="button" class="primary">새로고침</button>';document.body.appendChild(d);d.querySelector('button').onclick=()=>location.reload();}}catch(e){}}
+  setTimeout(chk,8000);setInterval(chk,300000);}
 })();
 </script>
 <script>
