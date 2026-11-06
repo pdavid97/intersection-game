@@ -2228,7 +2228,7 @@ function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
   loadMode(m);}
 setPlayMode(playMode);updateUI();requestAnimationFrame(frame);
 window.__test={owGeo,evalCfg,runSession,realCfg,levelCfg,LEVELS,REAL,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,step,DT,get WXP(){return WXP}};
-window.__g={NAME,touch:()=>updateUI(),modeId:()=>modeId(),openModal:(t,e)=>openModal(t,e),get cfg2(){return cfg},setWx(k){if(k==='clear')delete cfg.wx;else cfg.wx=k;const w=document.getElementById('wxsel');if(w)w.value=k;updateUI();},WXP,get sim(){return sim},get cfg(){return cfg},get mode(){return mode},sigState,vehPose,curReal,APPR,HEAD};
+window.__g={NAME,get skin(){return skin},SUN_BLD,CAR_SUN:CAR_PAINT.sunset,touch:()=>updateUI(),modeId:()=>modeId(),openModal:(t,e)=>openModal(t,e),get cfg2(){return cfg},setWx(k){if(k==='clear')delete cfg.wx;else cfg.wx=k;const w=document.getElementById('wxsel');if(w)w.value=k;updateUI();},WXP,get sim(){return sim},get cfg(){return cfg},get mode(){return mode},sigState,vehPose,curReal,APPR,HEAD};
 // ---------- 즉각 피드백: 말풍선, 효과음, 색종이 ----------
 // 실제 지표가 바뀐 순간에만 띄움: 대기열 해소, 오래 기다린 차, 보행자 무리 횡단, 무단 횡단, 사고, 이전 세션 대비 속도
 const FXP=(()=>{let p={bub:true,snd:true};try{Object.assign(p,JSON.parse(localStorage.getItem('fx-v1')||'{}'));}catch(e){}return p;})();
@@ -3211,28 +3211,33 @@ function setSun(R){const C=window.Cesium,v=st.viewer;if(!v||!R)return;const sn=S
   const[lon,lat]=toGeo(R,0,0),c0=C.Cartesian3.fromDegrees(lon,lat,0),enu=C.Transforms.eastNorthUpToFixedFrame(c0),m=C.Matrix4.getMatrix3(enu,new C.Matrix3());
   const toSun=new C.Cartesian3(Math.sin(az)*Math.cos(el),Math.cos(az)*Math.cos(el),Math.sin(el)),dw=C.Matrix3.multiplyByVector(m,toSun,new C.Cartesian3());
   C.Cartesian3.negate(dw,dw);C.Cartesian3.normalize(dw,dw);
-  const photo=getStyle()==='photo';v.scene.light=new C.DirectionalLight({direction:dw,intensity:photo?2.0:2.2});
+  const photo=getStyle()==='photo',warm=!photo&&sunsetOn();v.scene.light=new C.DirectionalLight({direction:dw,intensity:photo?2.0:2.2,color:warm?C.Color.fromCssColorString('#ffe0c2'):C.Color.WHITE});
   v.shadows=true;const sm=v.shadowMap;sm.softShadows=true;sm.darkness=photo?.42:.5;sm.maximumDistance=900;sm.size=2048;
   v.scene.globe.shadows=C.ShadowMode.RECEIVE_ONLY;if(st.tiles)st.tiles.shadows=C.ShadowMode.RECEIVE_ONLY;st.sunFor=R.id+':'+getStyle();}
 function clearSimple(){const v=st.viewer;if(!v||!st.simple)return;for(const e of st.simple.ents)v.entities.remove(e);st.simple=null;}
-function buildSimple(R){const C=window.Cesium,v=st.viewer;clearSimple();if(!R||!R.ctx)return;const X=R.ctx,ents=[];
+// 노을 도시 스킨(게임 기본 스킨)이면 단순 3D도 같은 색: 연두 땅, 베이지 보도, 짙은 아스팔트, 파스텔 건물, 따뜻한 햇빛
+const sunsetOn=()=>{const g=G();return!!g&&g.skin==='sunset';};
+function buildSimple(R){const C=window.Cesium,v=st.viewer;clearSimple();if(!R||!R.ctx)return;const X=R.ctx,ents=[],SS=sunsetOn(),g0=G();st.simpleSkin=SS;
+  v.scene.globe.baseColor=C.Color.fromCssColorString(SS?'#a9cf8f':'#dfe3da');
   const deg=(arr)=>{const o=[];for(let i=0;i<arr.length;i+=2){const[lon,lat]=toGeo(R,arr[i],arr[i+1]);o.push(lon,lat);}return o;};
   const near=arr=>{for(let i=0;i<arr.length;i+=2)if(Math.abs(arr[i])<700&&Math.abs(arr[i+1])<700)return true;return false;};
-  for(const pk of X.parks||[])if(near(pk))ents.push(v.entities.add({polygon:{hierarchy:C.Cartesian3.fromDegreesArray(deg(pk)),height:0,material:C.Color.fromCssColorString('#a8c995'),shadows:C.ShadowMode.RECEIVE_ONLY}}));
+  for(const pk of X.parks||[])if(near(pk))ents.push(v.entities.add({polygon:{hierarchy:C.Cartesian3.fromDegreesArray(deg(pk)),height:0,material:C.Color.fromCssColorString(SS?'#9fd18a':'#a8c995'),shadows:C.ShadowMode.RECEIVE_ONLY}}));
   const W={p:16,s:11,r:7,v:4.5,l:5};
   for(const rd of X.roads){if(!near(rd.p)||rd.p.length<4)continue;
-    if(rd.c==='w'){ents.push(v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(deg(rd.p)),width:4,height:0,extrudedHeight:7,material:C.Color.fromCssColorString('#b49b74'),outline:true,outlineColor:C.Color.fromCssColorString('#7d6a4f'),shadows:C.ShadowMode.CAST_ONLY}}));continue;}
-    ents.push(v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(deg(rd.p)),width:W[rd.c]||4,height:.03,material:C.Color.fromCssColorString(rd.c==='p'||rd.c==='s'?'#7c838b':'#9aa0a6'),cornerType:C.CornerType.ROUNDED,shadows:C.ShadowMode.RECEIVE_ONLY}}));}
+    if(rd.c==='w'){ents.push(v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(deg(rd.p)),width:4,height:0,extrudedHeight:7,material:C.Color.fromCssColorString(SS?'#d9a98a':'#b49b74'),outline:true,outlineColor:C.Color.fromCssColorString(SS?'#a8785c':'#7d6a4f'),shadows:C.ShadowMode.CAST_ONLY}}));continue;}
+    if(SS)ents.push(v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(deg(rd.p)),width:(W[rd.c]||4)+5,height:.015,material:C.Color.fromCssColorString('#efe0c6'),cornerType:C.CornerType.ROUNDED,shadows:C.ShadowMode.RECEIVE_ONLY}}));
+    ents.push(v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(deg(rd.p)),width:W[rd.c]||4,height:.03,material:C.Color.fromCssColorString(SS?(rd.c==='p'||rd.c==='s'?'#4f5866':'#5d6672'):(rd.c==='p'||rd.c==='s'?'#7c838b':'#9aa0a6')),cornerType:C.CornerType.ROUNDED,shadows:C.ShadowMode.RECEIVE_ONLY}}));}
   const bh=R.bh||[];
   // 교차로 중심을 감싸는 건물 윤곽(지하 역사 등)은 도로를 덮으므로 제외
   const hasO=b=>{let c=false;for(let q=0,m=b.length/2,r=m-1;q<m;r=q++){const y1=b[2*r+1],y2=b[2*q+1];if((y2>0)!==(y1>0)&&0<(b[2*r]-b[2*q])*(0-y2)/(y1-y2)+b[2*q])c=!c;}return c;};
   X.blds.forEach((b,i)=>{if(hasO(b)||bh[i]===0)return;const h=bh[i]||12,t=Math.min(1,h/80),g=Math.round(236-60*t);
-    ents.push(v.entities.add({polygon:{hierarchy:C.Cartesian3.fromDegreesArray(deg(b)),height:0,extrudedHeight:h,material:C.Color.fromBytes(g,g+2,g+6,255),outline:true,outlineColor:C.Color.fromCssColorString('#5c636b').withAlpha(.6),shadows:C.ShadowMode.CAST_ONLY}}));});
+    const P=SS&&g0&&g0.SUN_BLD?g0.SUN_BLD[i%g0.SUN_BLD.length]:null;
+    ents.push(v.entities.add({polygon:{hierarchy:C.Cartesian3.fromDegreesArray(deg(b)),height:0,extrudedHeight:h,material:P?C.Color.fromCssColorString(P[0]):C.Color.fromBytes(g,g+2,g+6,255),outline:true,outlineColor:C.Color.fromCssColorString(P?P[1]:'#5c636b').withAlpha(.6),shadows:C.ShadowMode.CAST_ONLY}}));});
   st.simple={id:R.id,ents};
   setSun(R);
   status(`단순 3D 지도: OSM 건물 ${X.blds.length}동 (높이: OSM 값, 없으면 추정) © OpenStreetMap contributors`);}
 async function applyStyle(){const v=st.viewer;if(!v)return;const sty=getStyle();
-  if(sty==='simple'){if(st.tiles){v.scene.primitives.remove(st.tiles);st.tiles=null;}v.scene.globe.show=true;v.scene.globe.baseColor=window.Cesium.Color.fromCssColorString('#dfe3da');
+  if(sty==='simple'){if(st.tiles){v.scene.primitives.remove(st.tiles);st.tiles=null;}v.scene.globe.show=true;
     const g=G(),R=g&&g.curReal();buildSimple(R);st.net=null;st.flown=null;}
   else{clearSimple();v.scene.globe.baseColor=window.Cesium.Color.fromCssColorString('#3a4148');if(!getKey()){$('v3key').hidden=false;}await reloadTiles();const g=G();setSun(g&&g.curReal());st.flown=null;}}
 async function open(){if(location.protocol==='file:'){const o0=overlay();o0.hidden=false;window.__v3on=true;st.on=true;$('btn3d').textContent='2D로 돌아가기';status('파일을 더블클릭해서 열면 3D 지도가 동작하지 않습니다. 로컬 서버나 웹 호스팅 주소(http, https)로 열어 주세요.');return;}
@@ -3277,12 +3282,14 @@ const PAL=['#e8ebee','#2b2f36','#c9ced6','#c0392b','#2f6fe0','#e3be48','#5b6b7a'
 function tick(){if(!st.on)return;const g=G();if(!g)return;const R=g.curReal(),sim=g.sim,C=window.Cesium;
   if(!R||!R.geoRef){status('3D 보기는 실제 도시 스테이지에서만 됩니다');return;}
   if(st.realId!==R.id){st.realId=R.id;st.net=null;if(getStyle()==='simple')buildSimple(R);else setSun(R);}
+  // 게임 스킨을 바꾸면 단순 3D도 다시 그림(차는 새로 만듦)
+  if(getStyle()==='simple'&&st.simple&&st.simpleSkin!==sunsetOn()){buildSimple(R);for(const e of st.ents.values())for(const en of e.ents)st.viewer.entities.remove(en);st.ents.clear();}
   if(st.net!==sim.net){st.net=sim.net;rebuild(R,sim).then(()=>{const k=R.id+(st.tiles&&st.hs.length?':3d':':flat');if(st.flown!==k){st.flown=k;fly(true);}});return;}
   if(!st.hsReady)return;
   const seen=new Set();
   for(const v of sim.vehicles){const p=g.vehPose(v);if(Math.hypot(p.x,p.y)>175)continue;seen.add(v.id);
     let e=st.ents.get(v.id);
-    if(!e){const col=v.crashed?'#ff4d4d':v.cls==='bus'?'#2f6fe0':PAL[v.id%PAL.length],bus=v.cls==='bus',van=v.cls==='hov';
+    if(!e){const sk=getStyle()==='simple'&&sunsetOn()&&g.CAR_SUN,col=v.crashed?'#ff4d4d':v.cls==='bus'?(sk?(v.id%2?'#ef6f6c':'#7bd389'):'#2f6fe0'):sk?g.CAR_SUN[v.id%g.CAR_SUN.length]:PAL[v.id%PAL.length],bus=v.cls==='bus',van=v.cls==='hov';
       // 차량 모양: 차체(아래) + 유리창 층 + 지붕(위). 버스는 높은 차체 + 창문 띠
       const parts=bus?[{dx:0,z:1.6,d:[v.len,v.w,2.6],c:col},{dx:.1,z:2.05,d:[v.len*.92,v.w+.04,.85],c:'#1c2a36'},{dx:0,z:3.0,d:[v.len*.8,v.w*.8,.22],c:'#d9dde2'}]
         :[{dx:0,z:.55,d:[v.len,v.w,.8],c:col},{dx:van?-.05*v.len:-.08*v.len,z:1.22,d:[v.len*(van?.78:.5),v.w*.86,.56],c:'#1c2a36'},{dx:van?-.05*v.len:-.1*v.len,z:1.52,d:[v.len*(van?.7:.4),v.w*.8,.1],c:col}];
