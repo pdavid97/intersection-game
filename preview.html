@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Green Light! 모바일 미리보기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Lilita+One&display=swap">
+<style>
+/* 모바일 미리보기: 같은 게임(index.html)을 휴대폰 크기 틀(iframe) 여러 개로 나란히 띄움. 게임은 폭 700px 이하에서 모바일 화면으로 바뀜 */
+:root{--bg:#0e1216;--panel:#151a20;--line:#29323b;--fg:#e6e9ed;--muted:#8e99a6;--accent:#f3b531}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px "IBM Plex Sans KR",system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:2}
+h1{font:400 24px "Lilita One",sans-serif;margin:0}h1 span{color:#4fe08a}h1 small{font:500 13px "IBM Plex Sans KR";color:var(--muted);margin-left:8px}
+label{display:inline-flex;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+button,select{font:inherit;font-size:13px;color:var(--fg);background:#1b2229;border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button.on{border-color:var(--accent);color:var(--accent)}
+main{display:flex;flex-wrap:wrap;gap:22px;padding:18px 16px 40px;align-items:flex-start}
+.dev{display:flex;flex-direction:column;gap:6px}.dev .cap{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}.dev .cap b{color:var(--fg);font-weight:500}
+.shell{position:relative;background:#000;border-radius:34px;padding:12px;box-shadow:0 0 0 2px #2c333b,0 18px 40px rgba(0,0,0,.45);overflow:hidden}
+.shell .scr{position:relative;overflow:hidden;border-radius:24px;background:#000}
+.shell iframe{border:0;display:block;transform-origin:0 0;background:#fff}
+.note{color:var(--muted);font-size:12px;padding:0 16px}
+</style></head><body>
+<header><h1>Green <span>Light!</span><small>모바일 미리보기</small></h1>
+  <label>배율 <select id="zoom"><option value="1">100%</option><option value="0.85" selected>85%</option><option value="0.7">70%</option><option value="0.55">55%</option></select></label>
+  <button type="button" id="rot">가로로 돌리기</button>
+  <button type="button" id="reload">모두 새로고침</button>
+  <label><input type="checkbox" id="skip">시작 화면 건너뛰기</label>
+  <label><input type="checkbox" id="sync">한 화면만(같은 기기 1대)</label>
+  <a href="./" style="color:var(--accent);font-size:13px;margin-left:auto">PC 화면으로</a></header>
+<p class="note">같은 게임을 대표 휴대폰 크기로 띄운 화면입니다. 기기마다 저장값(진행, 설정)은 같은 브라우저라 서로 공유됩니다. 터치 대신 마우스로 조작됩니다.</p>
+<main id="grid"></main>
+<script>
+const DEV=[['iPhone 15 / 16','393×852',393,852],['iPhone SE','375×667',375,667],['갤럭시 S24','360×780',360,780],['iPad mini','744×1133',744,1133]];
+const ls={get(k,d){try{const v=localStorage.getItem('pv-'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('pv-'+k,JSON.stringify(v));}catch(e){}}};
+const st={zoom:ls.get('zoom',0.85),land:ls.get('land',false),skip:ls.get('skip',false),one:ls.get('one',false)};
+const $=id=>document.getElementById(id);
+function render(){const g=$('grid');g.innerHTML='';const list=st.one?DEV.slice(0,1):DEV;
+  for(const [name,size,w0,h0] of list){const w=st.land?h0:w0,h=st.land?w0:h0,z=st.zoom;
+    const d=document.createElement('div');d.className='dev';
+    d.innerHTML=`<div class="cap"><b>${name}</b><span>${st.land?h0+'×'+w0:size}</span></div><div class="shell"><div class="scr" style="width:${w*z}px;height:${h*z}px"><iframe title="${name}" style="width:${w}px;height:${h}px;transform:scale(${z})" src="./${st.skip?'#notitle':''}"></iframe></div></div>`;
+    g.appendChild(d);}
+  $('rot').textContent=st.land?'세로로 돌리기':'가로로 돌리기';$('rot').classList.toggle('on',st.land);}
+$('zoom').value=String(st.zoom);$('skip').checked=st.skip;$('sync').checked=st.one;
+$('zoom').onchange=e=>{st.zoom=+e.target.value;ls.set('zoom',st.zoom);render();};
+$('rot').onclick=()=>{st.land=!st.land;ls.set('land',st.land);render();};
+$('reload').onclick=()=>render();
+$('skip').onchange=e=>{st.skip=e.target.checked;ls.set('skip',st.skip);render();};
+$('sync').onchange=e=>{st.one=e.target.checked;ls.set('one',st.one);render();};
+render();
+</script></body></html>
