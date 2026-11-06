@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261105221220">
+<meta name="gl-build" content="20261105222327">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -181,7 +181,7 @@ body.play .stage{aspect-ratio:auto;height:min(86vh,940px);min-height:520px}
 .hud-tr button,.hud-tr select{padding:5px 9px;font-size:12px;white-space:nowrap;flex:none}
 .dock{position:relative!important;left:auto;right:auto;bottom:auto;border-radius:0;border-width:1px 0 0;padding:6px 12px 8px;background:var(--panel)}
 body.play .stage{display:flex;flex-direction:column}
-body.play .stage canvas{flex:1 1 auto;min-height:0;height:auto}
+body.play .stage>canvas#cv{flex:1 1 auto;min-height:0;height:auto}
 .dock #sigcore{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;column-gap:16px;align-items:center}
 .dock #tl,.dock .tlcap,.dock .tlleg{grid-column:1/-1}
 .dock .splits,.dock #selname{display:none}
@@ -335,7 +335,7 @@ body.mobile .hud-tr .bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;g
 body.mobile .hud-tr .bar::-webkit-scrollbar{display:none}
 body.mobile.showadv .hud-tr .bar{flex-wrap:wrap}
 body.mobile .hud-tr button,body.mobile .hud-tr select{min-height:36px;padding:6px 11px;font-size:13px}
-body.mobile .stage canvas{order:1}
+body.mobile .stage>canvas#cv{order:1}
 body.mobile .dock{order:3}
 body.mobile .dock .tl{height:44px}
 body.mobile .tl .h{width:36px;margin-left:-18px}
@@ -507,7 +507,7 @@ h1.brand span{color:#4fe08a}h1.brand small{font-family:var(--f-display);font-siz
 
 /* ===== 플레이 화면 v2(PC): 지도 | 옆 칸. 지도 위에는 패널을 두지 않음 ===== */
 body.pv2 .stage{display:grid!important;grid-template-columns:minmax(0,1fr) 312px;grid-template-rows:minmax(0,1fr) auto}
-body.pv2 .stage canvas{grid-column:1;grid-row:1;width:100%;height:100%;min-height:0}
+body.pv2 .stage>canvas#cv{grid-column:1;grid-row:1;width:100%;height:100%;min-height:0}
 body.pv2 .stage .dock{grid-column:1;grid-row:2}
 body.pv2 .side{grid-column:2;grid-row:1/span 2;display:flex;flex-direction:column;gap:10px;padding:12px;overflow-y:auto;border-left:1px solid var(--line);background:var(--panel)}
 .side{display:none}body.pv2 .side{display:flex}
@@ -547,18 +547,30 @@ body.sk-sunset h1.brand small{color:var(--muted)}
 body.mobile .hud-tl{position:static!important;order:2;border-radius:0;border-width:1px 0 0;max-width:none!important;min-width:0;padding:6px 10px}
 body.mobile .hud-tl .grid2{grid-template-columns:repeat(4,auto)}
 body.mobile.play .stage{height:auto!important}
-body.mobile.play .stage canvas{flex:none!important;height:min(96vw,58dvh)!important}
+body.mobile.play .stage>canvas#cv{flex:none!important;height:min(96vw,58dvh)!important}
 /* 모바일 순서: 지도 → 신호 막대(핵심 조작) → 확정과 재생 → 레벨과 점수 → 목표 → 민원 */
-body.mobile.play .stage canvas{order:1}body.mobile.play .dock{order:2}body.mobile.play .hud-tr{order:3}
+body.mobile.play .stage>canvas#cv{order:1}body.mobile.play .dock{order:2}body.mobile.play .hud-tr{order:3}
 body.mobile.play .hud-top{order:4}body.mobile.play .hud-tl{order:5}body.mobile.play .citcard{order:6}
 body.mobile.play .hud-tr .bar{flex-wrap:wrap!important;overflow:visible!important}
 body.mobile.play .hud-tr #skip{order:-2;flex:1 1 100%!important;font-size:15px;padding:10px}
+/* 신호 시계(링 다이얼): 막대 대신 원으로. 예전 막대와 주기 슬라이더는 숨김 */
+#sigcore #tl{display:none!important}#sigcore #cycrow{display:none!important}#sigcore .tlcap{display:none}
+.rgwrap{grid-column:1/-1;display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:4px 0}
+.rgwrap canvas{flex:none;touch-action:none}
+.rginfo{flex:1 1 220px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.rgnow{font-size:13px;color:var(--accent);font-weight:700}
+.rgcyc{display:flex;align-items:baseline;gap:6px}.rgcyc b{font-size:24px}.rgcyc span{color:var(--muted);font-size:12px}
+.rglock{margin-left:auto;font-size:12px;padding:4px 10px}
+.rginfo .tlleg{margin:0;font-size:12.5px;gap:4px 12px}
+.rghelp{font-size:11.5px;color:var(--muted);line-height:1.5}
+.dock .nudge{grid-column:1/-1!important;grid-row:auto!important;justify-self:start}
+body.mobile .rgwrap{flex-direction:column;align-items:stretch}body.mobile .rgwrap canvas{align-self:center}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.20. 아래 신호 막대로 녹색 시간을 나누고, 오른쪽 확정 버튼으로 결과를 확인하세요.</div>
+    <div class="sub">프로토타입 v0.20. 아래 신호 시계로 녹색 시간을 나누고, 오른쪽 확정 버튼으로 결과를 확인하세요.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -666,7 +678,7 @@ body.mobile.play .hud-tr #skip{order:-2;flex:1 1 100%!important;font-size:15px;p
           <div class="unserved" id="phwarn"></div>
           <div class="note">현시를 고른 뒤 표에서 녹색을 줄 이동류를 켜고 끕니다. 경로가 겹치는 이동류는 같은 현시에 넣을 수 없습니다. 같은 접근로의 직진이 녹색이고 비보호를 허용하면 좌회전은 비보호로 표시됩니다.</div>
         </div>
-        <div class="note">막대의 경계를 끌어 현시 비중을 나눕니다. 경계를 누른 뒤 ◀ ▶ 버튼이나 방향키로 1초씩 맞출 수 있습니다. 현시마다 최소 녹색은 5초입니다. 각 현시 뒤에는 황색과 전적색 1초가 붙습니다. 황색이 짧으면 멈추지도 지나가지도 못하는 차량이 생겨 신호 위반 사고가 나고, 길면 주기마다 버려지는 시간이 늘어납니다.</div>
+        <div class="note">신호 시계의 손잡이를 끌어 현시 비중을 나눕니다. 손잡이를 누른 뒤 ◀ ▶ 버튼이나 마우스 휠로 1초씩 맞출 수 있습니다. 현시마다 최소 녹색은 5초입니다. 각 현시 뒤에는 황색과 전적색 1초가 붙습니다. 황색이 짧으면 멈추지도 지나가지도 못하는 차량이 생겨 신호 위반 사고가 나고, 길면 주기마다 버려지는 시간이 늘어납니다.</div>
         <label class="chk" id="rtorlbl"><input type="checkbox" id="rtor">적색 신호 시 우회전 허용 (일시정지 후 진입)</label>
         <div class="pedbox" id="pedbox" hidden><b>보행 신호</b><button type="button" id="pedscr">보행 전용 현시 넣기</button><label class="chk"><input type="checkbox" id="pedconc">차량 신호와 함께 건너기 (동시 횡단, 회전 차량이 양보)</label><div class="note" id="pednote"></div></div>
       </section>
@@ -1164,7 +1176,7 @@ const LEVELS=[
  {id:'0-1',stage:0,jam:15,title:'첫 신호',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:26,EW_T:26},
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},
   story:'남북 도로는 출근 차량으로 붐비는데, 신호는 남북과 동서에 똑같이 26초씩 주고 있습니다.',
-  goal:'신호 막대의 경계를 끌어 남북과 동서의 녹색 시간을 다시 나누세요.',
+  goal:'신호 시계(지도 아래 원)의 흰 손잡이를 끌어 남북과 동서의 녹색 시간을 다시 나누세요.',
   hint:'차가 많이 오는 쪽에 녹색을 더 주면 됩니다. 그렇다고 동서를 너무 줄이면 동서 대기열이 넘칩니다.',goals:[{k:'dly',max:13},{k:'q',a:'S',max:12}],stars:[592,624,637]},
  {id:'0-2',stage:0,jam:15,title:'동서 대로',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:34,EW_T:18},
   appr:{N:[300,0,10,'T','TR'],S:[250,0,10,'T','TR'],E:[850,0,10,'T','TR'],W:[800,0,10,'T','TR']},
@@ -2460,16 +2472,16 @@ window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!
 
 // 안내 말풍선: 레벨에 처음 들어왔을 때 새 조작을 가리킴. 대상이 화면에 나타날 때까지 기다렸다가 표시
 const COACH={
- '0-1':[{sel:'#tl .h',t:'이 손잡이를 좌우로 끌면 남북과 동서의 녹색 시간이 나뉩니다. 차가 많은 남북 쪽에 녹색을 더 주세요.'},
+ '0-1':[{sel:'#ring',t:'신호 시계입니다. 원 위의 흰 손잡이를 원을 따라 끌면 남북(1)과 동서(2)의 녹색 시간이 나뉩니다. 차가 많은 남북 쪽에 녹색을 더 주세요.'},
         {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 확정할 때마다 세션 1번을 씁니다. 스테이지마다 세션은 5번입니다.'},
         {sel:'#gauge',t:'확정한 점수가 여기 바늘로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
- '0-4':[{sel:'#tl .h',t:'실제 강남역 신호입니다. 네 현시 사이의 경계를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
- '1-1':[{sel:'#cyc',t:'이제 주기 길이를 바꿀 수 있습니다. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
+ '0-4':[{sel:'#ring',t:'실제 강남역 신호입니다. 네 현시 사이의 경계를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
+ '1-1':[{sel:'#ring',t:'이제 주기 길이를 바꿀 수 있습니다. 신호 시계 가운데 숫자를 돌리면(마우스 휠도 됨) 주기가 바뀝니다. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
  '2-1':[{sel:'#arm-N',t:'접근로 버튼을 누르면 차로마다 용도(좌회전, 직진, 우회전)를 바꿀 수 있습니다.'}],
  '3-1':[{sel:'#phbtn',t:'신호 구성 편집에서 현시마다 녹색을 줄 이동류를 고를 수 있습니다.'}],
  '4-1':[{sel:'#arm-N',t:'북측 차로 버튼을 눌러 1차로에서 유턴도 할 수 있게 바꿔 보세요.'}],
  '4-2':[{sel:'#arm-S',t:'접근로 창에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
- '5-1':[{sel:'#tl .h',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 다 건널 만큼 동서 녹색을 늘려 주세요.'}],
+ '5-1':[{sel:'#ring',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 다 건널 만큼 동서 녹색을 늘려 주세요.'}],
  '5-2':[{sel:'#phbtn',t:'신호 구성 편집에서 보행 전용 현시를 넣을 수 있습니다.'}]};
 const coach={id:null,steps:null,i:0,el:null};
 const coachBox=(()=>{const d=document.createElement('div');d.className='coach';d.hidden=true;d.innerHTML='<div class="ring"></div><div class="cb"><p></p><div class="cbb"><button type="button" class="cskip">그만 보기</button><button type="button" class="cnext primary">알겠어요</button></div></div>';document.body.appendChild(d);return d;})();
@@ -2843,6 +2855,75 @@ function pvGoal(){if(!PV2S.goal)return;const lv=curLevel(),R=curReal(),t=thresho
   PV2S.goal.innerHTML=`<b>할 일</b><span>${g}</span><small>별 ★${t[0]} ★★${t[1]} ★★★${t[2]}점, 확정하면 점수가 나옵니다</small>`;}
 setInterval(()=>{try{pvApply();pvGoal();}catch(e){}},300);
 {const _sp=setPlayMode;setPlayMode=function(on){_sp(on);try{pvApply();}catch(e){}};}
+// ---------- 신호 시계(링 다이얼): 신호 한 바퀴를 원으로 보여 주고, 원 위 손잡이를 끌어 녹색을 옮김 ----------
+// 맨 위(12시)가 주기 시작. 색 조각 = 현시 녹색, 노랑 = 황색, 붉은 갈색 = 전적색, 흰 바늘 = 지금 신호 위치
+// 주기 고정(기본): 손잡이를 끌면 양옆 현시끼리 녹색을 주고받음(주기 그대로). 주기가 열린 레벨에서 고정을 풀면 그 현시만 늘고 줄어 주기가 바뀜
+// 가운데 주기 숫자를 돌리면 모든 현시가 비율대로 늘거나 줄어 주기가 바뀜(주기가 열린 레벨만)
+const RG={cv:null,ctx:null,size:230,lock:true,drag:null,col:[],hot:-1};
+function rgCols(){const out=[];for(let i=0;i<8;i++){const e=document.createElement('i');e.className='p'+i;e.style.display='none';document.body.appendChild(e);out.push(getComputedStyle(e).backgroundColor);e.remove();}
+  const y=document.createElement('i');y.className='Y';document.body.appendChild(y);RG.cY=getComputedStyle(y).backgroundColor;y.className='R';RG.cR=getComputedStyle(y).backgroundColor;y.remove();RG.col=out;}
+function rgBuild(){if(RG.cv)return;const core=$('sigcore');if(!core)return;
+  const w=document.createElement('div');w.className='rgwrap';w.id='rgwrap';
+  w.innerHTML=`<canvas id="ring" aria-label="신호 시계: 원 위 손잡이를 끌어 녹색 시간을 나누고, 가운데 숫자를 돌려 주기를 바꿉니다"></canvas>
+    <div class="rginfo"><div class="rgnow" id="rgnow"></div><div class="rgcyc"><b id="rgcycv"></b><span>초 주기</span><button type="button" id="rglock" class="rglock"></button></div>
+    <div class="rghelp" id="rghelp"></div></div>`;
+  core.insertBefore(w,core.firstChild);RG.cv=w.querySelector('canvas');RG.ctx=RG.cv.getContext('2d');rgCols();
+  $('rglock').addEventListener('click',()=>{RG.lock=!RG.lock;rgInfo();});
+  const cv=RG.cv;
+  cv.addEventListener('pointerdown',e=>{const p=rgPt(e);if(!p)return;cv.setPointerCapture(e.pointerId);
+    const cx=RG.size/2,r=Math.hypot(p.x-cx,p.y-cx),R0=RG.size*.3;
+    if(r<R0-6){if(!unlocked('cycle'))return;RG.drag={knob:true,a:Math.atan2(p.y-cx,p.x-cx),acc:0};return;}
+    const j=rgNear(p);if(j>=0){selH=j;RG.drag={j};refreshPlan();e.preventDefault();}});
+  cv.addEventListener('pointermove',e=>{const p=rgPt(e);if(!p)return;const cx=RG.size/2;
+    if(!RG.drag){const j=rgNear(p),r=Math.hypot(p.x-cx,p.y-cx);RG.hot=j;cv.style.cursor=j>=0?'grab':(r<RG.size*.3-6&&unlocked('cycle'))?'ew-resize':'default';rgDraw();return;}
+    if(RG.drag.knob){const a=Math.atan2(p.y-cx,p.x-cx);let d=a-RG.drag.a;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;RG.drag.a=a;RG.drag.acc+=d;
+      const step=Math.PI/30;while(Math.abs(RG.drag.acc)>=step){const s=Math.sign(RG.drag.acc);RG.drag.acc-=s*step;const C=cycleLen()+s;if(C>=40&&C<=200)setCycle(C);}return;}
+    const t=rgSec(p),j=RG.drag.j;
+    if(RG.lock||!unlocked('cycle'))setBoundary(j,t);
+    else{const start=boundary(j)-blk(j),LS=LOST(),g=Math.round(t-start-LS);PH[j].g=Math.max(MIN_G,Math.min(150,g));}
+    refreshPlan();});
+  const end=()=>{RG.drag=null;};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+  // 휠: 손잡이 위에서 1초씩, 가운데에서 주기 1초씩
+  cv.addEventListener('wheel',e=>{const p=rgPt(e);if(!p)return;const cx=RG.size/2,r=Math.hypot(p.x-cx,p.y-cx),s=e.deltaY<0?1:-1;
+    if(r<RG.size*.3-6){if(!unlocked('cycle'))return;e.preventDefault();const C=cycleLen()+s;if(C>=40&&C<=200)setCycle(C);return;}
+    const j=rgNear(p,40);if(j>=0){e.preventDefault();selH=j;nudge(j,s);}},{passive:false});
+  addEventListener('resize',rgSize);rgSize();}
+function rgPt(e){const r=RG.cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+function rgSec(p){const cx=RG.size/2;let a=Math.atan2(p.y-cx,p.x-cx)+Math.PI/2;if(a<0)a+=2*Math.PI;return a/(2*Math.PI)*cycleLen();}
+function rgAng(sec,C){return-Math.PI/2+sec/C*2*Math.PI;}
+// 가장 가까운 경계 손잡이(현시 j와 j+1 사이). px 거리로 판정
+function rgNear(p,lim){const C=cycleLen(),cx=RG.size/2,R=RG.size*.42;let best=-1,bd=lim||22;
+  for(let j=0;j<PH.length-1;j++){const a=rgAng(boundary(j),C),x=cx+Math.cos(a)*R,y=cx+Math.sin(a)*R,d=Math.hypot(p.x-x,p.y-y);if(d<bd){bd=d;best=j;}}return best;}
+function rgSize(){if(!RG.cv)return;const mob=document.body.classList.contains('mobile');RG.size=mob?Math.min(210,innerWidth-40):Math.max(190,Math.min(240,(innerHeight||800)*.27));
+  const d=Math.min(3,devicePixelRatio||1);RG.cv.style.width=RG.cv.style.height=RG.size+'px';RG.cv.width=RG.cv.height=Math.round(RG.size*d);RG.d=d;rgDraw();}
+function rgDraw(){if(!RG.cv||!PH||!PH.length)return;const c=RG.ctx,S=RG.size,d=RG.d||1,cx=S/2,R1=S*.47,R0=S*.31,Rh=S*.42,tl=timeline(PH,cfg.yellow),C=tl.len;
+  c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,S,S);
+  // 조각
+  for(const iv of tl.iv){if(iv.e<=iv.s)continue;c.beginPath();c.arc(cx,cx,R1,rgAng(iv.s,C),rgAng(iv.e,C));c.arc(cx,cx,R0,rgAng(iv.e,C),rgAng(iv.s,C),true);c.closePath();
+    c.fillStyle=iv.type==='G'?RG.col[iv.i%8]:iv.type==='Y'?RG.cY:RG.cR;c.fill();
+    if(iv.type==='G'&&(iv.e-iv.s)/C>.045){const m=rgAng((iv.s+iv.e)/2,C),rr=(R0+R1)/2;c.fillStyle='#fff';c.font=`700 ${Math.round(S*.058)}px "IBM Plex Sans KR",sans-serif`;c.textAlign='center';c.textBaseline='middle';
+      c.fillText((iv.i+1)+'',cx+Math.cos(m)*rr,cx+Math.sin(m)*rr-S*.03);c.font=`500 ${Math.round(S*.05)}px "IBM Plex Sans KR",sans-serif`;c.fillText((iv.e-iv.s)+'초',cx+Math.cos(m)*rr,cx+Math.sin(m)*rr+S*.035);}}
+  // 주기 시작 표시(12시)
+  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=2;c.beginPath();c.moveTo(cx,cx-R1-4);c.lineTo(cx,cx-R0+2);c.stroke();
+  // 지금 신호 위치 바늘(같은 설정을 보고 있을 때)
+  const m=$('tlmark');if(sim&&sim.tl&&m&&!m.hidden){const a=rgAng(sim.ct,sim.tl.len);c.strokeStyle='#fff';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(cx+Math.cos(a)*(R0-14),cx+Math.sin(a)*(R0-14));c.lineTo(cx+Math.cos(a)*(R1+3),cx+Math.sin(a)*(R1+3));c.stroke();}
+  // 손잡이
+  for(let j=0;j<PH.length-1;j++){const a=rgAng(boundary(j),C),x=cx+Math.cos(a)*Rh,y=cx+Math.sin(a)*Rh,on=j===selH||j===RG.hot;
+    c.beginPath();c.arc(x,y,on?S*.05:S*.042,0,7);c.fillStyle=on?'#ffd35a':'#fff8ee';c.fill();c.lineWidth=2;c.strokeStyle='#3a2313';c.stroke();}
+  // 가운데: 주기 숫자(돌리는 손잡이)
+  const kn=unlocked('cycle');c.beginPath();c.arc(cx,cx,R0-8,0,7);c.fillStyle=kn?'rgba(255,255,255,.08)':'rgba(255,255,255,.03)';c.fill();
+  if(kn){c.setLineDash([3,5]);c.strokeStyle='rgba(255,211,90,.6)';c.lineWidth=1.5;c.beginPath();c.arc(cx,cx,R0-8,0,7);c.stroke();c.setLineDash([]);}
+  c.fillStyle=getComputedStyle(document.body).color||'#fff';c.font=`700 ${Math.round(S*.15)}px "IBM Plex Sans KR",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(C),cx,cx-S*.02);
+  c.font=`500 ${Math.round(S*.05)}px "IBM Plex Sans KR",sans-serif`;c.globalAlpha=.75;c.fillText(kn?'초 주기, 돌려서 변경':'초 주기',cx,cx+S*.09);c.globalAlpha=1;}
+function rgInfo(){if(!RG.cv)return;const lg=$('tlleg'),info=RG.cv.parentNode.querySelector('.rginfo');if(lg&&info&&lg.parentNode!==info)info.insertBefore(lg,$('rghelp'));const kn=unlocked('cycle'),C=cycleLen();$('rgcycv').textContent=C;
+  const b=$('rglock');b.hidden=!kn;b.textContent=RG.lock?'주기 고정: 켜짐':'주기 고정: 꺼짐';b.classList.toggle('on',!RG.lock);
+  $('rghelp').innerHTML=!kn?'흰 손잡이를 원을 따라 끌면 양옆 현시끼리 녹색을 주고받습니다. 주기는 그대로입니다.'
+    :RG.lock?'손잡이를 끌면 양옆 현시끼리 녹색을 주고받습니다(주기 그대로). 가운데 숫자를 돌리면 모든 현시가 같은 비율로 늘거나 줍니다.'
+    :'손잡이를 끌면 그 현시만 늘고 줄어 주기가 바뀝니다. 가운데 숫자를 돌리면 비율대로 바뀝니다.';
+  const now=$('tlnow');$('rgnow').textContent=now?now.textContent:'';}
+{const _b=buildTL;buildTL=function(){_b();try{rgBuild();rgInfo();rgDraw();}catch(e){}};}
+setInterval(()=>{try{if(RG.cv&&RG.cv.offsetParent){rgDraw();const now=$('tlnow');if(now)$('rgnow').textContent=now.textContent;}}catch(e){}},120);
+try{rgBuild();rgInfo();rgDraw();}catch(e){}
 // ---------- 시작 화면: 노을 지는 도시 교차로를 비스듬히 내려다본 장면(움직이는 차, 신호, 보행자) ----------
 // 그림은 모두 코드로 그림(이미지 파일 없음). 누르거나 Enter/Space를 누르면 본게임으로. 주소에 #notitle이 있으면 건너뜀(시험용)
 const TTL=(()=>{const d=document.createElement('div');d.id='title';d.className='title';
