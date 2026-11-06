@@ -480,6 +480,8 @@ body.titleon{overflow:hidden}
 .title .tc .ts{font-family:var(--f-mono);font-size:12.5px;display:flex;flex-direction:column;align-items:center}.title .tc .ts small{font-family:var(--f-body);font-size:10.5px;opacity:.8}
 .title .tc.empty .tn{color:#fff8ee;font-weight:500;font-size:12px;opacity:.85}
 @media (max-width:640px){.title .tcity{grid-template-columns:repeat(3,minmax(0,1fr))}.title .tc:nth-child(n+4){grid-column:auto}}
+.title .tc b .tcy{font-weight:500;opacity:.8}
+.title .tc b{text-align:center;line-height:1.3}
 </style>
 
 <div class="wrap">
@@ -2699,17 +2701,18 @@ const TTL=(()=>{const d=document.createElement('div');d.id='title';d.className='
     </div><button type="button" class="tgo">게임 시작</button>
   <small class="tver"></small>`;document.body.appendChild(d);return d;})();
 // 교차로 챔피언: 실제 교차로 5곳마다 검증된(verified) 최고 기록 1개. 모든 도구가 열린 엔드게임 기록을 먼저, 없으면 그 교차로가 나오는 장 마지막 스테이지 기록
-const CHAMP=[['gangnam','서울 강남역',['real-gangnam','L5-4','L0-4']],['toronto','토론토',['real-toronto','L1-4']],['london','런던',['real-london','L2-4']],['edirnekapi','이스탄불',['real-edirnekapi','L3-4']],['tokyo','도쿄',['real-tokyo','L4-4']]];
+// 표기: 도시 + 교차로 이름(같은 수준으로)
+const CHAMP=[['gangnam','서울','강남역',['real-gangnam','L5-4','L0-4']],['toronto','토론토','레이크쇼어',['real-toronto','L1-4']],['london','런던','노스서큘러',['real-london','L2-4']],['edirnekapi','이스탄불','에디르네카프',['real-edirnekapi','L3-4']],['tokyo','도쿄','오하라',['real-tokyo','L4-4']]];
 function champLabel(sid){if(sid.startsWith('real-'))return'모든 도구';const lv=LEVELS.find(l=>'L'+l.id===sid);return lv?lvLabel(lv)+' 스테이지':'';}
 function champRender(rows){const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  $('tcity').innerHTML=CHAMP.map(([id,name,sids])=>{let best=null;for(const sid of sids){const r=(rows||[]).filter(x=>x.stage_id===sid).sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at))[0];if(r){best=r;break;}}
-    return`<div class="tc ${best?'':'empty'}"><b>${name}</b>${best?`<span class="tn">${esc(best.nickname||'익명')}</span><span class="ts">${best.score.toLocaleString()}점<small>통과 ${Number(best.persons||0).toLocaleString()}명, ${champLabel(best.stage_id)}</small></span>`:`<span class="tn">${rows?'아직 없음':'불러오는 중'}</span>`}</div>`;}).join('');}
-async function champLoad(){champRender(null);try{const ids=CHAMP.flatMap(c=>c[2]).join(',');
+  $('tcity').innerHTML=CHAMP.map(([id,city,ix,sids])=>{let best=null;for(const sid of sids){const r=(rows||[]).filter(x=>x.stage_id===sid).sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at))[0];if(r){best=r;break;}}
+    return`<div class="tc ${best?'':'empty'}"><b><span class="tcy">${city}</span> ${ix}</b>${best?`<span class="tn">${esc(best.nickname||'익명')}</span><span class="ts">${best.score.toLocaleString()}점<small>통과 ${Number(best.persons||0).toLocaleString()}명, ${champLabel(best.stage_id)}</small></span>`:`<span class="tn">${rows?'아직 없음':'불러오는 중'}</span>`}</div>`;}).join('');}
+async function champLoad(){champRender(null);try{const ids=CHAMP.flatMap(c=>c[3]).join(',');
   const r=await fetch(`https://qjguvtmkrkbtpvdnyelp.supabase.co/rest/v1/scores?select=stage_id,nickname,score,persons,created_at&status=eq.verified&weather=eq.clear&stage_id=in.(${ids})&order=score.desc&limit=200`,{headers:{apikey:'sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp'}});
   if(!r.ok)throw 0;champRender(await r.json());}catch(e){champRender([]);}}
 TTL.querySelector('.tver').textContent=((document.querySelector('header .sub')||{}).textContent||'').match(/v[0-9]+(\.[0-9]+)*/)?.[0]||'';
-const TS={on:true,t:0,last:0,cars:[],peds:[],bld:[],trees:[],spawn:{},cv:$('ttlcv')};
-TS.ctx=TS.cv.getContext('2d');
+window.__TS=null;const TS={on:true,t:0,last:0,cars:[],peds:[],bld:[],trees:[],spawn:{},cv:$('ttlcv')};
+TS.ctx=TS.cv.getContext('2d');window.__TS={get S(){return TS},step:dt=>tsStep(dt)};
 // 무작위(고정 씨앗): 매번 같은 도시
 let tsSeed=7;const trnd=()=>(tsSeed=(tsSeed*16807)%2147483647)/2147483647;
 const PAL={bld:[['#f6c9a8','#e6a987','#d48f70'],['#f3dca2','#e3c27f','#cfa866'],['#bfdccf','#9cc4b3','#80ab99'],['#cdd3ee','#aab3dc','#8f98c6'],['#f2b8c0','#df98a3','#c97f8b'],['#e9e2d6','#d3c9b8','#bcae9a']],
@@ -2722,26 +2725,49 @@ const PAL={bld:[['#f6c9a8','#e6a987','#d48f70'],['#f3dca2','#e3c27f','#cfa866'],
     const near=sx>0&&sy>0,w=7+trnd()*3,dd=7+trnd()*3,h=near?3.5+trnd()*(i+j>3?9:4):(i+j<2?8:6)+trnd()*(i+j>3?26:16),p=PAL.bld[Math.floor(trnd()*PAL.bld.length)];
     const a=[sx*x0,sx*(x0+w)].sort((u,v)=>u-v),b=[sy*y0,sy*(y0+dd)].sort((u,v)=>u-v);TS.bld.push({x0:a[0],x1:a[1],y0:b[0],y1:b[1],h,p,win:trnd()<.5});}}
   // 길가 가로수
-  for(const s of [-1,1])for(let k=14;k<60;k+=9){TS.trees.push({x:k*s,y:9.8*(k%18<9?1:-1),r:1.6});TS.trees.push({x:9.8*(k%18<9?-1:1),y:k*s,r:1.6});}})();
+  for(const s of [-1,1])for(let k=16;k<60;k+=9){TS.trees.push({x:k*s,y:10.4*(k%18<9?1:-1),r:1.5});TS.trees.push({x:10.4*(k%18<9?-1:1),y:k*s,r:1.5});}})();
 // 비스듬한 투영(등각): 화면 x = (x - y) 쪽, 화면 y = (x + y) 쪽, 높이 z는 위로
 function tsP(x,y,z){const s=TS.s;return[TS.cx+(x-y)*.866*s,TS.cy+(x+y)*.5*s-(z||0)*s];}
 function tsPoly(pts,fill,stroke){const c=TS.ctx;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 function tsQuad(x0,y0,x1,y1,z,fill){tsPoly([tsP(x0,y0,z),tsP(x1,y0,z),tsP(x1,y1,z),tsP(x0,y1,z)],fill);}
 // 상자: 윗면과 보이는 두 옆면(x1 면, y1 면)
 function tsBox(x0,y0,x1,y1,z0,z1,top,fx,fy){tsPoly([tsP(x0,y1,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x0,y1,z1)],fy);tsPoly([tsP(x1,y0,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x1,y0,z1)],fx);tsQuad(x0,y0,x1,y1,z1,top);}
-function tsSig(t){const c=t%16;return c<6?['G','R']:c<7.5?['Y','R']:c<8?['R','R']:c<14?['R','G']:c<15.5?['R','Y']:['R','R'];}
+// 신호: 주기 40초. 동서(x) 녹색 16초, 황색 2.5초, 전적색 1.5초 후 남북(y) 같은 순서. 전적색 동안 교차로 안 차가 빠져나감
+const SG={G:16,Y:2.5,AR:1.5};SG.C=2*(SG.G+SG.Y+SG.AR);
+function tsSig(t){const c=t%SG.C,h=SG.G+SG.Y+SG.AR,ph=c<h?0:1,u=c-ph*h,st=u<SG.G?'G':u<SG.G+SG.Y?'Y':'R';const s=ph===0?[st,'R']:['R',st];s.left=st==='G'?SG.G-u:0;s.ph=ph;return s;}
 const LANES=[];for(const [ax,dir] of [['x',1],['x',-1],['y',1],['y',-1]])for(const o of [1.75,5.25])LANES.push({ax,dir,off:(ax==='x'?-dir:dir)*o});
-function tsStep(dt){const t=TS.t,[sx,sy]=tsSig(t);
-  for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]||trnd()*3)-dt;const q=TS.cars.filter(c=>c.li===li);
-    if(TS.spawn[li]<=0){const last=q.reduce((m,c)=>Math.min(m,c.s*L.dir),1e9);if(last>-58){TS.cars.push({li,ax:L.ax,dir:L.dir,off:L.off,s:-70*L.dir,v:9,len:trnd()<.12?7:4.2,col:PAL.car[Math.floor(trnd()*PAL.car.length)],bus:false});}TS.spawn[li]=1.6+trnd()*3.2;}}
-  for(const c of TS.cars){const sig=c.ax==='x'?sx:sy,front=c.s*c.dir+c.len/2,stop=-10.5,lead=TS.cars.filter(o=>o.li===c.li&&o!==c&&o.s*c.dir>c.s*c.dir).sort((a,b)=>a.s*c.dir-b.s*c.dir)[0];
-    let gap=1e9;if(lead)gap=lead.s*c.dir-lead.len/2-front-2.2;if(sig!=='G'&&front<stop+.5&&front>stop-30&&!(sig==='Y'&&front>stop-6))gap=Math.min(gap,stop-front);
-    const vt=Math.max(0,Math.min(11,gap*1.4));c.v+=Math.max(-14,Math.min(5,(vt-c.v)*2))*dt;c.v=Math.max(0,c.v);c.s+=c.v*c.dir*dt;}
+// 차는 직진만. 차 좌표 s는 자기 축 위치, 앞범퍼 = s*dir + 길이/2. 정지선은 횡단보도(|축|=8.9~12.3) 앞 -13
+const STOP=-13,BOX=12.3,CWX=10.6,CWH=1.7,PV=1.45;
+const front=c=>c.s*c.dir+c.len/2,rear=c=>c.s*c.dir-c.len/2;
+const inBox=c=>front(c)>STOP&&rear(c)<BOX+.5;
+function tsStep(dt){const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
+  for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]??trnd()*3)-dt;
+    if(TS.spawn[li]<=0){const q=TS.cars.filter(c=>c.li===li),last=q.reduce((m,c)=>Math.min(m,rear(c)),1e9);
+      if(last>-56){const len=trnd()<.12?7:4.2;TS.cars.push({li,ax:L.ax,dir:L.dir,off:L.off,s:(-70+len/2)*L.dir,v:8,len,col:PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=1.8+trnd()*3.5;}}
+  for(const c of TS.cars){const sig=c.ax==='x'?sx:sy,f=front(c);let gap=1e9;
+    // 1) 같은 차로 앞차와 거리(2.2m 이상)
+    for(const o of TS.cars)if(o!==c&&o.li===c.li&&rear(o)>f-.01)gap=Math.min(gap,rear(o)-f-2.2);
+    // 2) 정지선: 녹색이고 교차하는 방향 차가 교차로 안에 없을 때만 들어감. 황색은 정지선 바로 앞(2.5m 안)이면 그대로 통과
+    if(!c.ent){const clear=!TS.cars.some(o=>o.ax!==c.ax&&o.ent&&inBox(o));const go=clear&&(sig==='G'||(sig==='Y'&&f>STOP-2.5));if(!go)gap=Math.min(gap,STOP-f);}
+    // 3) 횡단보도 위 보행자: 자기 차로 앞을 건너는 사람이 있으면 그 앞에서 멈춤
+    for(const k of [-1,1]){const P=c.dir*k*CWX;if(f>P+CWH)continue;
+      if(TS.peds.some(p=>p.cw===c.ax&&p.k===k&&!p.wait&&Math.abs(p.u-c.off)<2.6))gap=Math.min(gap,P-CWH-.4-f);}
+    const vt=Math.max(0,Math.min(11,gap*1.3));c.v+=Math.max(-16,Math.min(4,(vt-c.v)*2.2))*dt;c.v=Math.max(0,Math.min(c.v,gap>0?c.v:0));
+    const ds=Math.min(c.v*dt,Math.max(0,gap));c.s+=ds*c.dir;if(!c.ent&&front(c)>STOP+.05)c.ent=true;}
   TS.cars=TS.cars.filter(c=>Math.abs(c.s)<75);
-  // 보행자: 차가 서 있는 쪽 횡단보도를 건너고, 아니면 보도를 걸음
-  if(TS.peds.length<26&&trnd()<dt*3){const cross=trnd()<.45,k=trnd()<.5?1:-1;TS.peds.push(cross?{cw:trnd()<.5?'x':'y',k,u:-9.5*(trnd()<.5?1:-1),dirn:0,col:PAL.car[Math.floor(trnd()*8)],wait:true}:{side:trnd()<.5?'x':'y',k,u:(trnd()<.5?-1:1)*(12+trnd()*45),dirn:trnd()<.5?1:-1,col:PAL.car[Math.floor(trnd()*8)]});}
-  for(const p of TS.peds){if(p.cw){const ok=p.cw==='x'?sy==='G':sx==='G';if(p.wait&&ok){p.wait=false;p.dirn=-Math.sign(p.u)||1;}if(!p.wait)p.u+=p.dirn*1.4*dt;if(!p.wait&&Math.abs(p.u)>9.6&&Math.sign(p.u)===p.dirn)p.gone=true;}
-    else{p.u+=p.dirn*1.2*dt;if(Math.abs(p.u)>60||Math.abs(p.u)<10.5)p.gone=true;}}
+  // 보행자 1) 횡단: 연석 바로 뒤(|u|=7.6)에서 기다렸다가, 건너는 도로의 차가 멈춘 쪽 녹색이 충분히 남았을 때 출발. 방향마다 다른 줄(서로 엇갈리지 않게)
+  const SL=[9.35,10.15,11.05,11.85];
+  if(trnd()<dt*1.4){const cw=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,side=trnd()<.5?1:-1,dirn=-side,slot=dirn>0?trnd()<.5?0:1:trnd()<.5?2:3;
+    if(!TS.peds.some(p=>p.cw===cw&&p.k===k&&p.slot===slot&&(p.wait||Math.abs(p.u-side*7.6)<1.2)))TS.peds.push({cw,k,slot,u:side*7.6,dirn,wait:true,v:PV*(.9+trnd()*.2),col:PAL.car[Math.floor(trnd()*8)]});}
+  // 2) 보도 걷기: 보도 가운데 줄(8.6) 기준 진행 방향마다 옆으로 0.45m 비켜 걸음(오른쪽 통행). 앞사람이 1m 안이면 속도를 맞춤
+  if(TS.peds.filter(p=>!p.cw).length<22&&trnd()<dt*2.2){const side=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,end=trnd()<.5?1:-1,out=trnd()<.5,dirn=out?end:-end,u=out?end*13.6:end*60;
+    if(!TS.peds.some(p=>!p.cw&&p.side===side&&p.k===k&&p.dirn===dirn&&Math.abs(p.u-u)<1.6))TS.peds.push({side,k,u,dirn,v:1.05+trnd()*.35,col:PAL.car[Math.floor(trnd()*8)]});}
+  for(const p of TS.peds){
+    if(p.cw){const ok=(p.cw==='x'?sy:sx)==='G'&&sg.left>15.2/p.v+.5&&!TS.cars.some(c=>c.ax===p.cw&&c.ent&&rear(c)<BOX+CWH);if(p.wait&&ok)p.wait=false;if(!p.wait){let v=p.v;for(const o of TS.peds)if(o!==p&&o.cw===p.cw&&o.k===p.k&&o.slot===p.slot){const d=(o.u-p.u)*p.dirn;if(d>0&&d<1.1)v=o.wait?0:Math.min(v,o.v*(d<.8?.5:1));}p.u+=p.dirn*v*dt;}if(!p.wait&&p.u*p.dirn>7.6)p.gone=true;}
+    else{let v=p.v;for(const o of TS.peds)if(o!==p&&!o.cw&&o.side===p.side&&o.k===p.k&&o.dirn===p.dirn){const d=(o.u-p.u)*p.dirn;if(d>0&&d<1.1)v=Math.min(v,o.v*(d<.8?.5:1));}
+      p.u+=p.dirn*v*dt;if(Math.abs(p.u)>61||Math.abs(p.u)<13.4)p.gone=true;}
+    // 화면 위치
+    if(p.cw){const lat=p.k*SL[p.slot];[p.x,p.y]=p.cw==='x'?[lat,p.u]:[p.u,lat];}else{const lat=p.k*(8.6+p.dirn*p.k*.45);[p.x,p.y]=p.side==='x'?[p.u,lat]:[lat,p.u];}}
   TS.peds=TS.peds.filter(p=>!p.gone);}
 function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTransform(TS.dpr,0,0,TS.dpr,0,0);
   const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#ffcf9a');g.addColorStop(.5,'#f4a98a');g.addColorStop(1,'#b98aa8');c.fillStyle=g;c.fillRect(0,0,W,H);
@@ -2774,11 +2800,11 @@ function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTran
       const fr=car.dir>0,hl=(u,v,col)=>{const [p,q]=tsP(u,v,.75);c.fillStyle=col;c.beginPath();c.arc(p,q,.28*TS.s,0,7);c.fill();};
       if(car.ax==='x'){const fx=fr?x1:x0,bx=fr?x0:x1;hl(fx,y0+.45,'#fff6c8');hl(fx,y1-.45,'#fff6c8');hl(bx,y1-.45,car.v<1?'#ff5a5a':'#c9474a');}
       else{const fy=fr?y1:y0,by=fr?y0:y1;hl(x0+.45,fy,'#fff6c8');hl(x1-.45,fy,'#fff6c8');hl(x1-.45,by,car.v<1?'#ff5a5a':'#c9474a');}}});}
-  for(const p of TS.peds){const [x,y]=p.cw?(p.cw==='x'?[p.k*10.6,p.u]:[p.u,p.k*10.6]):(p.side==='x'?[p.u,p.k*9.2]:[p.k*9.2,p.u]);
+  for(const p of TS.peds){if(p.x==null)continue;const x=p.x,y=p.y;
     items.push({d:x+y+.2,f:()=>{const [a,b]=tsP(x,y,0),s=TS.s,bob=Math.abs(Math.sin(TS.t*8+x))*s*.12;c.fillStyle='rgba(30,20,40,.25)';c.beginPath();c.ellipse(a,b,s*.5,s*.22,0,0,7);c.fill();
       c.fillStyle=p.col;c.beginPath();c.ellipse(a,b-s*.9-bob,s*.38,s*.7,0,0,7);c.fill();c.fillStyle='#f6d2b5';c.beginPath();c.arc(a,b-s*1.95-bob,s*.36,0,7);c.fill();}});}
   // 신호등(네 귀퉁이): 각 접근로를 마주 봄
-  for(const [x,y,ax] of [[-9.5,-9.5,'x'],[9.5,9.5,'x'],[9.5,-9.5,'y'],[-9.5,9.5,'y']])items.push({d:x+y+.3,f:()=>{const st=ax==='x'?sx:sy,[a,b]=tsP(x,y,0),[a2,b2]=tsP(x,y,6.2),s=TS.s;
+  for(const [x,y,ax] of [[-7.8,-7.8,'x'],[7.8,7.8,'x'],[7.8,-7.8,'y'],[-7.8,7.8,'y']])items.push({d:x+y+.3,f:()=>{const st=ax==='x'?sx:sy,[a,b]=tsP(x,y,0),[a2,b2]=tsP(x,y,6.2),s=TS.s;
     c.strokeStyle='#3a3f48';c.lineWidth=Math.max(1.5,s*.28);c.beginPath();c.moveTo(a,b);c.lineTo(a2,b2);c.stroke();c.fillStyle='#2b2f36';c.beginPath();if(c.roundRect)c.roundRect(a2-s*.55,b2-s*2.6,s*1.1,s*2.8,s*.4);else c.rect(a2-s*.55,b2-s*2.6,s*1.1,s*2.8);c.fill();
     [['R','#ff5a5a'],['Y','#ffc94a'],['G','#4fe08a']].forEach(([k,col],i)=>{const on=st===k,yy=b2-s*2.15+i*s*.85;if(on){c.fillStyle=col+'55';c.beginPath();c.arc(a2,yy,s*.85,0,7);c.fill();}c.fillStyle=on?col:'#444a54';c.beginPath();c.arc(a2,yy,s*.32,0,7);c.fill();});}});
   items.sort((p,q)=>p.d-q.d).forEach(i=>i.f());
