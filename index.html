@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261106091652">
+<meta name="gl-build" content="20261106213318">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -610,50 +610,6 @@ body.mobile.m2 .stage>.dock.mrow{flex-direction:row-reverse;align-items:flex-end
 body.mobile.m2 .stage>.hud-tl .grid2>*{white-space:nowrap}
 body.mobile.m2 .stage>.citcard .cav{display:none}body.mobile.m2 .stage>.citcard .cwho{flex-wrap:wrap}
 body.mobile.m2.land .stage>.hud-tl .goals{display:block}
-/* ===== 여정 지도(journey.js) ===== */
-body.jopen{overflow:hidden}body.jopen .coach{display:none!important}
-.journey{position:fixed;inset:0;z-index:1050;display:flex;flex-direction:column;background:linear-gradient(180deg,#f4a98a 0%,#c97b8e 22%,#6b4a7a 55%,#2a1f36 100%);color:#fff3e6;font-family:"IBM Plex Sans KR",system-ui,sans-serif}
-.journey[hidden]{display:none}
-.jhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:rgba(42,31,54,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.jhead>div{display:flex;flex-direction:column;gap:2px}.jt{font:400 24px "Lilita One","IBM Plex Sans KR",sans-serif;letter-spacing:.5px}.jsum{font-size:12.5px;color:#ffe9d6}
-.jx{background:rgba(255,255,255,.18)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;border-radius:99px;padding:6px 14px}
-.jscroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 12px 170px}
-.jmap{position:relative;margin:0 auto}
-.jroad{position:absolute;left:0;top:0;pointer-events:none}
-.jroad path{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.jroad .r0{stroke:#3a2c47;stroke-width:22}.jroad .r1{stroke:#ffd35a;stroke-width:2;stroke-dasharray:8 10;opacity:.55}.jroad .r2{stroke:#ffd35a;stroke-width:6;opacity:.9}
-.jch{position:absolute;left:50%;transform:translate(-50%,-50%);display:flex;align-items:baseline;gap:8px;padding:6px 14px;border-radius:99px;background:rgba(42,31,54,.82);border:1px solid rgba(255,211,90,.45);white-space:nowrap;z-index:1;font-size:13px}
-.jch b{font-size:14px}.jch span{color:#ffd35a;font-size:12px}.jch.big{background:#ffd35a;color:#3a2313;border-color:#ffd35a}.jch.big span{color:#7a4a12}
-.jn{position:absolute;transform:translate(-50%,-50%);background:none!important;border:0!important;padding:0!important;box-shadow:none!important;cursor:pointer;z-index:2;border-radius:0!important}
-.jn .jc{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;font:700 15px "IBM Plex Sans KR",sans-serif;font-style:normal;box-shadow:0 4px 0 rgba(0,0,0,.28),0 0 0 4px rgba(42,31,54,.6)}
-.jn.done .jc{background:#ffd35a;color:#3a2313}
-.jn.open .jc{background:#fff8ee;color:#3a2313}
-.jn.lock .jc{background:#4a3a55;color:#a996b4;cursor:not-allowed}
-.jn.city .jc{width:64px;height:64px;font-size:13px;border-radius:18px}
-.jn.labn .jc{width:64px;height:64px;font-size:13px;background:#7fd1c3;color:#13332e;border-radius:18px}
-.jn.cur .jc{animation:jpulse 1.6s ease-in-out infinite;box-shadow:0 4px 0 rgba(0,0,0,.28),0 0 0 5px #ffd35a}
-@keyframes jpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
-.jlk{display:inline-block;width:12px;height:9px;background:#a996b4;border-radius:2px;position:relative;top:3px}.jlk::before{content:"";position:absolute;left:2px;top:-7px;width:4px;height:6px;border:2px solid #a996b4;border-bottom:0;border-radius:5px 5px 0 0}
-.jl{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:1px;white-space:nowrap;text-align:left;pointer-events:none}
-.jl.r{left:64px}.jl.l{right:64px;text-align:right;align-items:flex-end}.jn.city .jl.r,.jn.labn .jl.r{left:74px}.jn.city .jl.l,.jn.labn .jl.l{right:74px}
-.jl b{font-size:13px;font-weight:700;color:#fff3e6;text-shadow:0 1px 3px rgba(0,0,0,.45)}.jl em{font-style:normal;color:#ffd35a;font-size:13px;letter-spacing:1px}.jl em s{text-decoration:none;color:rgba(255,255,255,.3)}
-.jl small{font-size:10.5px;color:#d9c3d6}
-.jn.lock .jl b{color:#d9c3d6;font-weight:500}
-/* 지금 위치의 작은 차 */
-.jcar{position:absolute;left:50%;top:-30px;width:30px;height:16px;transform:translateX(-50%);background:#ef6f6c;border-radius:8px 10px 4px 4px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);animation:jbob 1.2s ease-in-out infinite}
-.jcar::before{content:"";position:absolute;left:7px;top:-7px;width:14px;height:8px;background:#ef6f6c;border-radius:6px 6px 0 0;box-shadow:inset 0 -4px 0 #9fd3f0}
-.jcar::after{content:"";position:absolute;left:3px;bottom:-5px;width:6px;height:6px;border-radius:50%;background:#2b2f36;box-shadow:16px 0 0 #2b2f36}
-@keyframes jbob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-3px)}}
-.jn.shake .jc{animation:jshake .4s}
-@keyframes jshake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
-.jask{position:absolute;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(520px,calc(100% - 24px));box-sizing:border-box;background:#271d31;border:1px solid #5a4668;border-radius:18px;padding:14px 16px;box-shadow:0 12px 34px rgba(0,0,0,.45);z-index:5}
-.jask[hidden]{display:none}.jq{font-size:14.5px;line-height:1.5;margin-bottom:10px}.jq b{color:#ffd35a}
-.jbtn{display:flex;gap:8px;flex-wrap:wrap}.jbtn button{flex:1 1 auto;min-height:40px;font-size:14px}
-.jtoast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#3a2c47;border:1px solid #ffd35a;border-radius:99px;padding:8px 14px;font-size:12.5px;z-index:6;max-width:calc(100% - 24px)}
-.jtoast[hidden]{display:none}
-.jlvbtn{margin:0 0 10px;width:100%}
-body.land .jask{left:auto;right:16px;transform:none;width:min(360px,45vw)}
-.jn.ahead .jc{background:#8f7398;color:#fff3e6;box-shadow:0 3px 0 rgba(0,0,0,.2),0 0 0 4px rgba(42,31,54,.45)}.jn.ahead .jl b{color:#ecd9e6;font-weight:500}
 /* ===== PC: 신호 시계 카드를 지도 안 빈 귀퉁이에(body.jogpc, mobile2.js) ===== */
 body.jogpc.pv2 .stage{grid-template-rows:minmax(0,1fr)!important}
 body.jogpc .stage>.dock{position:absolute!important;grid-column:auto!important;grid-row:auto!important;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding:10px 12px;border:1px solid #5a4668!important;border-radius:16px;background:rgba(39,29,49,.9)!important;box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:4;width:auto;margin:0}
@@ -668,6 +624,95 @@ body.jogpc .stage>.dock .rgcyc b{font-size:20px}
 body.jogpc .stage>.dock .mring{display:block;font-size:12px;padding:4px 12px;min-height:28px}
 body.jogpc .msheet{position:absolute;left:auto;right:0;top:0;bottom:0;width:440px;max-height:none;border-radius:16px 0 0 16px;border-top:0;border-left:1px solid var(--line)}
 body.jogpc .msheet .rgwrap{flex-direction:column;align-items:center}
+
+/* ===== 나의 교통 여정(journey.js): 교차로, 도로 표지 테마 ===== */
+.title[hidden]{display:none}
+body.jopen{overflow:hidden}body.jopen .coach{display:none!important}
+.journey{position:fixed;inset:0;z-index:1050;display:flex;flex-direction:column;color:#fff3e6;font-family:"IBM Plex Sans KR",system-ui,sans-serif;
+  background:radial-gradient(120% 60% at 50% 0%,#f4a98a 0%,rgba(244,169,138,0) 60%),linear-gradient(180deg,#c97b8e 0%,#6b4a7a 40%,#2a1f36 100%)}
+.journey[hidden]{display:none}
+.jhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:rgba(42,31,54,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.12)}
+.jhead>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}.jt{font-size:21px;font-weight:700}.jsum{font-size:12px;color:#ffe9d6}
+.jhb{display:flex;gap:6px;flex:none}
+.jx{background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;border-radius:99px;padding:6px 13px;font-size:13px}
+.jscroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:14px 12px 180px}
+.jcols{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;max-width:1040px;margin:0 auto}
+@media (min-width:900px){.jcols{grid-template-columns:300px minmax(0,1fr);align-items:start}.jfree{position:sticky;top:0}}
+.jfh,.jrh{display:flex;flex-direction:column;gap:2px;margin:0 2px 10px}.jfh b,.jrh b{font-size:15px}.jfh span,.jrh span{font-size:12px;color:#e8d3e0}
+/* 나들목 표지판(초록 고속도로 표지) */
+.jexits{display:grid;grid-template-columns:1fr;gap:10px}
+@media (max-width:899px){.jexits{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}.jexits::-webkit-scrollbar{display:none}.jexit{flex:0 0 172px;scroll-snap-align:start}}
+.jexit{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:#1f6f43!important;color:#fff!important;border:0!important;border-radius:10px!important;padding:24px 34px 10px 12px!important;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #1f6f43,0 4px 0 #0f3d24,0 8px 16px rgba(0,0,0,.25)!important;cursor:pointer;font-family:inherit}
+.jexit:hover{filter:brightness(1.08)}
+.jexit .jeno{position:absolute;left:10px;top:-8px;background:#ffd35a;color:#1b2b1f;font:800 11px/1 "IBM Plex Sans KR",sans-serif;letter-spacing:.5px;padding:4px 8px;border-radius:5px;box-shadow:0 0 0 2px #fff}
+.jexit b{font-size:16px;font-weight:800}.jexit .jeix{font-size:13px;opacity:.95}.jexit em{font-style:normal;color:#ffd35a;font-size:13px;letter-spacing:1px;margin-top:3px}.jexit em s{text-decoration:none;color:rgba(255,255,255,.3)}
+.jexit small{font-size:11px;opacity:.8}
+.jexit .jearr{position:absolute;right:12px;top:50%;width:14px;height:14px;border-top:3px solid #fff;border-right:3px solid #fff;transform:translateY(-50%) rotate(45deg)}
+.jexit.lab{background:#2459a8!important;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #2459a8,0 4px 0 #143566,0 8px 16px rgba(0,0,0,.25)!important}
+.jexit.cur{outline:3px solid #ffd35a;outline-offset:3px}
+/* 본선 길 */
+.jroute{min-width:0}
+.jmap{position:relative;margin:0 auto}
+.jroad{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.jroad path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.jroad .r0{stroke:#e9d8c6;stroke-width:40;opacity:.35}.jroad .r1{stroke:#3a3346;stroke-width:32}
+.jroad .r2{stroke:#4fe08a;stroke-width:32;opacity:.22}.jroad .r3{stroke:#ffd35a;stroke-width:2;stroke-dasharray:10 12;opacity:.75}
+/* 장 표지판(파란 도로 안내판) */
+.jsign{position:absolute;left:50%;transform:translate(-50%,-50%);display:flex;align-items:baseline;gap:8px;padding:6px 14px;border-radius:7px;background:#2459a8;color:#fff;white-space:nowrap;z-index:1;font-size:13px;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #2459a8,0 4px 10px rgba(0,0,0,.3)}
+.jsign b{font-size:14px}.jsign span{color:#ffe9a8;font-size:12px}
+.jsign.clr{background:#1f6f43;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #1f6f43,0 4px 10px rgba(0,0,0,.3)}
+.jsign.fin{background:#ffd35a;color:#3a2313;box-shadow:inset 0 0 0 2px #3a2313,0 4px 10px rgba(0,0,0,.3)}.jsign.fin span{color:#7a4a12}
+/* 교차로 하나 = 신호등 + 이름표 */
+.jn{position:absolute;width:0;height:0;background:none!important;border:0!important;padding:0!important;box-shadow:none!important;cursor:pointer;z-index:2;border-radius:0!important}
+.jsig{position:absolute;top:-30px;display:flex;flex-direction:column;gap:3px;padding:4px;border-radius:7px;background:#232027;box-shadow:0 0 0 2px #4d4555,0 3px 6px rgba(0,0,0,.35)}
+.jsig.r{left:22px}.jsig.l{right:22px}
+.jsig::after{content:"";position:absolute;left:50%;top:100%;width:3px;height:12px;margin-left:-1.5px;background:#4d4555}
+.jsig i{display:block;width:13px;height:13px;border-radius:50%;background:#3d3742}
+.s-r .jsig .lr{background:#ff5a5a;box-shadow:0 0 8px #ff5a5a}
+.s-y .jsig .ly{background:#ffc94a;box-shadow:0 0 10px #ffc94a;animation:jblink 1s steps(2,start) infinite}
+.s-g .jsig .lg{background:#4fe08a;box-shadow:0 0 8px #4fe08a}
+@keyframes jblink{to{opacity:.25}}
+.jl{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:1px;white-space:nowrap;text-align:left;pointer-events:none}
+.jl.r{left:50px}.jl.l{right:50px;text-align:right;align-items:flex-end}
+.jno{display:inline-block;font-size:11px;font-weight:800;color:#3a2313;background:#fff3e6;border-radius:4px;padding:1px 6px;align-self:inherit}
+.jl b{font-size:13px;font-weight:700;color:#fff3e6;text-shadow:0 1px 3px rgba(0,0,0,.5)}.jl em{font-style:normal;color:#ffd35a;font-size:12.5px;letter-spacing:1px}.jl em s{text-decoration:none;color:rgba(255,255,255,.28)}
+.s-r .jl b{color:#e4cfdd;font-weight:500}.s-r .jno{background:#8f7398;color:#fff}
+.s-y .jno{background:#ffd35a}
+/* 지금 차례: 위에서 내려다본 작은 차가 정지선 앞에서 대기 */
+.jcar{position:absolute;left:-7px;top:-36px;width:14px;height:24px;border-radius:5px 5px 4px 4px;background:#ef6f6c;box-shadow:inset 0 5px 0 #9fd3f0,inset 0 -4px 0 #c94a4a,0 2px 4px rgba(0,0,0,.4);animation:jbob 1.2s ease-in-out infinite}
+@keyframes jbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.jn.cur::before{content:"";position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid #ffd35a;animation:jpulse 1.6s ease-out infinite;pointer-events:none}
+@keyframes jpulse{0%{transform:scale(.7);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.jn:hover .jl b,.jn:focus-visible .jl b{text-decoration:underline}
+.jn.shake .jsig{animation:jshake .4s}
+@keyframes jshake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.jask{position:absolute;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(540px,calc(100% - 24px));box-sizing:border-box;background:#271d31;border:1px solid #5a4668;border-radius:18px;padding:14px 16px;box-shadow:0 12px 34px rgba(0,0,0,.45);z-index:5}
+.jask[hidden]{display:none}.jq{font-size:14px;line-height:1.55;margin-bottom:10px}.jq b{color:#ffd35a}
+.jbtn{display:flex;gap:8px;flex-wrap:wrap}.jbtn button{flex:1 1 auto;min-height:40px;font-size:14px}
+.jtoast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#3a2c47;border:1px solid #ffd35a;border-radius:99px;padding:8px 14px;font-size:12.5px;z-index:6;max-width:calc(100% - 24px)}
+.jtoast[hidden]{display:none}
+.jlvbtn{margin:0 0 10px;width:100%}
+body.land .jask{left:auto;right:16px;transform:none;width:min(360px,45vw)}
+/* 게임 중 메뉴 */
+.jmenu{display:inline-flex;align-items:center;gap:6px}
+.jhb3{display:inline-block;width:12px;height:2px;background:currentColor;box-shadow:0 -4px 0 currentColor,0 4px 0 currentColor}
+.jmpop{position:fixed;z-index:1200;display:flex;flex-direction:column;min-width:200px;background:#271d31;border:1px solid #5a4668;border-radius:14px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.jmpop[hidden]{display:none}
+.jmpop button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:none!important;border:0!important;border-radius:10px!important;padding:9px 12px!important;color:var(--fg)!important;font-size:14px;font-weight:600}
+.jmpop button:hover{background:#3a2c47!important}.jmpop button small{font-size:11.5px;font-weight:400;color:var(--muted)}
+.jl.r{align-items:flex-start}
+@media (max-width:899px){.jfree{position:sticky;top:-14px;z-index:4;margin:-14px -12px 0;padding:10px 12px 8px;background:rgba(42,31,54,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.12)}
+  .jfh{flex-direction:row;align-items:baseline;gap:8px;margin-bottom:12px}.jfh b{font-size:13.5px}.jfh span{font-size:11px}
+  .jexits{padding-top:8px}.jexit{flex:0 0 140px!important;padding:16px 24px 8px 10px!important}.jexit b{font-size:14px}.jexit .jeix{font-size:12px}.jexit small{display:none}.jexit em{font-size:11.5px;margin-top:1px}.jexit .jearr{width:10px;height:10px;right:10px;border-width:2.5px}
+  .jexit .jeno{font-size:10px;top:-7px;padding:3px 6px}}
+/* 가로로 눕힌 휴대폰: 나들목은 왼쪽 세로 칸(따로 스크롤), 본선은 오른쪽 */
+@media (max-width:899px) and (max-height:500px) and (min-width:560px){
+  .jcols{grid-template-columns:200px minmax(0,1fr);align-items:start}
+  .jfree{position:sticky;top:-14px;margin:-14px 0 0 -12px;max-height:calc(100dvh - 64px);overflow-y:auto;border-bottom:0;border-right:1px solid rgba(255,255,255,.12)}
+  .jfh{flex-direction:column;gap:1px;margin-bottom:8px}
+  .jexits{display:grid;grid-template-columns:1fr;gap:12px;overflow:visible;padding:8px 0 0}.jexit{flex:none!important}
+  .jhead{padding-top:6px;padding-bottom:6px}.jt{font-size:17px}
+  .jscroll{padding-bottom:120px}}
 </style>
 
 <div class="wrap">
@@ -3300,78 +3345,109 @@ function tsFrame(now){if(!TS.on)return;const dt=Math.min(.05,(now-(TS.last||now)
 // 미리 몇 초 돌려 차가 깔린 상태로 시작
 for(let i=0;i<300;i++){TS.t+=.05;tsStep(.05);}
 EGG.on=false;EGG.next=6;EGG.trail=[];
-function titleClose(){if(!TS.on)return;TS.on=false;TTL.classList.add('out');document.body.classList.remove('titleon');setTimeout(()=>{TTL.remove();},600);
-  try{fxAudio();}catch(e){}if(INTRO_PEND)introBox.hidden=false;try{anTrack('title_start',{sec:Math.round(TS.t-15)});}catch(e){}
+function titleClose(){if(!TS.on)return;TS.on=false;TTL.classList.add('out');document.body.classList.remove('titleon');setTimeout(()=>{if(!TS.on)TTL.hidden=true;},600);
+  try{fxAudio();}catch(e){}if(!store.get('intro-v1'))introBox.hidden=false;try{anTrack('title_start',{sec:Math.round(TS.t-15)});}catch(e){}
   requestAnimationFrame(()=>{try{resize();positionArms();}catch(e){}});}
-if(/notitle/.test(location.hash)){TS.on=false;TTL.remove();if(INTRO_PEND)introBox.hidden=false;}
-else{document.body.classList.add('titleon');tsResize();addEventListener('resize',()=>{if(TS.on)tsResize();});requestAnimationFrame(tsFrame);
-  // 게임 시작 버튼으로만 시작(버튼에 초점이 있으면 Enter/Space도 됨)
-  const go=TTL.querySelector('.tgo');go.addEventListener('click',e=>{e.stopPropagation();titleClose();});setTimeout(()=>{try{go.focus({preventScroll:true});}catch(e){}},300);
-  const lamp=TTL.querySelector('.tlamp');if(lamp){lamp.style.cursor='pointer';lamp.title='?';lamp.addEventListener('click',e=>{e.stopPropagation();eggStart();});}
-  champLoad();}
-// ---------- 여정 지도: 게임 시작 뒤 스테이지 선택. 6장 24스테이지와 실제 교차로 5곳을 한 줄기 길로 이어 보여 줌 ----------
-// 깬 스테이지(별 1개 이상)는 노란 원, 지금 차례는 흰 원과 작은 차, 그 뒤 아직 안 간 곳은 흐린 원(시제품은 열려 있어 고를 수 있음), 잠긴 곳은 회색
-// 열자마자 '가장 멀리 간 스테이지'를 이어서 할지 묻고, 지도에서 다른 열린 스테이지를 골라도 됨
+// 게임 중 '메뉴 > 첫 화면으로'(journey.js)에서 다시 엶. 게임 시뮬레이션은 첫 화면이 떠 있는 동안 멈춤(app.js frame)
+function titleOpen(){if(TS.on)return;closePop();closeModal();TTL.hidden=false;TTL.classList.remove('out');document.body.classList.add('titleon');TS.on=true;TS.last=0;EGG.on=false;EGG.next=6;EGG.trail=[];
+  tsResize();requestAnimationFrame(tsFrame);champLoad();setTimeout(()=>{try{TTL.querySelector('.tgo').focus({preventScroll:true});}catch(e){}},300);try{anTrack('title_reopen',{});}catch(e){}}
+addEventListener('resize',()=>{if(TS.on)tsResize();});
+// 게임 시작 버튼으로만 시작(버튼에 초점이 있으면 Enter/Space도 됨)
+TTL.querySelector('.tgo').addEventListener('click',e=>{e.stopPropagation();titleClose();});
+{const lamp=TTL.querySelector('.tlamp');if(lamp){lamp.style.cursor='pointer';lamp.title='?';lamp.addEventListener('click',e=>{e.stopPropagation();eggStart();});}}
+if(/notitle/.test(location.hash)){TS.on=false;TTL.hidden=true;if(INTRO_PEND)introBox.hidden=false;}
+else{document.body.classList.add('titleon');tsResize();requestAnimationFrame(tsFrame);setTimeout(()=>{try{TTL.querySelector('.tgo').focus({preventScroll:true});}catch(e){}},300);champLoad();}
+// ---------- 나의 교통 여정: 게임 시작 뒤 스테이지 선택(교차로, 도로 표지 테마) ----------
+// 큰 길 하나 = 6장 24스테이지(차례로 가는 본선). 스테이지마다 횡단보도가 있는 교차로와 신호등:
+//   초록불 = 깬 곳(별 1개 이상), 노란불 깜빡 + 작은 차 = 지금 차례, 빨간불 = 아직 안 간 곳
+// 실제 교차로 5곳과 실험실은 본선과 상관없이 언제든 갈 수 있는 '나들목(EXIT) 표지판'으로 따로 둠
+// 열자마자 본선에서 깬 마지막 스테이지의 다음 칸을 이어서 할지 물음
 const JR=(()=>{const d=document.createElement('div');d.id='journey';d.className='journey';d.hidden=true;
-  d.innerHTML=`<div class="jhead"><div><b class="jt">나의 교통 여정</b><span class="jsum" id="jsum"></span></div><button type="button" class="jx" id="jx">닫기</button></div>
-    <div class="jscroll" id="jscroll"><div class="jmap" id="jmap"></div></div>
-    <div class="jask" id="jask"><div class="jq" id="jq"></div><div class="jbtn"><button type="button" class="primary" id="jgo">이어서 하기</button><button type="button" id="jpick">다른 스테이지 고르기</button></div></div>
+  d.innerHTML=`<div class="jhead"><div><b class="jt">나의 교통 여정</b><span class="jsum" id="jsum"></span></div><div class="jhb"><button type="button" class="jx" id="jhome">첫 화면</button><button type="button" class="jx" id="jx">닫기</button></div></div>
+    <div class="jscroll" id="jscroll"><div class="jcols">
+      <aside class="jfree"><div class="jfh"><b>언제든 갈 수 있는 곳</b><span>본선 진행과 상관없이 바로 들어갈 수 있어요</span></div><div class="jexits" id="jexits"></div></aside>
+      <section class="jroute"><div class="jrh"><b>본선: 신호 배우기 6장</b><span>앞 스테이지를 깨면 다음 교차로로</span></div><div class="jmap" id="jmap"></div></section>
+    </div></div>
+    <div class="jask" id="jask"><div class="jq" id="jq"></div><div class="jbtn"><button type="button" class="primary" id="jgo">이어서 하기</button><button type="button" id="jpick">다른 곳 고르기</button></div></div>
     <div class="jtoast" id="jtoast" hidden></div>`;
   document.body.appendChild(d);return d;})();
-const JS={rec:null,nodes:[]};
-const jStars=id=>((prog[id]||{}).stars)||0;
-// 가장 멀리 간 스테이지: 열린 마지막 레벨. 모두 깼으면 별 2개 미만인 첫 실제 교차로(없으면 첫 교차로)
-// (시제품은 모든 레벨이 열려 있으므로 '열림'이 아니라 실제로 깬 기록으로 판단: 깬 마지막 스테이지의 다음)
+const JS={rec:null,nodes:[],front:-1};
+const jStars=id=>((prog[id]||{}).stars)||0,jBest=id=>{const b=(prog[id]||{}).best;return b!=null&&b>-1e8?Math.round(b):null;};
+// 본선에서 깬 마지막 스테이지(시제품은 모든 레벨이 열려 있어 '열림'이 아니라 깬 기록으로 판단)
 function jFront(){let c=-1;for(let k=0;k<LEVELS.length;k++)if(jStars(LEVELS[k].id)>=1)c=k;return c;}
-function jRecommend(){const c=jFront();let i=Math.min(LEVELS.length-1,c+1);if(!levelUnlocked(i))for(let k=0;k<LEVELS.length;k++)if(levelUnlocked(k))i=k;
-  const allDone=c===LEVELS.length-1;
-  if(!allDone)return{m:{kind:'level',idx:i},key:'L'+i,name:`${lvLabel(LEVELS[i])} ${LEVELS[i].title}`,first:i===0&&!jStars(LEVELS[0].id)};
-  const R=Object.values(REAL),r=R.find(x=>jStars('real-'+x.id)<2)||R[0];return{m:{kind:'real',id:r.id},key:'R'+r.id,name:'실제 교차로: '+r.title,first:false};}
-function jBuild(){const box=$('jmap'),W=Math.min(560,Math.max(300,$('jscroll').clientWidth-24)),A=Math.max(60,W/2-78);
-  const items=[];let y=40,k=0;JS.front=jFront();
+function jRecommend(){const c=jFront();if(c<LEVELS.length-1){const i=c+1;return{m:{kind:'level',idx:i},key:'L'+i,name:`${lvLabel(LEVELS[i])} ${LEVELS[i].title}`,first:c<0};}
+  const R=Object.values(REAL),r=R.find(x=>jStars('real-'+x.id)<2)||R[0];return{m:{kind:'real',id:r.id},key:'R'+r.id,name:'실제 교차로 '+r.title,first:false,done:true};}
+// 나들목 표지판: 실제 교차로 5곳(도시 + 교차로) + 실험실
+const J_CITY={gangnam:['서울','강남역'],toronto:['토론토','레이크쇼어'],london:['런던','노스서큘러'],edirnekapi:['이스탄불','에디르네카프'],tokyo:['도쿄','오하라']};
+function jExits(){const rec=JS.rec;$('jexits').innerHTML=Object.values(REAL).map((r,i)=>{const [city,ix]=J_CITY[r.id]||[r.city||'',r.title],st=jStars('real-'+r.id),b=jBest('real-'+r.id),k='R'+r.id;
+    return`<button type="button" class="jexit ${k===rec.key?'cur':''}" data-key="${k}"><span class="jeno">EXIT ${i+1}</span><b>${city}</b><span class="jeix">${ix}</span><em>${'★'.repeat(st)}<s>${'★'.repeat(3-st)}</s></em><small>${b!=null?'내 최고 '+b.toLocaleString()+'점':'아직 기록 없음'}</small><i class="jearr"></i></button>`;}).join('')+
+    `<button type="button" class="jexit lab ${rec.key==='LAB'?'cur':''}" data-key="LAB"><span class="jeno">FREE</span><b>실험실</b><span class="jeix">모든 도구, 제약 없음</span><small>별과 순위 없음</small><i class="jearr"></i></button>`;}
+// 본선 지도: 위에서 아래로 굽이치는 길. 교차로마다 횡단보도와 신호등
+function jBuild(){const box=$('jmap'),W=Math.min(520,Math.max(290,box.parentNode.clientWidth-8)),A=Math.max(48,W/2-96);
+  const items=[];let y=46,k=0;JS.front=jFront();
   for(const sg of STAGES){const L=LEVELS.map((lv,i)=>[lv,i]).filter(([lv])=>lv.stage===sg.n),got=L.reduce((s,[lv])=>s+jStars(lv.id),0);
-    items.push({h:1,y,t:sg.name,s:`★ ${got} / ${L.length*3}`});y+=64;
-    for(const [lv,i] of L){items.push({k,y,key:'L'+i,lab:lvLabel(lv),t:lv.title,st:jStars(lv.id),open:levelUnlocked(i),ahead:i>JS.front+1,m:{kind:'level',idx:i}});y+=92;k++;}}
-  const R=Object.values(REAL),rg=R.reduce((s,x)=>s+jStars('real-'+x.id),0);
-  items.push({h:1,y,t:'실제 교차로 5곳',s:`★ ${rg} / ${R.length*3}`,big:1});y+=64;
-  for(const r of R){items.push({k,y,key:'R'+r.id,lab:(r.title.split(/[ /]/)[0]||'').slice(0,4),t:r.title,st:jStars('real-'+r.id),open:true,city:1,m:{kind:'real',id:r.id}});y+=96;k++;}
-  items.push({h:1,y,t:'자유 실험',s:'모든 도구'});y+=64;items.push({k,y,key:'LAB',lab:'실험실',t:'제약 없이 모든 조작',st:-1,open:true,lab1:1,m:{kind:'lab'}});y+=110;
-  const pts=items.filter(n=>!n.h).map(n=>{n.x=W/2+A*Math.sin(n.k*.95);return n;});
-  // 길: 점들을 부드럽게 잇는 곡선(Catmull-Rom → 베지어)
-  const path=(P)=>P.map((p,i)=>{if(!i)return`M${p.x},${p.y}`;const p0=P[i-2]||P[i-1],p1=P[i-1],p3=P[i+1]||p;return`C${p1.x+(p.x-p0.x)/6},${p1.y+(p.y-p0.y)/6} ${p.x-(p3.x-p1.x)/6},${p.y-(p3.y-p1.y)/6} ${p.x},${p.y}`;}).join('');
-  const rec=JS.rec,ri=Math.max(0,pts.findIndex(n=>n.key===rec.key)),done=path(pts.slice(0,ri+1));
+    items.push({h:1,y,t:sg.name,s:`★ ${got} / ${L.length*3}`,clr:L.every(([lv])=>jStars(lv.id)>=1)});y+=70;
+    for(const [lv,i] of L){items.push({k,y,i,key:'L'+i,lab:lvLabel(lv),t:lv.title,st:jStars(lv.id),m:{kind:'level',idx:i}});y+=100;k++;}}
+  items.push({h:1,y,t:'본선 완주',s:'실제 교차로 5곳으로',fin:1});y+=60;
+  const pts=items.filter(n=>!n.h).map(n=>{n.x=W/2+A*Math.sin(n.k*.9+.4);return n;});
+  // 길: 점들을 부드럽게 잇는 곡선(Catmull-Rom → 베지어). 처음과 끝은 화면 밖에서 들어오고 나감
+  const P=[{x:W/2,y:0},...pts,{x:W/2,y}];
+  const path=Q=>Q.map((p,i)=>{if(!i)return`M${p.x},${p.y}`;const p0=Q[i-2]||Q[i-1],p1=Q[i-1],p3=Q[i+1]||p;return`C${p1.x+(p.x-p0.x)/6},${p1.y+(p.y-p0.y)/6} ${p.x-(p3.x-p1.x)/6},${p.y-(p3.y-p1.y)/6} ${p.x},${p.y}`;}).join('');
+  const rec=JS.rec,ri=pts.findIndex(n=>n.key===rec.key),doneP=path(P.slice(0,(ri<0?pts.length:ri)+2));
+  // 횡단보도: 길 방향에 직각으로 흰 줄 5개
+  const zebra=n=>{const j=P.indexOf(n),a=P[j-1],b=P[j+1],ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+    return`<g transform="translate(${n.x},${n.y}) rotate(${ang.toFixed(1)})">${[-12,-6,0,6,12].map(o=>`<rect x="-5" y="${o-2}" width="10" height="3.4" rx="1" fill="#f3ece4" opacity=".9"/>`).join('')}<rect x="-15" y="-17" width="30" height="34" rx="4" fill="none" stroke="rgba(255,255,255,.12)"/></g>`;};
   box.style.width=W+'px';box.style.height=y+'px';
-  box.innerHTML=`<svg class="jroad" width="${W}" height="${y}" viewBox="0 0 ${W} ${y}" aria-hidden="true"><path d="${path(pts)}" class="r0"/><path d="${path(pts)}" class="r1"/>${ri>0?`<path d="${done}" class="r2"/>`:''}</svg>`+
-    items.map(n=>n.h?`<div class="jch ${n.big?'big':''}" style="top:${n.y}px"><b>${n.t}</b><span>${n.s}</span></div>`:
-      `<button type="button" class="jn ${n.st>=1?'done':n.open?'open':'lock'} ${n.ahead&&n.st<1?'ahead':''} ${n.key===rec.key?'cur':''} ${n.city?'city':''} ${n.lab1?'labn':''}" data-key="${n.key}" style="left:${n.x}px;top:${n.y}px" aria-label="${n.lab} ${n.t}${n.open?'':' 잠김'}">
-        <i class="jc">${n.open?n.lab:'<span class="jlk"></span>'}</i>${n.key===rec.key?'<i class="jcar"></i>':''}
-        <span class="jl ${n.x>W/2?'l':'r'}"><b>${n.t}</b>${n.st>=0&&n.open?`<em>${'★'.repeat(n.st)}<s>${'★'.repeat(3-n.st)}</s></em>`:n.open?'':'<small>앞 스테이지 별 1개면 열림</small>'}</span></button>`).join('');
+  box.innerHTML=`<svg class="jroad" width="${W}" height="${y}" viewBox="0 0 ${W} ${y}" aria-hidden="true">
+      <path d="${path(P)}" class="r0"/><path d="${path(P)}" class="r1"/>${doneP?`<path d="${doneP}" class="r2"/>`:''}<path d="${path(P)}" class="r3"/>${pts.map(zebra).join('')}</svg>`+
+    items.map(n=>n.h?`<div class="jsign ${n.fin?'fin':''} ${n.clr?'clr':''}" style="top:${n.y}px"><b>${n.t}</b><span>${n.s}</span></div>`:(()=>{
+      const state=n.st>=1?'g':n.key===rec.key?'y':'r',side=n.x>W/2?'l':'r';
+      return`<button type="button" class="jn s-${state} ${n.key===rec.key?'cur':''}" data-key="${n.key}" style="left:${n.x}px;top:${n.y}px" aria-label="${n.lab} ${n.t}${state==='g'?' 클리어':state==='y'?' 지금 차례':''}">
+        ${n.key===rec.key?'<i class="jcar"></i>':''}
+        <span class="jsig ${side}"><i class="lr"></i><i class="ly"></i><i class="lg"></i></span>
+        <span class="jl ${side}"><span class="jno">${n.lab}</span><b>${n.t}</b><em>${'★'.repeat(n.st)}<s>${'★'.repeat(3-n.st)}</s></em></span></button>`;})()).join('');
   JS.nodes=items.filter(n=>!n.h);}
-function jSummary(){const n=LEVELS.filter(l=>jStars(l.id)>=1).length,s=LEVELS.reduce((a,l)=>a+jStars(l.id),0)+Object.values(REAL).reduce((a,r)=>a+jStars('real-'+r.id),0),mx=(LEVELS.length+Object.keys(REAL).length)*3;
-  $('jsum').textContent=`스테이지 ${n} / ${LEVELS.length} 클리어, 별 ${s} / ${mx}`;}
-function journeyOpen(ask){JS.rec=jRecommend();JR.hidden=false;document.body.classList.add('jopen');jSummary();jBuild();
-  const r=JS.rec;$('jq').innerHTML=r.first?`<b>처음 오셨네요.</b> 1-1 첫 신호부터 시작할까요?`:`<b>${r.name}</b>까지 왔어요. 여기서 이어서 할까요?`;
-  $('jgo').textContent=r.first?'1-1부터 시작':'이어서 하기';$('jask').hidden=ask===false;
-  requestAnimationFrame(()=>{const c=JR.querySelector('.jn.cur'),sc=$('jscroll');if(c)sc.scrollTop=Math.max(0,c.offsetTop-sc.clientHeight*.45);});
+function jSummary(){const n=LEVELS.filter(l=>jStars(l.id)>=1).length,rs=Object.values(REAL).reduce((a,r)=>a+jStars('real-'+r.id),0);
+  $('jsum').textContent=`본선 ${n} / ${LEVELS.length} 교차로 통과, 실제 교차로 별 ${rs} / ${Object.keys(REAL).length*3}`;}
+function journeyOpen(ask){JS.rec=jRecommend();JR.hidden=false;document.body.classList.add('jopen');jSummary();jExits();jBuild();
+  const r=JS.rec;$('jq').innerHTML=r.first?`<b>처음 오셨네요.</b> 본선 1-1 첫 신호부터 출발할까요? 실제 교차로와 실험실은 언제든 들어갈 수 있어요.`
+    :r.done?`본선을 모두 통과했어요. <b>${r.name}</b>에 도전해 볼까요?`:`본선 <b>${r.name}</b> 교차로 차례예요. 이어서 갈까요?`;
+  $('jgo').textContent=r.first?'1-1부터 출발':'이어서 하기';$('jask').hidden=ask===false;
+  requestAnimationFrame(()=>{const c=JR.querySelector('.jn.cur'),sc=$('jscroll');if(c){const top=c.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop;sc.scrollTop=Math.max(0,top-sc.clientHeight*.4);}});
   try{anTrack('journey_open',{rec:r.key});}catch(e){}}
 function journeyClose(){JR.hidden=true;document.body.classList.remove('jopen');
-  // 처음 온 사람의 소개 창은 여정 지도가 대신함
+  // 처음 온 사람의 소개 창은 여정 화면이 대신함
   if(!store.get('intro-v1')){store.set('intro-v1',1);introBox.hidden=true;}
   requestAnimationFrame(()=>{try{resize();positionArms();}catch(e){}});}
 function journeyPick(m,key){journeyClose();const same=JSON.stringify(m)===JSON.stringify(mode);if(!same)loadMode(m);try{anTrack('journey_pick',{key,rec:JS.rec&&JS.rec.key,same});}catch(e){}}
 $('jgo').addEventListener('click',()=>journeyPick(JS.rec.m,JS.rec.key));
 $('jpick').addEventListener('click',()=>{$('jask').hidden=true;});
 $('jx').addEventListener('click',journeyClose);
+$('jhome').addEventListener('click',()=>{JR.hidden=true;document.body.classList.remove('jopen');titleOpen();});
+$('jexits').addEventListener('click',e=>{const b=e.target.closest('.jexit');if(!b)return;const k=b.dataset.key;journeyPick(k==='LAB'?{kind:'lab'}:{kind:'real',id:k.slice(1)},k);});
+// 본선: 시제품은 모든 스테이지가 열려 있어 아무 곳이나 고를 수 있음. 출시 때 잠금(UNLOCK_ALL=false)을 켜면 앞 스테이지 별 1개가 필요
 let jtT=null;$('jmap').addEventListener('click',e=>{const b=e.target.closest('.jn');if(!b)return;const n=JS.nodes.find(x=>x.key===b.dataset.key);if(!n)return;
-  if(!n.open){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const t=$('jtoast');t.textContent=`${n.lab} ${n.t}: 바로 앞 스테이지에서 별 1개 이상 받으면 열립니다.`;t.hidden=false;clearTimeout(jtT);jtT=setTimeout(()=>{t.hidden=true;},2600);return;}
+  if(!levelUnlocked(n.i)){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const t=$('jtoast');t.textContent=`${n.lab} ${n.t}: 바로 앞 교차로에서 별 1개 이상 받으면 열립니다.`;t.hidden=false;clearTimeout(jtT);jtT=setTimeout(()=>{t.hidden=true;},2600);return;}
   journeyPick(n.m,n.key);});
 addEventListener('resize',()=>{if(!JR.hidden)jBuild();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!JR.hidden)journeyClose();});
-// 게임 시작 버튼 → 여정 지도(소개 창 대신)
+// 게임 시작 버튼 → 여정 화면(소개 창 대신)
 {const _tc=titleClose;titleClose=function(){const pend=!store.get('intro-v1');_tc();if(pend)introBox.hidden=true;journeyOpen(true);};}
-// 플레이 중에도 열 수 있게: 레벨 칩 옆 '여정 지도' 버튼, 레벨 창 맨 위 버튼
-{const b=document.createElement('button');b.type='button';b.id='jbtn';b.className='chip';b.textContent='여정 지도';const lv=$('lvchip');lv.parentNode.insertBefore(b,lv.nextSibling);b.addEventListener('click',()=>journeyOpen(false));
-  const c=document.createElement('button');c.type='button';c.className='primary jlvbtn';c.textContent='여정 지도로 보기';c.addEventListener('click',()=>{closeModal();journeyOpen(false);});
+// 게임 중 언제든: '메뉴' 버튼 → 나의 교통 여정 / 첫 화면으로
+const JM=(()=>{const b=document.createElement('button');b.type='button';b.id='jbtn';b.className='chip jmenu';b.innerHTML='<i class="jhb3"></i>메뉴';b.setAttribute('aria-haspopup','menu');
+  const lv=$('lvchip');lv.parentNode.insertBefore(b,lv);
+  const m=document.createElement('div');m.className='jmpop';m.id='jmpop';m.hidden=true;m.setAttribute('role','menu');
+  m.innerHTML='<button type="button" role="menuitem" data-j="journey">나의 교통 여정<small>스테이지 고르기</small></button><button type="button" role="menuitem" data-j="title">첫 화면으로<small>시작 화면과 교차로 챔피언</small></button>';
+  document.body.appendChild(m);
+  const close=()=>{m.hidden=true;};
+  b.addEventListener('click',e=>{e.stopPropagation();if(!m.hidden){close();return;}const r=b.getBoundingClientRect();m.hidden=false;const w=m.offsetWidth,h=m.offsetHeight;
+    m.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';m.style.top=(r.bottom+6+h>innerHeight-8?Math.max(8,r.top-h-6):r.bottom+6)+'px';});
+  m.addEventListener('click',e=>{const t=e.target.closest('[data-j]');if(!t)return;close();if(t.dataset.j==='journey')journeyOpen(false);else titleOpen();});
+  document.addEventListener('pointerdown',e=>{if(!m.hidden&&!m.contains(e.target)&&e.target!==b&&!b.contains(e.target))close();},true);
+  addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+  return m;})();
+// 레벨 창 맨 위에도 여정 화면 버튼
+{const c=document.createElement('button');c.type='button';c.className='primary jlvbtn';c.textContent='나의 교통 여정으로 보기';c.addEventListener('click',()=>{closeModal();journeyOpen(false);});
   const _om=openModal;openModal=function(t,els){const r=_om(t,els);if(t==='레벨과 목표')$('modalbody').insertBefore(c,$('modalbody').firstChild);return r;};}
 window.__J={open:journeyOpen,close:journeyClose,rec:()=>jRecommend()};
 // ---------- 새 버전 알림: 공개 주소에서 5분마다 배포본의 빌드 번호를 확인해, 바뀌었으면 새로고침 안내 ----------
