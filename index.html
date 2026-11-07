@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261106213318">
+<meta name="gl-build" content="20261106221035">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -713,6 +713,57 @@ body.land .jask{left:auto;right:16px;transform:none;width:min(360px,45vw)}
   .jexits{display:grid;grid-template-columns:1fr;gap:12px;overflow:visible;padding:8px 0 0}.jexit{flex:none!important}
   .jhead{padding-top:6px;padding-bottom:6px}.jt{font-size:17px}
   .jscroll{padding-bottom:120px}}
+/* ===== 오늘의 도전 카드(daily.js): 교통 속보 전광판 ===== */
+.jdaily{max-width:1040px;margin:0 auto 16px}
+.dcard{background:#1a1420;border:2px solid #ffd35a;border-radius:16px;padding:12px 14px;box-shadow:0 0 0 4px rgba(255,211,90,.15),0 10px 26px rgba(0,0,0,.35);color:#fff3e6}
+.dcard.none{display:flex;gap:10px;align-items:center;border-color:#5a4668;box-shadow:none}.dcard.none b{font-size:13px;font-weight:500}
+.dtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.dtag{display:inline-flex;align-items:center;gap:6px;background:#ff5a5a;color:#fff;font-weight:800;font-size:12px;padding:3px 9px;border-radius:5px;letter-spacing:.5px}
+.dtag i{width:7px;height:7px;border-radius:50%;background:#fff;animation:jblink 1s steps(2,start) infinite}
+.ddate{font-size:12.5px;color:#ffd35a;font-weight:700}.dleft{margin-left:auto;font-size:11.5px;color:#c9aebd;font-family:var(--f-mono,monospace)}
+.dmain{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:14px}
+@media (max-width:640px){.dmain{grid-template-columns:1fr}}
+.dtitle{display:block;font-size:19px;margin-bottom:4px}.dtxt p{margin:0 0 8px;font-size:13.5px;line-height:1.55;color:#f1e3d6}
+.dchips{display:flex;flex-wrap:wrap;gap:6px}.dchips span{font-size:11.5px;padding:3px 8px;border-radius:99px;background:#33263f;border:1px solid #5a4668}.dchips .dai{border-color:#7fd1c3;color:#7fd1c3}
+.dside{display:flex;flex-direction:column;gap:8px}
+.dq{display:flex;flex-direction:column;gap:3px;background:#271d31;border:1px solid #4a3a55;border-radius:12px;padding:8px 10px;font-size:12.5px}.dq b{font-size:12px;color:#ffd35a}
+.dq span{color:#c9aebd}.dq span.ok{color:#4fe08a}.dq small{font-size:11px;color:#c9aebd;margin-top:2px}
+.dgo{min-height:40px;font-size:15px}
+.dtopn{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed #4a3a55;font-size:12.5px}
+.dtopn small{color:#c9aebd}.dtopn em{font-style:normal;display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:#ffd35a;color:#3a2313;font-weight:800;font-size:11px;margin-right:5px}
+.dtopn b{color:#ffd35a}
+.dlybrief{display:flex;flex-direction:column;gap:3px;background:#1a1420;border:1px solid #ffd35a;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:13px}.dlybrief b{color:#ffd35a}.dlybrief small{color:var(--muted)}
+/* ===== 나만의 교차로(custom.js) ===== */
+.jcx{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:#c25a12!important;color:#fff!important;border:0!important;border-radius:10px!important;padding:24px 34px 10px 12px!important;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #c25a12,0 4px 0 #7a3608,0 8px 16px rgba(0,0,0,.25)!important;cursor:pointer;font-family:inherit}
+.jcx:hover{filter:brightness(1.08)}.jcx b{font-size:15px;font-weight:800}.jcx .jeix{font-size:12px;opacity:.95}
+.jcx .jeno{position:absolute;left:10px;top:-8px;background:#fff;color:#7a3608;font:800 11px/1 "IBM Plex Sans KR",sans-serif;padding:4px 8px;border-radius:5px;box-shadow:0 0 0 2px #c25a12}
+.jcx .jearr{position:absolute;right:12px;top:50%;width:12px;height:12px;border-top:3px solid #fff;border-right:3px solid #fff;transform:translateY(-50%) rotate(45deg)}
+.jcx .jeplus{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:26px;font-weight:700}
+.jcx.new{background:#e07a1f!important;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #e07a1f,0 4px 0 #7a3608,0 8px 16px rgba(0,0,0,.25)!important}
+@media (max-width:899px){.jcx{flex:0 0 150px!important;padding:16px 24px 8px 10px!important;scroll-snap-align:start}.jcx b{font-size:13.5px}.jcx .jeix{font-size:11px}.jcx .jeno{font-size:10px;top:-7px;padding:3px 6px}}
+.cxbox{position:fixed;inset:0;z-index:1150;background:rgba(10,6,14,.6);display:flex;align-items:center;justify-content:center;padding:12px}
+.cxbox[hidden]{display:none}
+.cxpanel{width:min(620px,100%);max-height:calc(100dvh - 24px);overflow-y:auto;background:#271d31;border:1px solid #5a4668;border-radius:18px;padding:14px 16px;box-shadow:0 18px 40px rgba(0,0,0,.5);color:var(--fg);box-sizing:border-box}
+.cxh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.cxh b{font-size:17px}
+.cxp{font-size:13px;line-height:1.55;color:#e8d3e0;margin:4px 0 10px}.cxp.bad,.bad.cxp{color:#ff8a8a}
+.cxf{display:flex;gap:8px}.cxf input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:1px solid #5a4668;background:#1c1524;color:var(--fg)}
+.cxres{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.cxr{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border-radius:10px!important;padding:9px 12px!important;background:#33263f!important}.cxr b{font-size:14px}.cxr span{font-size:11.5px;color:var(--muted);line-height:1.4}
+.cxst{font-size:13.5px;font-weight:600;color:#ffd35a;margin-bottom:8px}
+.cxpv{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}.cxpv canvas{width:300px;height:300px;max-width:100%;border-radius:12px;background:#e9e2d6;flex:none}
+.cxinfo{flex:1 1 200px;display:flex;flex-direction:column;gap:6px;font-size:13px}.cxinfo>div{display:grid;grid-template-columns:22px 1fr;gap:0 6px}.cxinfo b{grid-row:span 2;color:#ffd35a}.cxinfo small{color:var(--muted);font-size:11.5px}.cxlht{color:#7fd1c3!important}
+.cxopt{display:flex;flex-direction:column;gap:10px;margin-top:12px}.cxopt label{display:flex;gap:8px;align-items:center;font-size:13px}.cxopt input{flex:1;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid #5a4668;background:#1c1524;color:var(--fg)}
+.cxlv{display:flex;gap:8px;align-items:center;font-size:13px}.cxbtn{display:flex;gap:8px;flex-wrap:wrap}.cxbtn button{flex:1 1 auto;min-height:40px}
+.cxnote{font-size:11.5px;color:var(--muted);line-height:1.5}
+.cxtoast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:6100;background:#271d31;border:1px solid #ffd35a;color:var(--fg);border-radius:14px;padding:10px 16px;font-size:13px;max-width:calc(100% - 32px);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.cxtoast[hidden]{display:none}
+.cxchip{background:#c25a12!important;border-color:#e07a1f!important;color:#fff!important}
+.cxboard{display:flex;flex-direction:column;gap:8px}.cxbh{display:flex;flex-direction:column}.cxbh b{font-size:16px}.cxbh small{color:var(--muted);font-size:12px}
+.cxshare{display:flex;gap:6px}.cxshare input{flex:1;min-width:0;font:inherit;font-size:12.5px;padding:7px 9px;border-radius:8px;border:1px solid #5a4668;background:#1c1524;color:var(--fg)}
+.cxbest{background:#1a1420;border:1px solid #ffd35a;border-radius:10px;padding:8px 10px;font-size:13px}.cxbest b{color:#ffd35a}
+.cxt{width:100%;border-collapse:collapse;font-size:12.5px}.cxt th,.cxt td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.cxt th{color:var(--muted);font-weight:500}.cxt td.n{text-align:right;font-family:var(--f-mono,monospace)}
+.cxt td small{display:block;color:var(--muted);font-size:10.5px}.cxt td.m{color:#e8d3e0;max-width:220px}.cxt tr.me td{background:rgba(255,211,90,.1)}
+.cxmemo{flex:1 1 260px}.cxmemo input{width:100%;box-sizing:border-box}
 </style>
 
 <div class="wrap">
@@ -1212,6 +1263,13 @@ function evalCfg(c,firstSt){const sts=[firstSt||runSession(c,SEEDS[0]).st];for(c
 
 // ---------- 실제 교차로 자료(src/data/real/*.js가 채움) ----------
 const REAL={};
+// 오늘의 도전: 실제 교차로 기본 설정에 그날 시나리오(daily_scenarios.params)의 교통량 배율, 회전 비율 가감, 날씨를 얹음. 게임과 점수 검증이 같은 함수를 씀
+// 회전 비율은 원래 그 회전이 있고 직진도 있는 접근로만 바꿈(차로 구성과 맞지 않는 회전이 생기지 않게)
+function dailyCfg(R,D){const c=realCfg(R),p=(D&&D.params)||{},cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+  for(const a of APPR){const x=c.appr[a],m=cl(+((p.mult&&p.mult[a])||1),.5,1.8),th=100-x.pl-x.pr;x.vph=Math.round(x.vph*m);
+    if(th>0){if(x.pl>0)x.pl=Math.round(cl(x.pl+((p.dl&&p.dl[a])||0),1,70));if(x.pr>0)x.pr=Math.round(cl(x.pr+((p.dr&&p.dr[a])||0),1,70));
+      const over=x.pl+x.pr-90;if(over>0){if(x.pr>=x.pl)x.pr-=over;else x.pl-=over;}}}
+  if(D&&D.wx&&D.wx!=='clear')c.wx=D.wx;return c;}
 function realCfg(R){const appr={};for(const a of APPR){const [vph,pl,pr,lanes,perm,pu]=R.appr[a];appr[a]={vph,pl,pr,lanes:[...lanes],perm:!!perm};if(pu)appr[a].pu=pu;if(R.ped&&R.ped[a])appr[a].ped=R.ped[a];}
   return{geo:clone(R.geo),phases:clone(R.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};}
 // ---------- 실제 교차로 ----------
@@ -1469,13 +1527,19 @@ let prog={};
 const curLevel=()=>mode.kind==='level'?LEVELS[mode.idx]:null;
 // 실제 교차로 지도: 엔드게임(real)과 각 장 마지막 레벨(lv.real) 모두
 const curReal=()=>mode.kind==='real'?REAL[mode.id]:(mode.kind==='level'&&LEVELS[mode.idx]&&LEVELS[mode.idx].real?REAL[LEVELS[mode.idx].real]:null);
-const baseCfg=()=>mode.kind==='level'?levelCfg(curLevel()):mode.kind==='real'?realCfg(curReal()):cfgFor(scenKey);
-const modeId=()=>mode.kind==='level'?'L'+curLevel().id:mode.kind==='real'?'real-'+mode.id:'lab-'+scenKey;
+// 오늘의 도전(daily.js가 DAILY_S를 채움): 실제 교차로 + 그날 시나리오. 나만의 교차로(custom.js)는 REAL에 custom:true로 들어옴
+let DAILY_S=null;
+const OFFICIAL=()=>Object.values(REAL).filter(R=>!R.custom);
+const baseCfg=()=>mode.kind==='level'?levelCfg(curLevel()):mode.kind==='real'?(mode.daily&&DAILY_S&&DAILY_S.day===mode.daily?dailyCfg(curReal(),DAILY_S):realCfg(curReal())):cfgFor(scenKey);
+const modeId=()=>mode.kind==='level'?'L'+curLevel().id:mode.kind==='real'?(mode.daily?'daily-'+mode.daily:REAL[mode.id]&&REAL[mode.id].custom?'custom-'+mode.id.slice(2):'real-'+mode.id):'lab-'+scenKey;
 const unlocked=k=>mode.kind==='lab'||(mode.kind==='real'&&k!=='demand')||(mode.kind==='level'&&curLevel().unlock.includes(k));
 // 실제 도시 별 기준: 자동 탐색(tools/opt.mjs, 녹색 시간, 주기, 차로 용도, 비보호, 적색 회전)으로 찾은 최고점까지의 거리로 정함.
 // ★1 = 시작점 + 30%, ★2 = + 65%, ★3 = + 95% (v0.18 보행자 반영. 시작점 335/738/269/529/152, 탐색 최고 469/819/338/710/361. 탐색: tools/opt.mjs, 보행 전용 현시 포함)
 const REAL_STARS={gangnam:[375,422,462],edirnekapi:[762,791,815],toronto:[290,314,335],london:[583,647,701],tokyo:[215,288,351]};
-function thresholds(){if(mode.kind==='level')return curLevel().stars;if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
+function thresholds(){if(mode.kind==='level')return curLevel().stars;
+  // 오늘의 도전, 나만의 교차로: 탐색으로 정한 별 기준이 없으므로 시작 설정 점수에서 얼마나 올렸는지로(시작점이 음수여도 동작)
+  if(mode.kind==='real'&&(mode.daily||(curReal()&&curReal().custom))){const b0=baseline?baseline.score:0,S=Math.max(150,Math.abs(b0));return[.12,.28,.45].map(k=>Math.ceil(b0+S*k));}
+ if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
 // 확정 기회: 스테이지마다 5번(실험실은 무제한). 다 쓰면 처음부터 다시. 이 브라우저에 저장
 const TRIES_MAX=5,limited=()=>mode.kind!=='lab';
 // 세션 = 3분 관찰 + 확정 1번. 점수는 관찰 시간과 별개로 5분 시뮬레이션 x 시드 3개(evalCfg)라 별 기준은 그대로
@@ -1487,8 +1551,8 @@ function triesAdd(){const t=store.get('tries-v1')||{},k=modeId();t[k]=(t[k]||0)+
 function restartStage(){const t=store.get('tries-v1')||{};delete t[modeId()];store.set('tries-v1',t);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
 // 다음 스테이지: 레벨은 다음 레벨, 마지막 레벨 다음은 첫 실제 교차로, 실제 교차로는 다음 도시
 function nextTarget(){if(mode.kind==='level'){if(mode.idx+1<LEVELS.length){const l=LEVELS[mode.idx+1];return{m:{kind:'level',idx:mode.idx+1},name:lvLabel(l)+' '+l.title};}
-    const ids=Object.keys(REAL);return ids.length?{m:{kind:'real',id:ids[0]},name:'실제 교차로: '+REAL[ids[0]].title}:null;}
-  if(mode.kind==='real'){const ids=Object.keys(REAL),i=ids.indexOf(mode.id);if(i>=0&&i+1<ids.length)return{m:{kind:'real',id:ids[i+1]},name:'실제 교차로: '+REAL[ids[i+1]].title};}
+    const ids=OFFICIAL().map(R=>R.id);return ids.length?{m:{kind:'real',id:ids[0]},name:'실제 교차로: '+REAL[ids[0]].title}:null;}
+  if(mode.kind==='real'&&!mode.daily){const ids=OFFICIAL().map(R=>R.id),i=ids.indexOf(mode.id);if(i>=0&&i+1<ids.length)return{m:{kind:'real',id:ids[i+1]},name:'실제 교차로: '+REAL[ids[i+1]].title};}
   return null;}
 function jammed(st){const lv=curLevel();return!!(lv&&lv.jam&&st&&st.peakQ>=lv.jam);}
 function starsOf(score,risk){const t=thresholds();let n=score>=t[2]?3:score>=t[1]?2:score>=t[0]?1:0;if(riskGrade(risk)===2)n=Math.min(n,1);return n;}
@@ -1758,7 +1822,7 @@ function finishWith(fc,ev,keep){const base=baseCfg(),st=ev.st,score=ev.score,pre
   const stars=sameDemand&&!jam?starsOf(score,st.risk):0;
   const rec={no:sessNo,cfg:clone(fc),st,score,changes,sameDemand,stars,jam,record:sameDemand&&!jam&&score>prevBest&&history.length>0};
   rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX-rec.try);}
-  if(mode.kind==='real'&&sameDemand){const id='real-'+mode.id,p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
+  if(mode.kind==='real'&&sameDemand){const id=modeId(),p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
   if(mode.kind==='level'&&sameDemand){const id=curLevel().id,p=prog[id]||{stars:0,best:-1e9},nextLocked=mode.idx+1<LEVELS.length&&!levelUnlocked(mode.idx+1);
     prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);
     if(nextLocked&&levelUnlocked(mode.idx+1))rec.opened=LEVELS[mode.idx+1];
@@ -1889,14 +1953,15 @@ $('clearhist').addEventListener('click',()=>{history=[];store.set(histKey(),hist
 function renderLevels(){const box=$('levels');
   box.innerHTML=STAGES.map(sg=>`<div class="stage-row"><span>${sg.n}단계 ${sg.name}</span><div class="lvbtns">${LEVELS.map((lv,i)=>lv.stage!==sg.n?'':
     `<button class="lv ${mode.kind==='level'&&mode.idx===i?'cur':''}" data-lv="${i}" ${levelUnlocked(i)?'':'disabled'}>${lvLabel(lv)}<small>${levelUnlocked(i)?starHTML((prog[lv.id]||{}).stars||0):'잠김'}</small></button>`).join('')}</div></div>`).join('')+
-    `<div class="stage-row"><span>실제 도시</span><div class="lvbtns">${Object.values(REAL).map(R=>`<button class="lv ${mode.kind==='real'&&mode.id===R.id?'cur':''}" data-real="${R.id}">${R.title}<small>${starHTML((prog['real-'+R.id]||{}).stars||0)}</small></button>`).join('')}</div></div>`+
+    `<div class="stage-row"><span>실제 도시</span><div class="lvbtns">${OFFICIAL().map(R=>`<button class="lv ${mode.kind==='real'&&mode.id===R.id?'cur':''}" data-real="${R.id}">${R.title}<small>${starHTML((prog['real-'+R.id]||{}).stars||0)}</small></button>`).join('')}</div></div>`+
     `<div class="stage-row"><span>자유</span><div class="lvbtns"><button class="lv ${mode.kind==='lab'?'cur':''}" data-lab="1">실험실<small>전체 조작</small></button></div></div>`;}
 $('levels').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.lab)loadMode({kind:'lab'});else if(b.dataset.real)loadMode({kind:'real',id:b.dataset.real});else loadMode({kind:'level',idx:+b.dataset.lv});});
 function renderBrief(){const el=$('brief');$('labrow').hidden=mode.kind!=='lab';
   if(mode.kind==='lab'){el.innerHTML=`<h3><small>LAB</small>실험실</h3><p>레벨 제약 없이 모든 조작을 써볼 수 있습니다. 별은 시작 설정 점수의 1배, 1.3배, 1.6배 기준입니다.</p>`;return;}
-  if(mode.kind==='real'){const R=curReal(),t=thresholds(),p=prog['real-'+R.id];
-    el.innerHTML=`<h3><small>${R.city}</small>${R.title}</h3><p>${R.desc} 레벨 없이 모든 조작이 열려 있습니다.</p>
+  if(mode.kind==='real'){const R=curReal(),t=thresholds(),p=prog[modeId()];
+    const dly=mode.daily&&DAILY_S?`<div class="dlybrief"><b>오늘의 도전: ${DAILY_S.title}</b><span>${DAILY_S.story}</span>${DAILY_S.tip?`<small>힌트: ${DAILY_S.tip}</small>`:''}</div>`:'';
+    el.innerHTML=`${dly}<h3><small>${R.city}</small>${R.title}</h3><p>${R.desc} 레벨 없이 모든 조작이 열려 있습니다.</p>
       <div class="thr"><span>★ <b>${t[0]}</b></span><span>★★ <b>${t[1]}</b></span><span>★★★ <b>${t[2]}</b></span><span>현재 가정 설정 ${baseline?baseline.score:'-'}점</span>${p?`<span>내 최고 ${p.best}점</span>`:''}</div>
       <div class="unl">${R.srcNote} 화면 방향: ${R.orient} 북측 = ${R.arm.N}, 남측 = ${R.arm.S}, 동측 = ${R.arm.E}, 서측 = ${R.arm.W}</div>
       <button class="link" id="databtn" style="margin-top:6px;padding-left:0">데이터 출처와 가정 보기</button>
@@ -1908,7 +1973,7 @@ function renderBrief(){const el=$('brief');$('labrow').hidden=mode.kind!=='lab';
     <div class="unl">열린 조작: ${lv.unlock.map(k=>CTRL_NAME[k]).join(', ')}</div>
     <button class="link" id="hintbtn" style="margin-top:6px;padding-left:0">힌트 보기</button><div class="hint" id="hint" hidden>${lv.hint}</div>`;
   $('hintbtn').addEventListener('click',()=>{$('hint').hidden=false;$('hintbtn').hidden=true;});}
-function loadMode(m){closePop();closeModal();mode=m.kind==='lab'?{kind:'lab'}:m;setHand(!!(curReal()&&curReal().lht));if(m.kind==='lab'&&m.scen)scenKey=m.scen;store.set('last-v3',mode.kind==='lab'?{kind:'lab',scen:scenKey}:mode);VIEW=mode.kind==='real'?(wideMap?190:84):72;$('mapzoom').hidden=mode.kind!=='real';$('mapzoom').textContent=wideMap?'교차로 확대':'지도 넓게 보기';
+function loadMode(m){closePop();closeModal();if(m.kind==='real'&&m.daily&&!(DAILY_S&&DAILY_S.day===m.daily&&DAILY_S.stage===m.id))m={kind:'real',id:m.id};if(m.kind==='real'&&!REAL[m.id])m={kind:'level',idx:0};mode=m.kind==='lab'?{kind:'lab'}:m;setHand(!!(curReal()&&curReal().lht));if(m.kind==='lab'&&m.scen)scenKey=m.scen;store.set('last-v3',mode.kind==='lab'?{kind:'lab',scen:scenKey}:mode);VIEW=mode.kind==='real'?(wideMap?190:84):72;$('mapzoom').hidden=mode.kind!=='real';$('mapzoom').textContent=wideMap?'교차로 확대':'지도 넓게 보기';
   scenSel.value=scenKey;cfg=clone(baseCfg());syncControls();
   history=(store.get(histKey())||[]).filter(h=>h&&h.cfg&&h.cfg.geo&&h.cfg.phases&&h.st&&h.st.riskBy);
   baseline=evalCfg(baseCfg());renderLevels();renderBrief();renderResult(history[0]||null,history[1]);renderHistory();startSession();buildArms();}
@@ -2265,7 +2330,7 @@ function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=ge
     ctx.globalAlpha=.5;ctx.strokeStyle=COL.paint;ctx.lineWidth=W+.5;ctx.stroke();ctx.globalAlpha=1;ctx.strokeStyle=COL.asphalt;ctx.lineWidth=W+.1;ctx.stroke();ctx.restore();}}
   for(const a of APPR){const d=HEAD[a],c=sc2.appr[a],n=G.nIn[a],sgA=G.slipGeo&&G.slipGeo[a],nA=sgA?n:D.nAll(a),no=G.nOut[a],sd=D.stopD(a),bd=D.exitD(a),md=D.oOff(a)+D.off(a),igA=G.inGeo&&G.inGeo[a],LVi=igA?sd+6:LV;ctx.save();local([0,0],d);ctx.translate(0,-D.off(a));{const cl=Math.min(G.drawLen&&G.drawLen[a]||1e9,R&&R.bend&&R.bend[a]?L:1e9);if(cl<1e9){ctx.beginPath();ctx.rect(-cl,-300,cl+300,600);ctx.clip();}}
     ctx.globalAlpha=1;ctx.fillStyle=COL.asphalt;for(let i=0;i<n;i++)ctx.fillRect(-(igA&&igA[i]?LVi:LV),-(i+1)*W,(igA&&igA[i]?LVi:LV)-sd,W);{const og=G.outGeo&&G.outGeo[a],LO=og?bd+6:LV;ctx.fillRect(-LO,md,LO-bd,no*W);}if(nA>n)ctx.fillRect(-LV,-nA*W,LV-sd-SLIP_BACK,W);
-    if(md>.5){ctx.fillStyle=COL.island;ctx.fillRect(-LV,.3,LV-Math.max(sd,bd)-1.5,md-.6);ctx.fillStyle=COL.asphalt;}
+    if(md>.5){const LI=igA&&G.outGeo&&G.outGeo[a]?Math.max(sd,bd)+6:LV;ctx.fillStyle=COL.island;ctx.fillRect(-LI,.3,LI-Math.max(sd,bd)-1.5,md-.6);ctx.fillStyle=COL.asphalt;}
     c.lanes.forEach((m,i)=>{if(m==='B'){ctx.globalAlpha=.2;ctx.fillStyle=COL.bus;ctx.fillRect(-LV,-(i+1)*W,LV-sd,W);ctx.globalAlpha=.9;ctx.fillRect(-LV,-(i+1)*W-.12,LV-sd,.24);ctx.fillRect(-LV,-i*W-.12,LV-sd,.24);}});
     ctx.globalAlpha=1;ctx.lineWidth=.16;ctx.strokeStyle=COL.y;ctx.beginPath();
     for(const o of md>.5?[-.18,md+.18]:md<-.5?[]:[-.18,.18]){ctx.moveTo(o<.5?-sd:-bd,o);ctx.lineTo(o<0&&igA?-LVi:o>0&&G.outGeo&&G.outGeo[a]?-bd-6:-LV,o);}ctx.stroke();
@@ -2397,7 +2462,7 @@ function renderHud(){if(!playMode||!sim)return;const st=stats(sim),el=sim.t-sim.
   $('hudtl').innerHTML=`<div class="t">${sessLabel()}${state==='done'?' 종료':''}  관찰 ${fmtT(Math.min(el,OBS_T))} / ${fmtT(OBS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/OBS_T*100)}%"></i></div>
     <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>${goalHTML(st)}`;
   const R=curReal(),lv=curLevel();
-  $('lvchip').innerHTML=(lv?`${lvLabel(lv)} ${lv.title}`:R?R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
+  $('lvchip').innerHTML=(lv?`${lvLabel(lv)} ${lv.title}`:mode.daily&&DAILY_S?`오늘의 도전: ${DAILY_S.title}`:R?(R.custom?'나만의 교차로: ':'')+R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
   for(const a of APPR){const b=$('arm-'+a);if(!b)continue;let n=0;sim.net.inL[a].forEach((sg,i)=>{n+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)n++;});b.querySelector('.q').textContent='대기 '+n;}}
 function setPlayMode(on){playMode=on;try{localStorage.setItem('play-v1',JSON.stringify(on));}catch(e){}document.body.classList.toggle('play',on);
   $('modebtn').textContent=on?'상세 패널 보기':'플레이 화면으로';
@@ -2562,8 +2627,10 @@ function anDevice(){const ua=navigator.userAgent,os=/iPhone|iPad|iPod/.test(ua)|
     tz:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){return'';}})(),standalone:matchMedia('(display-mode: standalone)').matches,ref:(()=>{try{return document.referrer?new URL(document.referrer).hostname:'';}catch(e){return'';}})()};}
 const anStage=()=>{try{return modeId();}catch(e){return'';}};
 function anTrack(ev,data){if(!AN.on)return;AN.q.push({cid:AN.cid,vid:AN.vid,ev,ver:AN.ver,host:location.hostname||location.protocol.replace(':',''),stage:anStage(),data:data||{}});if(AN.q.length>=20)anFlush();}
-function anFlush(beacon){if(!AN.q.length||!AN.on)return;const body=JSON.stringify(AN.q.splice(0,50));
-  try{fetch(AN.url,{method:'POST',keepalive:!!beacon,headers:{apikey:AN.key,'Content-Type':'application/json',Prefer:'return=minimal'},body}).catch(()=>{});}catch(e){}}
+// 서버 표의 이벤트 이름 제한(events_ev_chk)에 없는 새 이벤트(여정, 오늘의 도전, 나만의 교차로 등)는 따로 보냄: 같이 보내면 한 묶음 전체가 거절되기 때문
+const AN_CORE=new Set(['open','level_start','session_end','session_restart','skip','coach','leave','error']);
+function anFlush(beacon){if(!AN.q.length||!AN.on)return;const all=AN.q.splice(0,50),core=all.filter(x=>AN_CORE.has(x.ev)),ext=all.filter(x=>!AN_CORE.has(x.ev));
+  for(const part of [core,ext]){if(!part.length)continue;try{fetch(AN.url,{method:'POST',keepalive:!!beacon,headers:{apikey:AN.key,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(part)}).catch(()=>{});}catch(e){}}}
 setInterval(anFlush,15000);
 addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')anFlush(true);});
 // 방문 시작
@@ -3115,10 +3182,12 @@ function m2Place(B){const S=$('stage'),g=8,Q=B.Q,cs=M2.ins?getComputedStyle(M2.i
     // nat: 줄바꿈 안 되는 칸(숫자 표)이 있으면 그 폭에 맞춘 뒤 통째로 줄임
     if(nat){sp(el,'width',Math.max(60,W)+'px');const sw=el.scrollWidth;if(sw>W+1)sp(el,'width',sw+'px');}
     const w=Math.max(el.offsetWidth,el.scrollWidth),h=el.offsetHeight,k=Math.max(.5,Math.min(1,W/Math.max(1,w),H/Math.max(1,h)));
-    if(a.L){sp(el,'left',a.x0+'px');sp(el,'right','auto');}else{sp(el,'right',(cw-a.x1)+'px');sp(el,'left','auto');}
-    if(a.T||top!=null){sp(el,'top',(top??a.y0)+'px');sp(el,'bottom','auto');}else{sp(el,'bottom',(ch-a.y1)+'px');sp(el,'top','auto');}
-    sp(el,'transform-origin',(a.T||top!=null?'top ':'bottom ')+(a.L?'left':'right'));sp(el,'transform',k<.999?`scale(${k.toFixed(3)})`:'none');
-    const x0=a.L?a.x0:a.x1-w*k,y0=a.T||top!=null?(top??a.y0):a.y1-h*k,r=[x0,y0,x0+w*k,y0+h*k];out.push(r);return r;};
+    const bw=w*k,bh=h*k,yTop=top??a.y0;let x0=a.L?a.x0:a.x1-bw,y0=a.T||top!=null?yTop:a.y1-bh;
+    // 비스듬한 실제 도로(나만의 교차로 등)가 사분면을 지나가면: 같은 사분면 안에서 차로와 다른 카드를 피하는 가장 가까운 자리
+    const Gd=jogGridC(),hitO=(x,y)=>out.some(p=>x+bw>p[0]-4&&x<p[2]+4&&y+bh>p[1]-4&&y<p[3]+4);
+    if(Gd&&(!Gd.free(x0,y0,x0+bw,y0+bh)||hitO(x0,y0))){let best=null;for(let y=yTop;y+bh<=a.y1;y+=8)for(let x=a.x0;x+bw<=a.x1;x+=8){if(!Gd.free(x,y,x+bw,y+bh)||hitO(x,y))continue;const dd=Math.hypot(x-x0,y-y0);if(!best||dd<best.d)best={x,y,d:dd};}if(best){x0=best.x;y0=best.y;}}
+    sp(el,'right','auto');sp(el,'bottom','auto');sp(el,'left',x0+'px');sp(el,'top',y0+'px');sp(el,'transform-origin','top left');sp(el,'transform',k<.999?`scale(${k.toFixed(3)})`:'none');
+    const r=[x0,y0,x0+bw,y0+bh];out.push(r);return r;};
   // 1) 신호 시계: 사분면 크기에 맞춰 원 지름을 정함(아래 '크게 편집' 버튼 자리 34px)
   const d=$('dock');if(d&&d.parentNode===S){const a=area('br'),W=a.x1-a.x0,H=a.y1-a.y0,row=W>H*1.5;d.classList.toggle('mrow',row);
     const sz=Math.round(Math.max(96,Math.min(230,row?W-110:W-14,row?H-14:H-48)));
@@ -3140,6 +3209,7 @@ function jogApply(){const want=playMode&&!document.body.classList.contains('mobi
 // 놓을 자리 찾기: 차가 다니는 모든 차로(시뮬레이션 차로 선, 비스듬한 실제 도로 포함)를 8px 칸 격자에 칠하고,
 // 원을 가장 크게 놓을 수 있는 빈 칸을 찾음(원 230px부터 10px씩 줄임, 정보 칸은 원 옆 또는 아래). 같은 크기면 오른쪽 아래 귀퉁이에 가까운 곳
 const JOG={key:'',pos:null};
+const JGC={key:'',g:null};function jogGridC(){const key=[modeId(),cw|0,ch|0,VIEW,sim&&sim.net?(sim.net.__id||(sim.net.__id=Math.random())):0].join('|');if(key!==JGC.key){JGC.key=key;JGC.g=jogGrid();}return JGC.g;}
 function jogGrid(){const n=sim&&sim.net;if(!n)return null;const C=8,nx=Math.ceil(cw/C),ny=Math.ceil(ch/C),G=new Uint8Array(nx*ny),sc=Math.min(cw,ch)/(2*VIEW),hw=n.G.LW*sc/2+8;
   const markR=(x,y,hw)=>{const r=Math.ceil(hw/C);const cx=Math.floor(x/C),cy=Math.floor(y/C);for(let j=cy-r;j<=cy+r;j++)for(let i=cx-r;i<=cx+r;i++){if(i<0||j<0||i>=nx||j>=ny)continue;if(Math.hypot((i+.5)*C-x,(j+.5)*C-y)<=hw+C*.7)G[j*nx+i]=1;}};
   const mark=(x,y)=>{const r=Math.ceil(hw/C);const cx=Math.floor(x/C),cy=Math.floor(y/C);for(let j=cy-r;j<=cy+r;j++)for(let i=cx-r;i<=cx+r;i++){if(i<0||j<0||i>=nx||j>=ny)continue;if(Math.hypot((i+.5)*C-x,(j+.5)*C-y)<=hw+C*.7)G[j*nx+i]=1;}};
@@ -3376,10 +3446,10 @@ const jStars=id=>((prog[id]||{}).stars)||0,jBest=id=>{const b=(prog[id]||{}).bes
 // 본선에서 깬 마지막 스테이지(시제품은 모든 레벨이 열려 있어 '열림'이 아니라 깬 기록으로 판단)
 function jFront(){let c=-1;for(let k=0;k<LEVELS.length;k++)if(jStars(LEVELS[k].id)>=1)c=k;return c;}
 function jRecommend(){const c=jFront();if(c<LEVELS.length-1){const i=c+1;return{m:{kind:'level',idx:i},key:'L'+i,name:`${lvLabel(LEVELS[i])} ${LEVELS[i].title}`,first:c<0};}
-  const R=Object.values(REAL),r=R.find(x=>jStars('real-'+x.id)<2)||R[0];return{m:{kind:'real',id:r.id},key:'R'+r.id,name:'실제 교차로 '+r.title,first:false,done:true};}
+  const R=OFFICIAL(),r=R.find(x=>jStars('real-'+x.id)<2)||R[0];return{m:{kind:'real',id:r.id},key:'R'+r.id,name:'실제 교차로 '+r.title,first:false,done:true};}
 // 나들목 표지판: 실제 교차로 5곳(도시 + 교차로) + 실험실
 const J_CITY={gangnam:['서울','강남역'],toronto:['토론토','레이크쇼어'],london:['런던','노스서큘러'],edirnekapi:['이스탄불','에디르네카프'],tokyo:['도쿄','오하라']};
-function jExits(){const rec=JS.rec;$('jexits').innerHTML=Object.values(REAL).map((r,i)=>{const [city,ix]=J_CITY[r.id]||[r.city||'',r.title],st=jStars('real-'+r.id),b=jBest('real-'+r.id),k='R'+r.id;
+function jExits(){const rec=JS.rec;$('jexits').innerHTML=OFFICIAL().map((r,i)=>{const [city,ix]=J_CITY[r.id]||[r.city||'',r.title],st=jStars('real-'+r.id),b=jBest('real-'+r.id),k='R'+r.id;
     return`<button type="button" class="jexit ${k===rec.key?'cur':''}" data-key="${k}"><span class="jeno">EXIT ${i+1}</span><b>${city}</b><span class="jeix">${ix}</span><em>${'★'.repeat(st)}<s>${'★'.repeat(3-st)}</s></em><small>${b!=null?'내 최고 '+b.toLocaleString()+'점':'아직 기록 없음'}</small><i class="jearr"></i></button>`;}).join('')+
     `<button type="button" class="jexit lab ${rec.key==='LAB'?'cur':''}" data-key="LAB"><span class="jeno">FREE</span><b>실험실</b><span class="jeix">모든 도구, 제약 없음</span><small>별과 순위 없음</small><i class="jearr"></i></button>`;}
 // 본선 지도: 위에서 아래로 굽이치는 길. 교차로마다 횡단보도와 신호등
@@ -3407,8 +3477,8 @@ function jBuild(){const box=$('jmap'),W=Math.min(520,Math.max(290,box.parentNode
         <span class="jsig ${side}"><i class="lr"></i><i class="ly"></i><i class="lg"></i></span>
         <span class="jl ${side}"><span class="jno">${n.lab}</span><b>${n.t}</b><em>${'★'.repeat(n.st)}<s>${'★'.repeat(3-n.st)}</s></em></span></button>`;})()).join('');
   JS.nodes=items.filter(n=>!n.h);}
-function jSummary(){const n=LEVELS.filter(l=>jStars(l.id)>=1).length,rs=Object.values(REAL).reduce((a,r)=>a+jStars('real-'+r.id),0);
-  $('jsum').textContent=`본선 ${n} / ${LEVELS.length} 교차로 통과, 실제 교차로 별 ${rs} / ${Object.keys(REAL).length*3}`;}
+function jSummary(){const n=LEVELS.filter(l=>jStars(l.id)>=1).length,rs=OFFICIAL().reduce((a,r)=>a+jStars('real-'+r.id),0);
+  $('jsum').textContent=`본선 ${n} / ${LEVELS.length} 교차로 통과, 실제 교차로 별 ${rs} / ${OFFICIAL().length*3}`;}
 function journeyOpen(ask){JS.rec=jRecommend();JR.hidden=false;document.body.classList.add('jopen');jSummary();jExits();jBuild();
   const r=JS.rec;$('jq').innerHTML=r.first?`<b>처음 오셨네요.</b> 본선 1-1 첫 신호부터 출발할까요? 실제 교차로와 실험실은 언제든 들어갈 수 있어요.`
     :r.done?`본선을 모두 통과했어요. <b>${r.name}</b>에 도전해 볼까요?`:`본선 <b>${r.name}</b> 교차로 차례예요. 이어서 갈까요?`;
@@ -3450,6 +3520,374 @@ const JM=(()=>{const b=document.createElement('button');b.type='button';b.id='jb
 {const c=document.createElement('button');c.type='button';c.className='primary jlvbtn';c.textContent='나의 교통 여정으로 보기';c.addEventListener('click',()=>{closeModal();journeyOpen(false);});
   const _om=openModal;openModal=function(t,els){const r=_om(t,els);if(t==='레벨과 목표')$('modalbody').insertBefore(c,$('modalbody').firstChild);return r;};}
 window.__J={open:journeyOpen,close:journeyClose,rec:()=>jRecommend()};
+// ---------- 오늘의 도전(일일 퀘스트): 하루 한정 교통 상황 + 그날만의 랭킹 ----------
+// 시나리오는 Supabase Edge Function 'daily'가 하루 1번 만듦(Claude가 쓴 사건 이야기와 교통량 배율, 실패하면 규칙 생성기). 날짜는 한국 시간 기준
+// 게임에서는 실제 교차로 모드에 daily:YYYYMMDD를 붙여 플레이(mode={kind:'real',id,daily}). 기록 키 'daily-YYYYMMDD'(별, 도전 5번, 랭킹 모두 그날 따로)
+// 퀘스트: 1) 오늘 도전 확정 1번 2) 별 1개 이상 3) 랭킹 등록. 별 1개 이상 받은 날이 이어지면 연속 기록
+const DLY={row:null,err:null,loading:null,top:null};
+const DLY_URL='https://qjguvtmkrkbtpvdnyelp.supabase.co/functions/v1/daily',DLY_KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp';
+const kstDay=(t)=>new Date((t||Date.now())+9*3600e3).toISOString().slice(0,10).replace(/-/g,'');
+const dEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function dailyLoad(force){const today=kstDay(),c=store.get('daily-v1');
+  if(!force&&c&&c.day===today&&c.row){DLY.row=c.row;DAILY_S=c.row;return c.row;}
+  if(DLY.loading)return DLY.loading;
+  DLY.loading=(async()=>{try{const r=await fetch(DLY_URL,{headers:{apikey:DLY_KEY}});if(!r.ok)throw new Error('http '+r.status);const j=await r.json();if(!j||!j.day||!REAL[j.stage])throw new Error('bad');
+      DLY.row=j;DAILY_S=j;DLY.err=null;store.set('daily-v1',{day:j.day,row:j});return j;}
+    catch(e){DLY.err=e;return null;}finally{DLY.loading=null;}})();return DLY.loading;}
+// 오늘 기록과 퀘스트 상태(이 브라우저 기준)
+const dKey=d=>'daily-'+d;
+function dQuest(day){const q=(store.get('dquest-v1')||{})[day]||{};return{played:!!q.played,star:!!q.star,lb:!!q.lb,best:q.best??null,stars:q.stars||0};}
+function dQuestSet(day,f){const all=store.get('dquest-v1')||{};const q=all[day]||{};f(q);all[day]=q;
+  // 오래된 날은 30일치만 남김
+  const ks=Object.keys(all).sort();while(ks.length>30)delete all[ks.shift()];store.set('dquest-v1',all);}
+function dStreak(){const all=store.get('dquest-v1')||{};let n=0,t=Date.now();if(!(all[kstDay(t)]||{}).star)t-=864e5;
+  for(;;){const q=all[kstDay(t)];if(q&&q.star){n++;t-=864e5;}else break;}return n;}
+function dLeft(){const now=Date.now(),k=new Date(now+9*3600e3),mid=Date.UTC(k.getUTCFullYear(),k.getUTCMonth(),k.getUTCDate()+1)-9*3600e3,s=Math.max(0,Math.round((mid-now)/1000));
+  return`${Math.floor(s/3600)}시간 ${Math.floor(s%3600/60)}분`;}
+const D_WX={clear:'맑음',rain:'약한 비',heavy:'강한 비',snow:'눈',fog:'안개'};
+const D_CITY={gangnam:'서울 강남역',toronto:'토론토 레이크쇼어',london:'런던 노스서큘러',edirnekapi:'이스탄불 에디르네카프',tokyo:'도쿄 오하라'};
+function dailyPlay(){const r=DLY.row;if(!r)return;if(typeof journeyClose==='function'&&!JR.hidden)journeyClose();loadMode({kind:'real',id:r.stage,daily:r.day});try{anTrack('daily_start',{day:r.day,stage:r.stage});}catch(e){}}
+// 여정 화면 맨 위 '교통 속보' 카드
+function dailyCard(){const r=DLY.row;
+  if(!r)return`<div class="dcard none"><span class="dtag">오늘의 도전</span><b>${DLY.err?'오늘의 도전을 불러오지 못했습니다':'오늘의 도전을 불러오는 중'}</b>${DLY.err?'<button type="button" class="dretry">다시 시도</button>':''}</div>`;
+  const q=dQuest(r.day),st=dStreak(),wx=D_WX[r.wx]||r.wx,m=r.params&&r.params.mult||{},up=Object.entries(m).filter(([,v])=>v>=1.15).map(([a,v])=>`${({N:'북',E:'동',S:'남',W:'서'})[a]} ${Math.round((v-1)*100)}%↑`);
+  const T=DLY.top;
+  return`<div class="dcard"><div class="dtop"><span class="dtag"><i></i>교통 속보</span><span class="ddate">${r.day.slice(4,6)}월 ${+r.day.slice(6)}일 오늘의 도전</span><span class="dleft">남은 시간 ${dLeft()}</span></div>
+    <div class="dmain"><div class="dtxt"><b class="dtitle">${dEsc(r.title)}</b><p>${dEsc(r.story)}</p>
+      <div class="dchips"><span>${dEsc(D_CITY[r.stage]||REAL[r.stage].title)}</span><span>날씨 ${dEsc(wx)}</span>${up.length?`<span>교통량 ${up.join(', ')}</span>`:''}${r.source==='claude'?'<span class="dai">AI가 만든 시나리오</span>':''}</div></div>
+      <div class="dside"><div class="dq"><b>오늘의 퀘스트</b>
+        <span class="${q.played?'ok':''}">${q.played?'✓':'○'} 오늘의 도전 확정 1번</span><span class="${q.star?'ok':''}">${q.star?'✓':'○'} 별 1개 이상</span><span class="${q.lb?'ok':''}">${q.lb?'✓':'○'} 오늘 랭킹에 등록</span>
+        <small>${st?`연속 ${st}일째 별 획득 중`:'별을 받으면 연속 기록이 시작돼요'}${q.best!=null?`, 오늘 내 최고 ${q.best}점`:''}</small></div>
+        <button type="button" class="primary dgo">${q.played?'다시 도전':'도전하기'}</button></div></div>
+    <div class="dtopn">${T==null?'<small>오늘 순위 불러오는 중</small>':T.length?`<small>오늘의 순위</small>${T.slice(0,3).map((x,i)=>`<span><em>${i+1}</em>${dEsc(x.nickname)} <b>${x.score}</b></span>`).join('')}`:'<small>아직 오늘 순위에 오른 사람이 없어요. 첫 주인공이 되어 보세요</small>'}</div></div>`;}
+async function dailyTop(){const r=DLY.row;if(!r||!window.__lb)return;try{DLY.top=await window.__lb.top(dKey(r.day),r.wx||'clear');}catch(e){DLY.top=[];}dailyRender();}
+function dailyRender(){const box=$('jdaily');if(!box)return;box.innerHTML=dailyCard();
+  const go=box.querySelector('.dgo');if(go)go.onclick=dailyPlay;const rt=box.querySelector('.dretry');if(rt)rt.onclick=()=>{dailyLoad(true).then(()=>{dailyRender();dailyTop();});dailyRender();};}
+// 여정 화면에 카드 자리
+{const sc=$('jscroll'),b=document.createElement('div');b.id='jdaily';b.className='jdaily';sc.insertBefore(b,sc.firstChild);
+  const _jo=journeyOpen;journeyOpen=function(ask){_jo(ask);DLY.top=null;dailyRender();dailyLoad().then(()=>{dailyRender();dailyTop();});};}
+// 게임 메뉴에도 '오늘의 도전'
+{const m=$('jmpop');if(m){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.innerHTML='오늘의 도전<small>하루 한정 교통 상황, 오늘의 순위</small>';
+  b.addEventListener('click',async()=>{m.hidden=true;if(!DLY.row)await dailyLoad();if(DLY.row)dailyPlay();else journeyOpen(false);});m.insertBefore(b,m.firstChild);}}
+// 세션 결과로 퀘스트 갱신
+window.addEventListener('session-done',ev=>{const d=ev.detail;if(!d||!/^daily-/.test(d.stage))return;const day=d.stage.slice(6),rec=d.rec;
+  dQuestSet(day,q=>{q.played=1;if(rec.sameDemand){q.best=Math.max(q.best??-1e9,rec.score);q.stars=Math.max(q.stars||0,rec.stars||0);if(rec.stars>=1)q.star=1;}});
+  try{anTrack('daily_done',{day,score:rec.score,stars:rec.stars});}catch(e){}});
+// 랭킹 등록 성공 표시: lb.js가 남기는 내 최고 기록(lb-best)에 오늘 키가 생기면 등록한 것으로 봄
+setInterval(()=>{try{const r=DLY.row;if(!r)return;const b=JSON.parse(localStorage.getItem('lb-best')||'{}');if(b[dKey(r.day)+':'+(r.wx||'clear')]!=null&&!dQuest(r.day).lb)dQuestSet(r.day,q=>{q.lb=1;});}catch(e){}},3000);
+// 날짜가 바뀐 뒤 어제 도전 모드에 남아 있으면 그대로 두되(어제 기록), 새로 열 때는 오늘 것을 받음
+dailyLoad();
+window.__D={load:dailyLoad,get row(){return DLY.row},play:dailyPlay,streak:dStreak};
+// ---------- 나만의 교차로 생성기: OpenStreetMap 자료로 실제 교차로 스테이지(REAL 형식)를 자동으로 만듦 ----------
+// 입력: osm={nodes:Map(id→{lat,lon,tags}), ways:[{id,nds,tags}]}, q={lat,lon,cc(국가 코드),addr,city,level}
+// 1) 차가 다니는 도로가 3갈래 이상 만나는 지점(신호등 가까울수록, 큰 도로일수록 우선) 2) 분리 차도면 가까운 교차점을 하나로 묶음
+// 3) 교차로에서 바깥으로 도로를 따라가 갈래(접근로)를 찾고, 차로 수(lanes 태그, 없으면 도로 등급 기본값)와 일방통행을 읽음
+// 4) 갈래가 상하좌우에 가장 가깝도록 지도를 돌리고(큰 도로를 위아래로), 좌측 통행 나라는 좌우를 뒤집음(게임 규칙과 같음)
+// 5) 차로 선은 실제 도로 중심선을 따라 그림(정지선 근처만 표준 위치로 맞춤). 교통량과 신호는 도로 등급으로 추정
+// 화면 밖 시험: node로 이 파일만 읽어 cxBuild를 부를 수 있게 순수 함수로 둠(DOM 없음)
+const CX={
+  RANK:{trunk:5,primary:4,secondary:3,tertiary:2,unclassified:1,residential:1,living_street:0,trunk_link:1,primary_link:1,secondary_link:1,tertiary_link:1},
+  LANES:{trunk:3,primary:2,secondary:2,tertiary:1,unclassified:1,residential:1,living_street:1},
+  VPL:{trunk:520,primary:450,secondary:380,tertiary:300,unclassified:220,residential:160,living_street:100},
+  CL:{trunk:'p',primary:'p',motorway:'p',secondary:'s',tertiary:'r',residential:'v',unclassified:'v',living_street:'v',service:'v',primary_link:'l',trunk_link:'l',secondary_link:'l',tertiary_link:'l',motorway_link:'l'},
+  LHT:new Set('jp gb ie au nz in za th my sg id hk mo pk bd lk np ke tz ug zm zw bw na mz mt cy jm tt bb bs mu sc bn pg fj ws to gy sr ls sz mw bt tl im je gg'.split(' ')),
+  LW:3.2};
+const cxBase=h=>(h||'').replace('_link','');
+function cxOneway(t){const o=t.oneway;if(o==='-1'||o==='reverse')return -1;if(o==='yes'||o==='1'||o==='true'||t.junction==='roundabout'||t.junction==='circular'||t.highway==='motorway'||/_link$/.test(t.highway||'')&&o!=='no')return 1;return 0;}
+function cxName(t){return(t['name:ko']||t.name||t.ref||'').replace(/[<>&"']/g,'').slice(0,30);}
+function cxBuild(osm,q){
+  const lat0=q.lat,lon0=q.lon,kx=111320*Math.cos(lat0*Math.PI/180),ky=110540,lht=CX.LHT.has((q.cc||'').toLowerCase()),LW=CX.LW;
+  const P=new Map();for(const [id,n] of osm.nodes)P.set(id,[(n.lon-lon0)*kx,(n.lat-lat0)*ky]);
+  const hyp=p=>Math.hypot(p[0],p[1]);
+  // 차가 다니는 도로(터널, 다리, 통행 금지 제외)
+  const W=osm.ways.filter(w=>{const t=w.tags,h=t.highway;return h&&CX.RANK[h]!=null&&t.tunnel!=='yes'&&t.bridge!=='yes'&&t.area!=='yes'&&t.access!=='no'&&t.access!=='private'&&t.motor_vehicle!=='no'&&w.nds.length>1&&w.nds.every(n=>P.has(n));});
+  if(!W.length)throw new Error('이 근처에서 차가 다니는 도로를 찾지 못했습니다');
+  // 노드별로 붙은 도로 조각 수(가운데 노드는 2, 끝 노드는 1). 3 이상이면 갈림길
+  const deg=new Map(),ws=new Map();
+  for(const w of W)w.nds.forEach((n,i)=>{deg.set(n,(deg.get(n)||0)+((i===0||i===w.nds.length-1)?1:2));if(!ws.has(n))ws.set(n,new Set());ws.get(n).add(w);});
+  const sigs=[...osm.nodes].filter(([,n])=>n.tags&&(n.tags.highway==='traffic_signals'||n.tags['crossing']==='traffic_signals')).map(([id])=>P.get(id));
+  const rankAt=n=>Math.max(...[...ws.get(n)].map(w=>CX.RANK[w.tags.highway]||0));
+  const cands=[...deg].filter(([n,d])=>d>=3&&ws.get(n).size>=2&&hyp(P.get(n))<320).map(([n])=>{const p=P.get(n),sg=sigs.some(s=>Math.hypot(s[0]-p[0],s[1]-p[1])<35);
+    return{n,p,s:hyp(p)-(sg?45:0)-14*rankAt(n)};}).sort((a,b)=>a.s-b.s);
+  if(!cands.length)throw new Error('주소 근처(약 300m)에 차도 교차로가 없습니다. 더 큰 길의 교차로 주소로 해 보세요');
+  // 분리 차도 교차로는 교차점이 여러 개: 큰 도로의 교차점끼리 40m 안이면 하나로 묶음
+  const c0=cands[0],cl=[c0],dual=n=>[...ws.get(n)].some(w=>cxOneway(w.tags)!==0&&(CX.RANK[w.tags.highway]||0)>=2);
+  for(let grow=true;grow;){grow=false;const cx=cl.reduce((s,c)=>s+c.p[0],0)/cl.length,cy=cl.reduce((s,c)=>s+c.p[1],0)/cl.length;
+    for(const c of cands){if(cl.includes(c))continue;const d=Math.hypot(c.p[0]-cx,c.p[1]-cy);if(d<12||(d<42&&dual(c.n)&&dual(c0.n)&&rankAt(c.n)>=2)){cl.push(c);grow=true;}}}
+  if(cl.some(c=>[...ws.get(c.n)].some(w=>/^(roundabout|circular)$/.test(w.tags.junction||''))))throw new Error('회전교차로(로터리)는 아직 만들 수 없어요. 신호등이 있는 네거리나 세거리를 골라 주세요');
+  const C=[cl.reduce((s,c)=>s+c.p[0],0)/cl.length,cl.reduce((s,c)=>s+c.p[1],0)/cl.length],inC=new Set(cl.map(c=>c.n));
+  const spread=Math.max(0,...cl.map(c=>Math.hypot(c.p[0]-C[0],c.p[1]-C[1])));
+  // 좌표: 교차로 중심이 원점, 좌측 통행이면 좌우 뒤집기(회전은 갈래를 찾은 뒤)
+  const T=p=>{const x=p[0]-C[0],y=p[1]-C[1];return[lht?-x:x,y];};
+  const Q=new Map();for(const [id,p] of P)Q.set(id,T(p));
+  // 도로망: 노드 → 이어진 노드(도로, 정방향 여부)
+  const adj=new Map();const link=(a,b,w,f)=>{if(!adj.has(a))adj.set(a,[]);adj.get(a).push({b,w,f});};
+  for(const w of W)for(let i=1;i<w.nds.length;i++){link(w.nds[i-1],w.nds[i],w,true);link(w.nds[i],w.nds[i-1],w,false);}
+  // 바깥으로 따라가기: 꺾임이 가장 작은 길로, 같은 이름이면 우선. 650m 또는 막다른 곳까지
+  function trace(a,e){const pts=[Q.get(a),Q.get(e.b)],edges=[e];let prev=a,cur=e.b,seen=new Set([a,e.b]);
+    while(hyp(Q.get(cur))<650&&pts.length<400){const p=Q.get(cur),dx=p[0]-Q.get(prev)[0],dy=p[1]-Q.get(prev)[1],L0=Math.hypot(dx,dy)||1,nm=cxName(edges[edges.length-1].w.tags);
+      let best=null;for(const x of adj.get(cur)||[]){if(seen.has(x.b))continue;const q2=Q.get(x.b),ex=q2[0]-p[0],ey=q2[1]-p[1],L1=Math.hypot(ex,ey)||1,cos=(dx*ex+dy*ey)/L0/L1;
+        // 바깥쪽으로 가는 길만(되돌아 들어오지 않게)
+        if(hyp(q2)<hyp(p)-3&&hyp(p)>30)continue;const sc=cos+(cxName(x.w.tags)===nm&&nm?0.35:0)+(x.w===edges[edges.length-1].w?0.2:0);if(cos>0.5&&(!best||sc>best.sc))best={...x,sc};}
+      if(!best)break;pts.push(Q.get(best.b));edges.push(best);seen.add(best.b);prev=cur;cur=best.b;}
+    return{pts,edges};}
+  // 묶은 교차점에서 바깥으로 나가는 모든 길(차도 한쪽씩)
+  const br=[];
+  for(const c of cl)for(const e of adj.get(c.n)||[]){if(inC.has(e.b))continue;const t=trace(c.n,e),far=t.pts[t.pts.length-1];
+    if(hyp(far)<Math.max(55,spread+30))continue;
+    // 대표 지점: 중심에서 60m 근처, 방향과 차로는 그 근처 도로 조각으로
+    let k=t.pts.findIndex(p=>hyp(p)>=Math.max(45,spread+25));if(k<1)k=t.pts.length-1;const ref=t.pts[k],eg=t.edges[Math.min(k-1,t.edges.length-1)],tg=eg.w.tags;
+    const ow=cxOneway(tg),outOK=ow===0||(ow===1)===eg.f,inOK=ow===0||(ow===1)!==eg.f,h=cxBase(tg.highway);
+    let lin=0,lout=0;const ln=+tg.lanes||0,lf=+tg['lanes:forward']||0,lb=+tg['lanes:backward']||0,def=CX.LANES[h]||1;
+    if(ow!==0){const n=ln||Math.max(1,def);if(inOK)lin=n;else lout=n;}
+    else{const fw=lf||(ln?Math.floor(ln/2):def),bw=lb||(ln?Math.ceil(ln/2):def);if(eg.f){lout=fw;lin=bw;}else{lout=bw;lin=fw;}}
+    br.push({ang:Math.atan2(ref[1],ref[0]),pts:t.pts,rank:CX.RANK[tg.highway]||0,h,name:cxName(tg),lin:Math.min(6,lin),lout:Math.min(6,lout),two:ow===0,link:/_link$/.test(tg.highway)});}
+  // 같은 방향(35도 안) 길을 한 갈래로
+  const ad=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;};
+  const arms=[];for(const b of br.filter(b=>!b.link).sort((x,y)=>y.rank-x.rank||y.lin+y.lout-x.lin-x.lout)){const g=arms.find(a=>Math.abs(ad(a.ang,b.ang))<35*Math.PI/180);if(g)g.br.push(b);else arms.push({ang:b.ang,br:[b]});}
+  for(const a of arms){a.rank=Math.max(...a.br.map(b=>b.rank));a.h=a.br.find(b=>b.rank===a.rank).h;a.name=(a.br.find(b=>b.name)||{}).name||'';
+    a.bin=a.br.filter(b=>b.lin>0).sort((x,y)=>y.lin-x.lin)[0]||null;a.bout=a.br.filter(b=>b.lout>0).sort((x,y)=>y.lout-x.lout)[0]||null;
+    a.lin=a.bin?a.bin.lin:0;a.lout=a.bout?a.bout.lout:0;a.w=a.rank*10+a.lin+a.lout;}
+  const A=arms.filter(a=>a.lin+a.lout>0).sort((x,y)=>y.w-x.w).slice(0,4);
+  if(A.length<3)throw new Error(`이 지점은 ${A.length}갈래 길이라 교차로로 만들 수 없습니다. 세 갈래 이상 만나는 곳을 골라 주세요`);
+  // 회전: 갈래 방향이 동(0도), 북(90), 서(180), 남(-90)에 가장 가깝게. 가장 큰 도로는 위아래(남북)로
+  const CARD={E:0,N:Math.PI/2,W:Math.PI,S:-Math.PI/2},KEYS=['N','E','S','W'],main=A.reduce((m,a)=>a.w>m.w?a:m,A[0]);
+  let best=null;
+  for(let deg=-180;deg<180;deg+=1){const r=deg*Math.PI/180,used=new Set(),as={};let cost=0,ok=true;
+    for(const a of [...A].sort((x,y)=>y.w-x.w)){const t=a.ang+r;let bk=null,bd=9;for(const k of KEYS){if(used.has(k))continue;const d=Math.abs(ad(t,CARD[k]));if(d<bd){bd=d;bk=k;}}
+      if(bd>Math.PI*0.42){ok=false;break;}used.add(bk);as[bk]=a;cost+=bd*bd*(1+a.w/20);}
+    if(!ok)continue;if(!(as.N===main||as.S===main))cost+=0.15;cost+=0.02*(r/Math.PI)**2;if(!best||cost<best.cost)best={r,as,cost};}
+  if(!best)throw new Error('갈래 방향이 너무 비스듬해 상하좌우 교차로로 맞추지 못했습니다');
+  const r=best.r,cr=Math.cos(r),sr=Math.sin(r),RT=p=>[p[0]*cr-p[1]*sr,p[0]*sr+p[1]*cr],as=best.as;
+  // ----- 차로 기하 -----
+  const HEAD={N:[0,-1],S:[0,1],E:[-1,0],W:[1,0]},OPP={N:'S',S:'N',E:'W',W:'E'},right=d=>[d[1],-d[0]];
+  const nIn={},nOut={},slip={N:false,E:false,S:false,W:false};
+  for(const k of KEYS){const a=as[k];nIn[k]=a?a.lin:0;nOut[k]=a?a.lout:0;}
+  // 회전 방향별로 나갈 갈래가 있는지(우측 통행 기준: 좌회전 = 왼쪽 갈래)
+  const exitOf=(k,mv)=>{const d=HEAD[k],t=mv==='T'?d:mv==='L'?[-d[1],d[0]]:[d[1],-d[0]];return OPP[KEYS.find(x=>HEAD[x][0]===t[0]&&HEAD[x][1]===t[1])];};
+  const mvs={};for(const k of KEYS)mvs[k]=nIn[k]?['L','T','R'].filter(m=>nOut[exitOf(k,m)]>0):[];
+  // 차로 용도: 회전이 있는데 1차로면 정지선 앞에서 2차로로 넓힘(실제 신호 교차로에서 흔한 형태)
+  const lanesOf=(ms,n)=>{if(!ms.length)return[];const has=m=>ms.includes(m);
+    if(n<2&&ms.length>1)n=2;if(n===1)return[ms[0]];
+    if(ms.length===3)return n===2?['LT','TR']:['L',...Array(n-2).fill('T'),'TR'];
+    if(has('L')&&has('T'))return n===2?['LT','T']:['L',...Array(n-1).fill('T')];
+    if(has('T')&&has('R'))return n===2?['T','TR']:[...Array(n-1).fill('T'),'TR'];
+    if(has('L')&&has('R')){const h=Math.ceil(n/2);return[...Array(h).fill('L'),...Array(n-h).fill('R')];}
+    return Array(n).fill(ms[0]);};
+  const lanes={};for(const k of KEYS){lanes[k]=lanesOf(mvs[k],nIn[k]);nIn[k]=lanes[k].length;}
+  const G0={LW,nIn,nOut,slip};
+  // 표준 정지선, 진출 시작 거리(엔진 geoDims와 같은 식)
+  const half=ax=>LW*Math.max(...(ax==='NS'?['N','S']:['E','W']).flatMap(x=>[nIn[x],nOut[x]]));
+  const boxD=k=>(k==='N'||k==='S')?half('EW'):half('NS'),STOP={},EXIT={};for(const k of KEYS){STOP[k]=boxD(k)+4;EXIT[k]=boxD(k);}
+  const dens=(Pl,st=3)=>{const o=[];for(let i=1;i<Pl.length;i++){const a=Pl[i-1],b=Pl[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/st));for(let j=0;j<n;j++)o.push([a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n]);}o.push(Pl[Pl.length-1]);return o;};
+  const offs=(Pl,d)=>Pl.map((p,i)=>{const a=Pl[Math.max(0,i-1)],b=Pl[Math.min(Pl.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[p[0]+dy/l*d,p[1]-dx/l*d];});
+  const r1=Pl=>Pl.map(p=>[Math.round(p[0]*10)/10,Math.round(p[1]*10)/10]);
+  // 바깥쪽 길 끝이 130m보다 짧으면 갈래 방향으로 곧게 늘임
+  const extend=(Pl,k)=>{const u=[-HEAD[k][0],-HEAD[k][1]],e=Pl[Pl.length-1],s=e[0]*u[0]+e[1]*u[1];if(s>=135)return Pl;return[...Pl,[e[0]+u[0]*(140-s),e[1]+u[1]*(140-s)]];};
+  const off={},oOff={},inGeo={},outGeo={},bend={};
+  for(const k of KEYS){const a=as[k];if(!a)continue;const d=HEAD[k],rt=right(d),u=[-d[0],-d[1]],along=q=>q[0]*u[0]+q[1]*u[1],lat=q=>q[0]*rt[0]+q[1]*rt[1];
+    // 들어오는 차로: 바깥 → 안 순서의 중심선에서 오른쪽으로(양방향 도로) 또는 차도 가운데 기준(일방 차도)
+    if(a.bin&&nIn[k]){const cen=extend(a.bin.pts.map(RT),k),inw=dens([...cen].reverse()),n=nIn[k],two=a.bin.two,ls=[],paths=[];
+      for(let i=0;i<n;i++){const o=two?(i+.5)*LW:(i-(n-1)/2)*LW,pth=offs(inw,o);paths.push(pth);const q=pth.reduce((b,x)=>Math.abs(along(x)-(STOP[k]+8))<Math.abs(along(b)-(STOP[k]+8))?x:b,pth[0]);ls.push(lat(q)-(i+.5)*LW);}
+      off[k]=Math.round(ls.reduce((s,v)=>s+v,0)/ls.length*100)/100;inGeo[k]={};
+      paths.forEach((pth,i)=>{const keep=pth.filter(q=>along(q)>STOP[k]+8&&hyp(q)<124).sort((x,y)=>along(y)-along(x));if(keep.length<2)return;
+        keep.push([d[0]*-(STOP[k]+6)+rt[0]*((i+.5)*LW+off[k]),d[1]*-(STOP[k]+6)+rt[1]*((i+.5)*LW+off[k])]);inGeo[k][i]=r1(keep);});}
+    // 나가는 차로: 진행 방향(바깥으로) 오른쪽
+    if(a.bout&&nOut[k]){const dd=HEAD[OPP[k]],ro=right(dd),cen=dens(extend(a.bout.pts.map(RT),k)),n=nOut[k],two=a.bout.two,ls=[],paths=[],al=q=>q[0]*dd[0]+q[1]*dd[1];
+      for(let j=0;j<n;j++){const o=two?(j+.5)*LW:(j-(n-1)/2)*LW,pth=offs(cen,o);paths.push(pth);const q=pth.reduce((b,x)=>Math.abs(al(x)-(EXIT[k]+8))<Math.abs(al(b)-(EXIT[k]+8))?x:b,pth[0]);ls.push(q[0]*ro[0]+q[1]*ro[1]-(j+.5)*LW);}
+      oOff[k]=Math.round(ls.reduce((s,v)=>s+v,0)/ls.length*100)/100;outGeo[k]={};
+      paths.forEach((pth,j)=>{const keep=pth.filter(q=>al(q)>EXIT[k]+8&&hyp(q)<124).sort((x,y)=>al(x)-al(y));if(keep.length<2)return;
+        outGeo[k][j]=r1([[dd[0]*(EXIT[k]+6)+ro[0]*((j+.5)*LW+oOff[k]),dd[1]*(EXIT[k]+6)+ro[1]*((j+.5)*LW+oOff[k])],...keep]);});}
+    // 시뮬레이션 구간(122m) 밖에서 지도 도로를 따라 휘게(app.js bendAt): 중심선의 옆 위치 변화
+    const cb=(a.bin||a.bout).pts.map(RT),res=[];
+    for(let s=110;s<=640;s+=20){let q=null;for(let i=1;i<cb.length;i++){const s0=along(cb[i-1]),s1=along(cb[i]);if((s0-s)*(s1-s)<=0&&s0!==s1){const t=(s-s0)/(s1-s0);q=[cb[i-1][0]+(cb[i][0]-cb[i-1][0])*t,cb[i-1][1]+(cb[i][1]-cb[i-1][1])*t];break;}}
+      if(!q)break;res.push([s,lat(q)]);}
+    if(res.length>1)bend[k]=res.map(([s,v])=>[s,Math.round((v-res[0][1])*10)/10]);}
+  const geo={LW,nIn,nOut,slip,off,oOff,inGeo,outGeo};
+  // ----- 교통량(추정): 진입 차로 수 x 도로 등급별 차로당 대수 x 선택한 붐빔 정도 -----
+  const lv=q.level||1,appr={},vphOf={};
+  for(const k of KEYS){const a=as[k],n=a?a.lin:0;if(!n||!lanes[k].length){appr[k]=[0,0,0,[],false];continue;}
+    const v=Math.min(2600,Math.round(n*(CX.VPL[a.h]||200)*lv/10)*10),ms=mvs[k],has=m=>ms.includes(m);
+    let pl=has('L')?12:0,pr=has('R')?12:0;if(!has('T')){if(has('L')&&has('R')){pl=50;pr=50;}else if(has('L'))pl=100;else if(has('R'))pr=100;}
+    appr[k]=[v,pl,pr,lanes[k],true];vphOf[k]=v/Math.max(1,lanes[k].length);}
+  // ----- 신호(가정): 축별 2현시, 좌회전은 비보호. 녹색은 차로당 교통량에 비례(주기 약 90초) -----
+  const moves=k=>[...new Set(lanes[k].join('').split(''))].filter(m=>'LTR'.includes(m)).map(m=>k+m);
+  const ns=['N','S'].filter(k=>lanes[k].length),ew=['E','W'].filter(k=>lanes[k].length),crit=ks=>Math.max(0,...ks.map(k=>vphOf[k]||0));
+  const phases=[];const tot=crit(ns)+crit(ew)||1;
+  if(ns.length)phases.push({m:ns.flatMap(moves),g:Math.round(Math.max(15,Math.min(60,80*crit(ns)/tot)))});
+  if(ew.length)phases.push({m:ew.flatMap(moves),g:Math.round(Math.max(15,Math.min(60,80*crit(ew)/tot)))});
+  if(phases.length<2)throw new Error('신호를 나눌 갈래가 부족합니다');
+  // ----- 배경 지도: 도로, 건물(높이), 공원 -----
+  const TT=id=>{const p=Q.get(id);return p?RT(p):null;};
+  const simp=(Pl,tol)=>{const o=[Pl[0]];for(const p of Pl.slice(1))if(Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>=tol)o.push(p);if(o[o.length-1]!==Pl[Pl.length-1])o.push(Pl[Pl.length-1]);return o;};
+  const flat=Pl=>Pl.flatMap(p=>[Math.round(p[0]),Math.round(p[1])]);
+  const area=Pl=>Math.abs(Pl.reduce((s,p,i)=>{const q=Pl[(i+1)%Pl.length];return s+p[0]*q[1]-q[0]*p[1];},0))/2;
+  const roads=[],blds=[],bh=[],parks=[];
+  for(const w of osm.ways){const t=w.tags||{};const Pl=w.nds.map(TT).filter(Boolean);if(Pl.length<2)continue;if(t.tunnel==='yes'||String(t.layer||'0').startsWith('-'))continue;
+    const h=t.highway;
+    if(h&&CX.CL[h]){if(Pl.every(p=>Math.abs(p[0])>800||Math.abs(p[1])>800))continue;const c=CX.CL[h],Qp=simp(Pl,c==='v'?5:3);if(c==='v'&&Qp.every(p=>hyp(p)>480))continue;if(roads.length<900)roads.push({c,p:flat(Qp)});continue;}
+    if(t.building&&Pl.length>=4&&Pl.every(p=>hyp(p)<330)&&area(Pl)>40&&blds.length<1600){const Qp=simp(Pl,1.5);if(Qp.length<3)continue;blds.push(flat(Qp));
+      let hh=parseFloat(String(t.height||'').replace(/[^0-9.]/g,''));if(!(hh>0)&&t['building:levels'])hh=parseFloat(t['building:levels'])*3.1;if(!(hh>0))hh=9+((+w.id||0)%7)*1.6;bh.push(Math.round(Math.min(hh,150)*10)/10);continue;}
+    if((/^(park|garden|pitch|playground)$/.test(t.leisure||'')||/^(grass|forest|recreation_ground|meadow|cemetery)$/.test(t.landuse||''))&&w.nds[0]===w.nds[w.nds.length-1]&&Pl.some(p=>hyp(p)<500)&&parks.length<200)parks.push(flat(simp(Pl,3)));}
+  // 갈래 이름 글자(교차로에서 75m)
+  const labels=[];for(const k of KEYS){const a=as[k];if(!a||!a.name)continue;const u=[-HEAD[k][0],-HEAD[k][1]],rt=right(HEAD[k]);labels.push([a.name,Math.round(u[0]*78+rt[0]*-6),Math.round(u[1]*78+rt[1]*-6),(k==='N'||k==='S')?90:0]);}
+  // ----- 스테이지 정보 -----
+  const KO={N:'북',E:'동',S:'남',W:'서'},nm=k=>as[k]?(as[k].name||`${KO[k]}쪽 길`):'',rotDeg=Math.round(r*180/Math.PI*10)/10,geoRot=lht?-rotDeg:rotDeg;
+  const arm={};for(const k of KEYS)arm[k]=as[k]?`${nm(k)} (${KO[k]}쪽)`:'(길 없음)';
+  const lanesSrc=A.some(a=>a.br.some(b=>b.lin+b.lout>0))?'OpenStreetMap lanes 태그, 없으면 도로 등급 기본값':'도로 등급 기본값';
+  const mainName=(as.N&&as.N.name)||(as.S&&as.S.name)||'큰 도로';
+  const def={custom:true,title:q.name||[...new Set(KEYS.map(nm).filter(Boolean))].slice(0,2).join(' x ')||'나만의 교차로',city:q.city||'',rot:-geoRot,lht:lht||undefined,
+    geoRef:{lat:+(lat0+C[1]/ky).toFixed(6),lon:+(lon0+C[0]/kx).toFixed(6),rot:geoRot,ox:0,oy:0},bend,
+    desc:`${q.addr||'입력한 주소'} 근처 교차로로 만든 나만의 교차로입니다.`,
+    srcNote:'도로와 차로는 OpenStreetMap에서 자동으로 읽었고, 교통량과 신호는 도로 등급으로 추정한 값입니다. 실제와 다를 수 있습니다.',
+    orient:`지도를 약 ${Math.abs(Math.round(rotDeg))}도 돌려 ${mainName}을(를) 위아래로 맞췄습니다.`,arm,geo,
+    appr:Object.fromEntries(KEYS.map(k=>[k,appr[k]])),phases,
+    data:[['갈래와 차로: '+KEYS.filter(k=>as[k]).map(k=>`${KO[k]} 진입 ${nIn[k]} / 진출 ${nOut[k]}`).join(', '),'자동 추출',lanesSrc],
+      ['교통량: '+KEYS.filter(k=>appr[k][0]).map(k=>`${KO[k]} ${appr[k][0].toLocaleString()}대/시`).join(', '),'추정',`진입 차로 수 x 도로 등급별 차로당 교통량(간선 450, 보조간선 380, 일반 300, 이면도로 160대/시) x 붐빔 정도 ${lv}배`],
+      ['회전 비율: 좌회전 12%, 우회전 12%(직진이 없는 갈래는 좌우 반반)','가정','교차로별 회전 교통량 자료 없음'],
+      ['신호: 남북, 동서 2현시, 좌회전 비보호','가정','실제 신호 운영 자료 없음'],
+      ['지도','공식 자료','OpenStreetMap contributors (ODbL)']],
+    bh,ctx:{roads,blds,parks,pois:[],labels}};
+  return{def,info:{arms:KEYS.filter(k=>as[k]).map(k=>({k,name:nm(k),cls:as[k].h,nIn:nIn[k],nOut:nOut[k],vph:appr[k][0]})),lht,rot:rotDeg,cluster:cl.length,signals:sigs.length,center:def.geoRef}};}
+// Overpass(JSON)와 OSM API(XML) 자료를 같은 모양으로
+function cxFromOverpass(j){const nodes=new Map(),ways=[];for(const e of j.elements||[]){if(e.type==='node')nodes.set(String(e.id),{lat:e.lat,lon:e.lon,tags:e.tags||{}});else if(e.type==='way')ways.push({id:String(e.id),nds:e.nodes.map(String),tags:e.tags||{}});}return{nodes,ways};}
+if(typeof module!=='undefined')module.exports={cxBuild,cxFromOverpass,CX};
+// ---------- 나만의 교차로: 주소로 스테이지 만들기, 링크 공유, 친구들과 공동 기록판 ----------
+// 만들기: 주소 검색(Nominatim) → 지도 자료(Overpass, 실패하면 OSM API) → cxbuild.js가 스테이지 생성 → Supabase custom_stages에 저장
+// 플레이: REAL['c_<id>']에 넣고 실제 교차로 모드로(mode={kind:'real',id:'c_<id>'}). 기록 키는 'custom-<id>'(공식 랭킹 밖)
+// 공유: https://pdavid97.github.io/intersection-game/#c=<id>. 받은 사람도 같은 스테이지를 엶
+// 공동 기록판: custom_runs 표. 점수, 설정, 한 줄 메모를 올리고 서로의 설정을 불러와 이어서 고침
+const CXU={osm:null,q:null,built:null,level:1,pending:null,busy:false};
+const CX_SB='https://qjguvtmkrkbtpvdnyelp.supabase.co',CX_KEY='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp',CX_PUB='https://pdavid97.github.io/intersection-game/';
+const cxEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cxClean=x=>String(x??'').replace(/[<>&"'`]/g,'').slice(0,60);
+const cxIdOf=()=>mode.kind==='real'&&REAL[mode.id]&&REAL[mode.id].custom?mode.id.slice(2):null;
+// ---- 저장소: 내가 만들거나 열어 본 교차로 목록(최근 8개), 스테이지 자료 캐시(최근 4개) ----
+function cxMine(){return store.get('cx-mine-v1')||[];}
+function cxRemember(id,name,addr,own){const L=cxMine().filter(x=>x.id!==id);L.unshift({id,name:cxClean(name),addr:cxClean(addr),own:!!own||(cxMine().find(x=>x.id===id)||{}).own,at:Date.now()});store.set('cx-mine-v1',L.slice(0,8));}
+function cxCache(id,def){try{const k='cx-def-'+id;localStorage.setItem(k,JSON.stringify(def));const ks=(store.get('cx-defs-v1')||[]).filter(x=>x!==id);ks.unshift(id);while(ks.length>4){try{localStorage.removeItem('cx-def-'+ks.pop());}catch(e){}}store.set('cx-defs-v1',ks);}catch(e){}}
+function cxCached(id){try{return JSON.parse(localStorage.getItem('cx-def-'+id));}catch(e){return null;}}
+// ---- 서버 ----
+async function cxAuth(){if(!window.__lb)throw new Error('로그인 모듈 없음');return window.__lb.token();}
+async function cxApi(path,opt={}){const a=opt.auth?await cxAuth():null;const r=await fetch(CX_SB+'/rest/v1/'+path,{method:opt.method||'GET',headers:{apikey:CX_KEY,...(a?{Authorization:'Bearer '+a.access}:{}),'Content-Type':'application/json',...(opt.prefer?{Prefer:opt.prefer}:{})},body:opt.body?JSON.stringify(opt.body):undefined});
+  if(!r.ok)throw new Error(`서버 오류 ${r.status}`);return r.status===204||r.status===201&&!opt.prefer?.includes('representation')?null:r.json();}
+const cxNewId=()=>{const a='abcdefghijkmnpqrstuvwxyz23456789';let s='';const b=crypto.getRandomValues(new Uint8Array(8));for(const x of b)s+=a[x%a.length];return s;};
+async function cxSave(def,meta){const id=cxNewId();await cxApi('custom_stages',{method:'POST',auth:true,prefer:'return=minimal',body:{id,name:cxClean(def.title).slice(0,40)||'나만의 교차로',addr:cxClean(meta.addr).slice(0,200),lat:def.geoRef.lat,lon:def.geoRef.lon,def}});return id;}
+async function cxLoad(id){const c=cxCached(id);if(c)return c;const rows=await cxApi(`custom_stages?id=eq.${encodeURIComponent(id)}&select=id,name,addr,def`);if(!rows||!rows[0])throw new Error('공유된 교차로를 찾지 못했습니다');
+  const d=rows[0].def;d.title=rows[0].name;d._addr=rows[0].addr;cxCache(id,d);return d;}
+// 받은 자료 정리: 글자는 태그가 될 수 있는 문자를 빼고, 표시용 필드만 남김
+function cxRegister(id,def){const d=def;d.id='c_'+id;d.custom=true;d.title=cxClean(d.title)||'나만의 교차로';d.city=cxClean(d.city);d.desc=cxClean(d.desc).slice(0,200);d.srcNote=cxClean(d.srcNote).slice(0,200);d.orient=cxClean(d.orient);
+  for(const k of ['N','E','S','W'])d.arm[k]=cxClean(d.arm&&d.arm[k]);d.data=(d.data||[]).map(r=>r.map(x=>cxClean(x).slice(0,160)));if(d.ctx)d.ctx.labels=(d.ctx.labels||[]).map(l=>[cxClean(l[0]),+l[1],+l[2],+l[3]]);d.ctx.pois=[];
+  REAL[d.id]=d;return d;}
+function cxPlay(id){if(typeof JR!=='undefined'&&!JR.hidden)journeyClose();cxClose();loadMode({kind:'real',id:'c_'+id});try{anTrack('custom_play',{id});}catch(e){}}
+// ---- 지도 자료 ----
+async function cxGeocode(q){const u=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&accept-language=ko&q=${encodeURIComponent(q)}`;
+  const r=await fetch(u);if(!r.ok)throw new Error('주소 검색 서버 오류 '+r.status);const j=await r.json();
+  return j.map(x=>({lat:+x.lat,lon:+x.lon,name:x.display_name,cc:(x.address&&x.address.country_code)||'',city:(x.address&&(x.address.city||x.address.town||x.address.county||x.address.state))||'',short:x.name||''}));}
+const CX_OVP=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
+async function cxFetchOsm(lat,lon,say){const Q=`[out:json][timeout:25];(way(around:700,${lat},${lon})["highway"];way(around:380,${lat},${lon})["building"];way(around:480,${lat},${lon})["leisure"~"park|garden|pitch|playground"];way(around:480,${lat},${lon})["landuse"~"grass|forest|recreation_ground|meadow|cemetery"];node(around:350,${lat},${lon})["highway"="traffic_signals"];);out body;>;out skel qt;`;
+  for(const [i,u] of CX_OVP.entries()){try{say(`지도 자료 받는 중${i?` (예비 서버 ${i})`:''}`);const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),30000);
+      const r=await fetch(u,{method:'POST',body:'data='+encodeURIComponent(Q),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ctl.signal});clearTimeout(to);if(!r.ok)continue;return cxFromOverpass(await r.json());}catch(e){}}
+  // 마지막 수단: OSM 편집 API(영역이 좁아야 함)
+  say('지도 자료 받는 중 (OSM 기본 서버)');const d=0.0055,dl=d/Math.max(.3,Math.cos(lat*Math.PI/180));const r=await fetch(`https://api.openstreetmap.org/api/0.6/map?bbox=${(lon-dl).toFixed(5)},${(lat-d).toFixed(5)},${(lon+dl).toFixed(5)},${(lat+d).toFixed(5)}`);
+  if(!r.ok)throw new Error('지도 자료를 받지 못했습니다. 잠시 뒤 다시 해 보세요');const x=new DOMParser().parseFromString(await r.text(),'text/xml'),nodes=new Map(),ways=[],tg=e=>Object.fromEntries([...e.getElementsByTagName('tag')].map(t=>[t.getAttribute('k'),t.getAttribute('v')]));
+  for(const n of x.getElementsByTagName('node'))nodes.set(n.getAttribute('id'),{lat:+n.getAttribute('lat'),lon:+n.getAttribute('lon'),tags:tg(n)});
+  for(const w of x.getElementsByTagName('way'))ways.push({id:w.getAttribute('id'),nds:[...w.getElementsByTagName('nd')].map(n=>n.getAttribute('ref')),tags:tg(w)});return{nodes,ways};}
+// ---- 만들기 창 ----
+const CXB=(()=>{const d=document.createElement('div');d.className='cxbox';d.id='cxbox';d.hidden=true;
+  d.innerHTML=`<div class="cxpanel" role="dialog" aria-label="나만의 교차로 만들기"><div class="cxh"><b>나만의 교차로 만들기</b><button type="button" class="cxx">닫기</button></div>
+    <div class="cxs1"><p class="cxp">우리 동네 교차로의 주소나 이름을 넣으면 OpenStreetMap 지도로 스테이지를 만들어요. 친구에게 링크를 보내 함께 최적의 신호를 찾아보세요.</p>
+      <form class="cxf"><input id="cxq" maxlength="120" placeholder="예: 신촌오거리, 서울 마포구 양화로 45, 시청역 교차로" autocomplete="off"><button type="submit" class="primary">찾기</button></form>
+      <div class="cxres" id="cxres"></div></div>
+    <div class="cxs2" hidden><div class="cxst" id="cxst"></div>
+      <div class="cxpv"><canvas id="cxcv" width="300" height="300" aria-label="만들 교차로 미리보기"></canvas><div class="cxinfo" id="cxinfo"></div></div>
+      <div class="cxopt" id="cxopt" hidden><label>이름 <input id="cxname" maxlength="40"></label>
+        <div class="cxlv"><span>교통량</span><div class="seg" id="cxlv"><button type="button" data-l="0.7">한산</button><button type="button" data-l="1" class="on">보통</button><button type="button" data-l="1.3">붐빔</button></div></div>
+        <div class="cxbtn"><button type="button" class="primary" id="cxgo">만들고 플레이</button><button type="button" id="cxback">다른 곳 찾기</button></div>
+        <small class="cxnote">교통량과 신호는 도로 크기로 추정한 값이라 실제와 다를 수 있어요. 공식 랭킹 대신 친구들과 쓰는 공동 기록판이 생겨요.</small></div></div></div>`;
+  document.body.appendChild(d);return d;})();
+const cxSay=t=>{$('cxst').textContent=t;};
+function cxOpen(){CXB.hidden=false;CXB.querySelector('.cxs1').hidden=false;CXB.querySelector('.cxs2').hidden=true;$('cxres').innerHTML='';setTimeout(()=>{try{$('cxq').focus();}catch(e){}},50);try{anTrack('custom_open',{});}catch(e){}}
+function cxClose(){CXB.hidden=true;}
+CXB.querySelector('.cxx').addEventListener('click',cxClose);CXB.addEventListener('click',e=>{if(e.target===CXB)cxClose();});
+$('cxback').addEventListener('click',()=>{CXB.querySelector('.cxs1').hidden=false;CXB.querySelector('.cxs2').hidden=true;});
+CXB.querySelector('.cxf').addEventListener('submit',async e=>{e.preventDefault();const q=$('cxq').value.trim();if(q.length<2||CXU.busy)return;const box=$('cxres');box.innerHTML='<div class="cxp">찾는 중</div>';CXU.busy=true;
+  try{const L=await cxGeocode(q);box.innerHTML=L.length?L.map((x,i)=>`<button type="button" class="cxr" data-i="${i}"><b>${cxEsc(x.short||x.name.split(',')[0])}</b><span>${cxEsc(x.name)}</span></button>`).join(''):'<div class="cxp">찾은 곳이 없어요. 동네 이름과 함께, 또는 다른 표기로 넣어 보세요.</div>';CXU.found=L;}
+  catch(err){box.innerHTML=`<div class="cxp bad">${cxEsc(err.message)}</div>`;}finally{CXU.busy=false;}});
+$('cxres').addEventListener('click',async e=>{const b=e.target.closest('.cxr');if(!b||CXU.busy)return;const x=CXU.found[+b.dataset.i];CXU.busy=true;
+  CXB.querySelector('.cxs1').hidden=true;CXB.querySelector('.cxs2').hidden=false;$('cxopt').hidden=true;$('cxinfo').innerHTML='';const c=$('cxcv').getContext('2d');c.clearRect(0,0,300,300);
+  try{CXU.osm=await cxFetchOsm(x.lat,x.lon,cxSay);cxSay('교차로 찾는 중');await new Promise(r=>setTimeout(r,30));
+    CXU.q={lat:x.lat,lon:x.lon,cc:x.cc,city:x.city,addr:x.name.split(',').slice(0,3).join(',')};cxRebuild();$('cxname').value=CXU.built.def.title;$('cxopt').hidden=false;
+    try{anTrack('custom_built',{cc:x.cc,arms:CXU.built.info.arms.length});}catch(e){}}
+  catch(err){cxSay(err.message);try{anTrack('custom_fail',{msg:String(err.message).slice(0,60)});}catch(e){}}finally{CXU.busy=false;}});
+function cxRebuild(){CXU.built=cxBuild(CXU.osm,{...CXU.q,level:CXU.level});const {def,info}=CXU.built;
+  cxSay(`${info.arms.length}갈래 교차로를 찾았어요${info.signals?' (근처에 신호등 있음)':''}`);
+  const KO={N:'북',E:'동',S:'남',W:'서'},CLS={trunk:'간선',primary:'간선',secondary:'보조간선',tertiary:'일반 도로',unclassified:'작은 길',residential:'이면도로',living_street:'생활 도로'};
+  $('cxinfo').innerHTML=info.arms.map(a=>`<div><b>${KO[a.k]}</b><span>${cxEsc(a.name||'이름 없는 길')}</span><small>${CLS[a.cls]||a.cls}, 진입 ${a.nIn}차로 / 진출 ${a.nOut}차로${a.vph?`, ${a.vph.toLocaleString()}대/시`:''}</small></div>`).join('')+(info.lht?'<small class="cxlht">좌측 통행 나라라 게임 화면에서 좌우가 실제처럼 뒤집혀 보여요</small>':'');
+  cxPreview(def);}
+// 미리보기: 배경 도로, 건물, 차로 선(교차로 중심, 위가 지도 '북쪽' 갈래)
+function cxPreview(def){const cv=$('cxcv'),c=cv.getContext('2d'),S=300,k=S/300,mx=def.lht?-1:1,P=(x,y)=>[S/2+mx*x*k,S/2-y*k];c.setTransform(1,0,0,1,0,0);c.fillStyle='#e9e2d6';c.fillRect(0,0,S,S);
+  const X=def.ctx;c.fillStyle='#cdbfae';for(const b of X.blds){c.beginPath();for(let i=0;i<b.length;i+=2){const p=P(b[i],b[i+1]);i?c.lineTo(...p):c.moveTo(...p);}c.closePath();c.fill();}
+  const W={p:16,s:11,r:7,v:4,l:4.5};c.lineCap='round';c.lineJoin='round';
+  for(const r of X.roads){if(!W[r.c])continue;c.strokeStyle='#fff';c.lineWidth=W[r.c]*k;c.beginPath();for(let i=0;i<r.p.length;i+=2){const p=P(r.p[i],r.p[i+1]);i?c.lineTo(...p):c.moveTo(...p);}c.stroke();}
+  const G=def.geo;c.lineWidth=1.6;for(const [g,col] of [[G.inGeo,'#2459a8'],[G.outGeo,'#d44a4a']])for(const a in g)for(const i in g[a]){const L=g[a][i];c.strokeStyle=col;c.beginPath();L.forEach((q,j)=>{const p=P(q[0],q[1]);j?c.lineTo(...p):c.moveTo(...p);});c.stroke();}
+  c.fillStyle='#3a2313';c.font='700 12px "IBM Plex Sans KR",sans-serif';c.textAlign='center';c.textBaseline='middle';for(const [a,x,y] of [['북',0,130],['남',0,-130],['동',130,0],['서',-130,0]]){const p=P(mx*x,y);c.fillText(a,p[0],p[1]);}}
+$('cxlv').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b||!CXU.osm)return;CXU.level=+b.dataset.l;$('cxlv').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));const nm=$('cxname').value;cxRebuild();$('cxname').value=nm;});
+$('cxgo').addEventListener('click',async()=>{if(!CXU.built||CXU.busy)return;CXU.busy=true;const def=CXU.built.def;def._addr=CXU.q.addr;def.title=cxClean($('cxname').value.trim()).slice(0,40)||def.title;const nick=store.get('lb-nick');if(nick)def.by=cxClean(nick).slice(0,20);
+  cxSay('저장하는 중');let id=null,local=false;
+  try{id=await cxSave(def,CXU.q);}catch(e){local=true;id='l'+cxNewId().slice(1);}
+  cxCache(id,def);cxRemember(id,def.title,CXU.q.addr,true);cxRegister(id,JSON.parse(JSON.stringify(def)));CXU.busy=false;cxPlay(id);
+  setTimeout(()=>cxToast(local?'서버에 저장하지 못해 이 기기에서만 열 수 있어요(공유 불가)':'만들었어요! 메뉴 옆 \'공동 기록판\'에서 친구에게 링크를 보내 보세요'),400);
+  try{anTrack('custom_create',{local});}catch(e){}});
+// ---- 알림 한 줄 ----
+function cxToast(t){let el=$('cxtoast');if(!el){el=document.createElement('div');el.id='cxtoast';el.className='cxtoast';document.body.appendChild(el);}el.textContent=t;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>{el.hidden=true;},5200);}
+// ---- 공동 기록판 ----
+const cxLink=id=>CX_PUB+'#c='+id;
+async function cxRuns(id){return cxApi(`custom_runs?stage_id=eq.${encodeURIComponent(id)}&select=id,user_id,nickname,score,persons,speed,memo,cfg,created_at&order=score.desc,created_at.asc&limit=60`);}
+const cxAgo=t=>{const s=(Date.now()-new Date(t).getTime())/1000;return s<3600?Math.max(1,Math.round(s/60))+'분 전':s<86400?Math.round(s/3600)+'시간 전':Math.round(s/86400)+'일 전';};
+async function cxBoardHTML(id){const R=REAL['c_'+id],local=id[0]==='l';let runs=[];let err='';if(!local)try{runs=await cxRuns(id);}catch(e){err=e.message;}
+  const best=runs[0],uid=(store.get('lb-auth-v1')||{}).uid;CXU.runs=runs;
+  return`<div class="cxboard"><div class="cxbh"><b>${cxEsc(R.title)}</b><small>${cxEsc(R._addr||'')}${R.by?` · 만든 사람 ${cxEsc(R.by)}`:''}</small></div>
+    ${local?'<p class="cxp">이 교차로는 서버에 저장되지 않아 공유할 수 없어요.</p>':`<div class="cxshare"><input readonly value="${cxEsc(cxLink(id))}" id="cxlink"><button type="button" class="primary" id="cxcopy">링크 복사</button>${navigator.share?'<button type="button" id="cxsh">공유</button>':''}</div>`}
+    <p class="cxp">공식 랭킹에는 들어가지 않아요. 친구가 올린 설정을 불러와 이어서 고치고, 무엇을 바꿨는지 한 줄로 남겨 함께 최고 점수를 찾아보세요.</p>
+    ${best?`<div class="cxbest">지금까지 모두의 최고 <b>${best.score}점</b> ${cxEsc(best.nickname)}${best.memo?`: “${cxEsc(best.memo)}”`:''}</div>`:''}
+    ${err?`<p class="cxp bad">${cxEsc(err)}</p>`:runs.length?`<table class="cxt"><thead><tr><th>#</th><th>닉네임</th><th class="n">점수</th><th>메모</th><th></th></tr></thead><tbody>${runs.slice(0,30).map((r,i)=>`<tr class="${r.user_id===uid?'me':''}"><td>${i+1}</td><td>${cxEsc(r.nickname)}<small>${cxAgo(r.created_at)}</small></td><td class="n">${r.score}</td><td class="m">${cxEsc(r.memo||'')}</td><td><button type="button" class="link" data-run="${i}">불러오기</button></td></tr>`).join('')}</tbody></table>`:(local?'':'<p class="cxp">아직 올라온 기록이 없어요. 확정하면 첫 기록을 올릴 수 있어요.</p>')}</div>`;}
+function cxWire(box,id){const cp=box.querySelector('#cxcopy');if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(cxLink(id));cp.textContent='복사했어요';}catch(e){const i=box.querySelector('#cxlink');i.select();cp.textContent='길게 눌러 복사';}};
+  const sh=box.querySelector('#cxsh');if(sh)sh.onclick=()=>navigator.share({title:'Green Light! 나만의 교차로',text:`${REAL['c_'+id].title}: 같이 신호 맞춰 보자`,url:cxLink(id)}).catch(()=>{});
+  box.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>cxApply(CXU.runs[+b.dataset.run]));}
+// 다른 사람 설정 불러오기: 같은 스테이지(차로 수가 맞는) 설정만
+function cxApply(run){if(!run||!run.cfg)return;const base=baseCfg(),c=run.cfg;if(!c.geo||!c.appr||!c.phases||['N','E','S','W'].some(a=>!c.appr[a]||(c.geo.nIn[a]||0)+(c.geo.nOut[a]||0)!==(base.geo.nIn[a]||0)+(base.geo.nOut[a]||0))){cxToast('이 기록은 지금 교차로와 맞지 않아 불러오지 못했어요');return;}
+  cfg=clone(c);for(const a of APPR){cfg.appr[a].vph=base.appr[a].vph;cfg.appr[a].pl=base.appr[a].pl;cfg.appr[a].pr=base.appr[a].pr;}closeModal();syncControls();startSession();buildArms();updateUI();cxToast(`${run.nickname}님의 설정(${run.score}점)을 불러왔어요. 관찰하고 고쳐서 다시 올려 보세요`);}
+const CX_SEC=(()=>{const h=document.createElement('div');h.hidden=true;const s=document.createElement('div');s.id='cxboardsec';h.appendChild(s);document.body.appendChild(h);return s;})();
+async function cxBoard(){const id=cxIdOf();if(!id)return;const sec=CX_SEC;sec.innerHTML='<p class="cxp">불러오는 중</p>';openModal('공동 기록판',[sec]);sec.innerHTML=await cxBoardHTML(id);cxWire(sec,id);}
+// 세션 결과: 공동 기록판에 올리기(닉네임 + 한 줄 메모)
+window.addEventListener('session-done',async ev=>{const d=ev.detail;if(!d||!/^custom-/.test(d.stage))return;const id=d.stage.slice(7),box=$('lbbox');if(!box)return;
+  if(id[0]==='l'){box.innerHTML='<div class="lb"><div class="msg">이 기기에만 있는 교차로라 공동 기록판이 없어요.</div></div>';return;}
+  const nick=store.get('lb-nick')||'',rec=d.rec;
+  box.innerHTML=`<div class="lb"><h3>공동 기록판</h3>${rec.sameDemand?`<div class="row"><label>닉네임 <input class="cxnick" maxlength="20" value="${cxEsc(nick)}"></label><label class="cxmemo">무엇을 바꿨나요 <input class="cxm" maxlength="80" placeholder="예: 남북 직진 녹색 +8초, 동측 좌회전 보호"></label><button type="button" class="primary cxpost">기록판에 올리기 (${rec.score}점)</button><span class="msg cxmsg"></span></div>`:'<div class="msg">교통량이나 날씨를 바꾼 세션은 올리지 않아요.</div>'}<div class="cxlist"></div></div>`;
+  const list=box.querySelector('.cxlist');const show=async()=>{list.innerHTML=await cxBoardHTML(id);cxWire(list,id);};show();
+  const go=box.querySelector('.cxpost');if(go)go.onclick=async()=>{const n=box.querySelector('.cxnick').value.trim(),m=box.querySelector('.cxm').value.trim(),msg=box.querySelector('.cxmsg');
+    if(!n){msg.textContent='닉네임을 넣어 주세요';return;}store.set('lb-nick',n);go.disabled=true;msg.textContent='올리는 중';
+    try{const st=rec.st;await cxApi('custom_runs',{method:'POST',auth:true,prefer:'return=minimal',body:{stage_id:id,nickname:cxClean(n).slice(0,20),score:Math.round(rec.score),persons:st.persons,speed:+st.spd.toFixed(2),cfg:rec.cfg,memo:cxClean(m).slice(0,80)||null}});
+      msg.textContent='올렸어요';await show();try{anTrack('custom_run',{id});}catch(e){}}catch(e){go.disabled=false;msg.textContent=e.message;}};});
+// ---- 게임 화면: 나만의 교차로일 때 '공동 기록판' 버튼 ----
+{const b=document.createElement('button');b.type='button';b.id='cxchip';b.className='chip cxchip';b.textContent='공동 기록판';b.hidden=true;const j=$('jbtn');(j?j.parentNode:$('hudtop')).insertBefore(b,j?j.nextSibling:null);b.addEventListener('click',cxBoard);
+  setInterval(()=>{b.hidden=!cxIdOf();},500);}
+// ---- 여정 화면: 나들목에 '나만의 교차로' 표지판 ----
+{const _je=jExits;jExits=function(){_je();const box=$('jexits'),L=cxMine();
+  box.insertAdjacentHTML('beforeend',`<button type="button" class="jcx new" data-cx="new"><span class="jeno">MY ROAD</span><b>나만의 교차로</b><span class="jeix">주소로 만들고 친구와 공유</span><i class="jeplus">+</i></button>`+
+    L.map(x=>`<button type="button" class="jcx" data-cx="${cxEsc(x.id)}"><span class="jeno">${x.own?'MY':'친구'}</span><b>${cxEsc(x.name)}</b><span class="jeix">${cxEsc((x.addr||'').split(',')[0])}</span><i class="jearr"></i></button>`).join(''));};}
+$('jexits').addEventListener('click',async e=>{const b=e.target.closest('.jcx');if(!b)return;e.stopPropagation();const id=b.dataset.cx;if(id==='new'){cxOpen();return;}
+  try{const d=await cxLoad(id);cxRegister(id,d);cxRemember(id,d.title,d._addr||'');cxPlay(id);}catch(err){cxToast(err.message);}},true);
+// 게임 메뉴에도
+{const m=$('jmpop');if(m){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.innerHTML='나만의 교차로 만들기<small>우리 동네 주소로 스테이지 만들기</small>';b.addEventListener('click',()=>{m.hidden=true;cxOpen();});m.appendChild(b);}}
+// ---- 공유 링크로 들어온 경우(#c=<id>): 첫 화면에서 '게임 시작'을 누르면 바로 그 교차로로 ----
+{const h=(location.hash.match(/[#&]c=([a-z0-9]{8})/)||[])[1];if(h){CXU.pending=h;cxLoad(h).then(d=>{cxRegister(h,d);cxRemember(h,d.title,d._addr||'');CXU.ready=h;
+    if(!document.body.classList.contains('titleon')){cxPlay(h);cxToast(`친구가 공유한 교차로: ${d.title}`);}}).catch(e=>{CXU.pending=null;cxToast(e.message);});
+  const _tc=titleClose;titleClose=function(){_tc();if(CXU.ready){const id=CXU.ready;CXU.ready=null;cxPlay(id);setTimeout(()=>cxToast(`친구가 공유한 교차로: ${REAL['c_'+id].title}`),300);}};}}
+// 지난번에 하던 나만의 교차로가 있으면 이어서(이 기기에 자료가 있을 때)
+{const last=store.get('last-v3');if(!CXU.pending&&last&&last.kind==='real'&&/^c_/.test(last.id||'')){const id=last.id.slice(2),d=cxCached(id);if(d){cxRegister(id,d);loadMode({kind:'real',id:last.id});}}}
+window.__cx={open:cxOpen,board:cxBoard,build:(osm,q)=>cxBuild(osm,q),register:cxRegister,play:cxPlay};
 // ---------- 새 버전 알림: 공개 주소에서 5분마다 배포본의 빌드 번호를 확인해, 바뀌었으면 새로고침 안내 ----------
 // GitHub Pages는 페이지를 10분까지 캐시하므로, 열어 둔 화면이 옛 버전인 채로 남는 것을 막음
 {const me=(document.querySelector('meta[name="gl-build"]')||{}).content;
@@ -3602,7 +4040,7 @@ async function render(el,d,note){const a=ls.get('lb-auth-v1'),uid=a&&a.uid,wn=d.
 function formHTML(d){const nick=ls.get('lb-nick')||'';
   return`<div class="row"><label>닉네임 <input class="lbnick" maxlength="20" value="${esc(nick)}" placeholder="1~20자"></label><button type="button" class="lbgo primary">이 기록 등록</button><span class="lbmsg msg"></span><span class="lbmine msg"></span></div>`;}
 // ---------- 세션 끝 ----------
-window.addEventListener('session-done',async ev=>{const d=ev.detail,box=$('lbbox');if(!box)return;box.innerHTML='';
+window.addEventListener('session-done',async ev=>{const d=ev.detail,box=$('lbbox');if(!box)return;if(/^custom-/.test(d.stage))return;box.innerHTML='';
   if(!d.eligible){box.innerHTML='<div class="lb"><div class="msg">교통량을 바꾸거나 실험실에서 한 세션은 랭킹에 올라가지 않습니다.</div></div>';return;}
   const nick=ls.get('lb-nick'),b=ls.get('lb-best')||{},k=d.stage+':'+d.weather,prevBest=b[k];
   let note=formHTML(d);
@@ -3618,7 +4056,7 @@ window.addEventListener('session-done',async ev=>{const d=ev.detail,box=$('lbbox
   else if(nick&&prevBest!=null){msg.textContent=`내 최고 ${prevBest}점보다 낮아 자동 등록하지 않았습니다`;}});
 // ---------- 조작 막대의 랭킹 버튼 ----------
 function wire(){const anchor=$('resetcfg');if(!anchor||$('lbbtn'))return;const b=document.createElement('button');b.type='button';b.id='lbbtn';b.textContent='랭킹';b.title='이 스테이지 랭킹 보기';anchor.after(b);
-  b.onclick=()=>{const G=g();if(!G)return;const m=G.mode;if(m.kind==='lab'){alertBox('실험실은 랭킹이 없습니다');return;}
+  b.onclick=()=>{const G=g();if(!G)return;const m=G.mode;if(m.kind==='lab'){alertBox('실험실은 랭킹이 없습니다');return;}if(/^custom-/.test(G.modeId())&&window.__cx){window.__cx.board();return;}
     const R=G.curReal(),w=(G.cfg&&G.cfg.wx)||'clear',d={stage:G.modeId(),weather:w,title:R?R.title:''};
     const sec=$('lbsec'),body=$('lbsecbody');render(body,d,'');G.openModal('랭킹',[sec]);};}
 function alertBox(t){const G=g();const sec=$('lbsec'),body=$('lbsecbody');body.innerHTML=`<div class="msg">${esc(t)}</div>`;G.openModal('랭킹',[sec]);}

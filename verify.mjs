@@ -13,7 +13,10 @@ const MODES=new Set(['L','LU','U','LT','T','TR','R','B']);
 // 순서 무관 비교: Supabase(jsonb)가 객체 키를 정렬해 저장하므로 키 순서를 맞춘 뒤 비교(예전에는 이 때문에 모든 기록이 '도로 모양이 기본값과 다름'으로 거절됨)
 const canon=v=>Array.isArray(v)?v.map(canon):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canon(v[k])])):v;
 const same=(a,b)=>JSON.stringify(canon(a))===JSON.stringify(canon(b));
+// 오늘의 도전(daily-YYYYMMDD): daily_scenarios 표의 시나리오를 main()이 미리 읽어 둠
+export const DAILY={};
 export function baseOf(stage){
+  if(stage.startsWith('daily-')){const D=DAILY[stage.slice(6)],R=D&&E.REAL[D.stage];if(!R)return null;return{base:E.dailyCfg(R,D),unlock:null};}
   if(stage.startsWith('real-')){const R=E.REAL[stage.slice(5)];if(!R)return null;return{base:E.realCfg(R),unlock:null};}
   if(stage.startsWith('L')){const lv=E.LEVELS.find(l=>'L'+l.id===stage);if(!lv)return null;return{base:E.levelCfg(lv),unlock:new Set(lv.unlock)};}
   return null;}
@@ -23,6 +26,7 @@ export function check(stage,weather,cfg){
   for(const a of E.APPR){const x=cfg.appr&&cfg.appr[a],y=base.appr[a];if(!x)return'접근로 누락';
     if(x.vph!==y.vph||x.pl!==y.pl||x.pr!==y.pr||(x.pu||0)!==(y.pu||0)||(x.ped||0)!==(y.ped||0))return'교통량이 기본값과 다름';}
   const wx=cfg.wx||'clear';if(wx!==weather)return'날씨 표시 불일치';if(!E.WXP[wx])return'알 수 없는 날씨';
+  if(stage.startsWith('daily-')&&wx!==((DAILY[stage.slice(6)]||{}).wx||'clear'))return'오늘의 도전 날씨와 다름';
   if(cfg.ow!=null){if(!U('oneway'))return'일방통행이 열리지 않은 레벨';for(const a in cfg.ow)if(!E.APPR.includes(a)||!['in','out'].includes(cfg.ow[a]))return'일방통행 값 오류';}
   if(!same(cfg.geo,E.owGeo(base.geo,cfg.ow)))return'도로 모양이 기본값과 다름';
   for(const a of E.APPR){const L=cfg.appr[a].lanes;if(!Array.isArray(L)||L.length!==cfg.geo.nIn[a])return'차로 수 불일치';
@@ -59,7 +63,9 @@ async function api(p,opt={}){const r=await fetch(URL_+'/rest/v1/'+p,{...opt,head
 async function main(){
   if(!URL_||!KEY){console.log('SUPABASE_URL, SUPABASE_SECRET_KEY 환경 변수가 필요합니다');process.exit(1);}
   const rows=await api(`scores?select=id,stage_id,weather,score,cfg,version&status=eq.pending&order=created_at.asc&limit=${MAX_ROWS}`,{headers:{Prefer:''}});
-  console.log(`엔진 ${E.VER}, 검증 대기 ${rows.length}건`);const t0=Date.now();let ok=0,no=0;
+  const days=[...new Set(rows.filter(r=>/^daily-[0-9]{8}$/.test(r.stage_id)).map(r=>r.stage_id.slice(6)))];
+  if(days.length){const ds=await api(`daily_scenarios?select=day,stage,wx,params&day=in.(${days.join(',')})`,{headers:{Prefer:''}});for(const d of ds)DAILY[d.day]=d;}
+  console.log(`엔진 ${E.VER}, 검증 대기 ${rows.length}건${days.length?`, 오늘의 도전 ${days.length}일치`:''}`);const t0=Date.now();let ok=0,no=0;
   for(const r of rows){if(Date.now()-t0>TIME_BUDGET){console.log('시간 예산 소진, 나머지는 다음 실행에서');break;}
     const why=check(r.stage_id,r.weather,r.cfg);let patch;
     if(why){patch={status:'rejected',note:why};no++;}

@@ -372,6 +372,13 @@ function evalCfg(c,firstSt){const sts=[firstSt||runSession(c,SEEDS[0]).st];for(c
 
 // ---------- 실제 교차로 자료(src/data/real/*.js가 채움) ----------
 const REAL={};
+// 오늘의 도전: 실제 교차로 기본 설정에 그날 시나리오(daily_scenarios.params)의 교통량 배율, 회전 비율 가감, 날씨를 얹음. 게임과 점수 검증이 같은 함수를 씀
+// 회전 비율은 원래 그 회전이 있고 직진도 있는 접근로만 바꿈(차로 구성과 맞지 않는 회전이 생기지 않게)
+function dailyCfg(R,D){const c=realCfg(R),p=(D&&D.params)||{},cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+  for(const a of APPR){const x=c.appr[a],m=cl(+((p.mult&&p.mult[a])||1),.5,1.8),th=100-x.pl-x.pr;x.vph=Math.round(x.vph*m);
+    if(th>0){if(x.pl>0)x.pl=Math.round(cl(x.pl+((p.dl&&p.dl[a])||0),1,70));if(x.pr>0)x.pr=Math.round(cl(x.pr+((p.dr&&p.dr[a])||0),1,70));
+      const over=x.pl+x.pr-90;if(over>0){if(x.pr>=x.pl)x.pr-=over;else x.pl-=over;}}}
+  if(D&&D.wx&&D.wx!=='clear')c.wx=D.wx;return c;}
 function realCfg(R){const appr={};for(const a of APPR){const [vph,pl,pr,lanes,perm,pu]=R.appr[a];appr[a]={vph,pl,pr,lanes:[...lanes],perm:!!perm};if(pu)appr[a].pu=pu;if(R.ped&&R.ped[a])appr[a].ped=R.ped[a];}
   return{geo:clone(R.geo),phases:clone(R.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};}
 // ---------- 실제 교차로 ----------
@@ -607,5 +614,5 @@ function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,p
 function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
   if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
-return {VER:'v0.20',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
+return {VER:'v0.20',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
 })();
