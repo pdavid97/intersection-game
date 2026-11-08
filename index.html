@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261107211825">
+<meta name="gl-build" content="20261107212452">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -823,7 +823,10 @@ body.dx.jogpc.pv2 .stage{grid-template-rows:minmax(0,1fr)!important}
 .dxtoast{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:32;display:flex;gap:10px;align-items:center;max-width:calc(100% - 24px);background:rgba(39,29,49,.96);border:1px solid #ffd35a;border-radius:12px;padding:8px 12px;font-size:13px;line-height:1.45;box-shadow:0 8px 20px rgba(0,0,0,.4)}
 .dxtoast[hidden]{display:none}.dxtoast button{flex:none;font-size:12.5px;padding:5px 10px}
 body.mobile .dxtoast{bottom:10px;font-size:12.5px;padding:7px 10px}
-body.mobile .dxbar{gap:4px;padding:5px}body.mobile .dxbar button{font-size:11.5px;padding:4px 8px}
+body.mobile .dxbar{gap:4px;padding:5px;left:8px!important;right:8px;transform:none;max-width:none}body.mobile .dxbar button{font-size:11.5px;padding:4px 8px}
+
+.dxbar .dxg{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;border-top:1px solid #5a4668;padding-top:6px;font-size:12.5px;color:#d8cce4}
+.dxbar .dxg button.on{border-color:#ffd35a;color:#ffd35a}
 </style>
 
 <div class="wrap">
@@ -2750,9 +2753,9 @@ const COACH={
         {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 확정할 때마다 세션 1번을 씁니다. 스테이지마다 세션은 5번입니다.'},
         {sel:'#gauge',t:'확정한 점수가 여기 바늘로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
  '0-4':[{sel:'#dx .dxh',t:'실제 강남역 신호입니다. 도로마다 받는 현시가 색 구간으로 이어져 있어요. 구간 끝 손잡이를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
- '1-1':[{sel:'#dx .dxs',t:'이제 주기 길이를 바꿀 수 있습니다. 신호등을 누르면 주기 +5/−5와 주기 고정 켜고 끄기가 나와요. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
- '2-1':[{sel:'#dx .dxs',t:'정지선 바로 뒤 차로(점선 네모)를 누르면 차로 용도(좌회전, 직진, 우회전)가 바뀝니다. 도로를 누르면 차로를 자세히 볼 수 있어요.'}],
- '3-1':[{sel:'#dx .dxc',t:'교차로 가운데를 누르면 현시 그리기가 열려요. 화살표를 눌러 현시마다 녹색을 줄 이동류를 고르세요. 신호등 메뉴의 좌회전 전용으로 좌회전 신호를 바로 넣을 수도 있어요.'}],
+ '1-1':[{sel:'#dx .dxc',t:'이제 주기 길이를 바꿀 수 있습니다. 교차로 가운데 "신호"를 누르면 주기 +5/−5와 주기 고정이 나와요. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
+ '2-1':[{sel:'#dx .dxs',t:'정지선 바로 뒤 차로(점선 네모)를 누르면 차로 용도(좌회전, 직진, 우회전)가 바뀝니다. '}],
+ '3-1':[{sel:'#dx .dxc',t:'교차로 가운데를 누르면 현시 그리기가 열려요. 화살표를 눌러 현시마다 녹색을 줄 이동류를 고르세요. 신호등을 누르고 좌회전을 "전용 신호"로 바꾸면 좌회전 신호가 바로 들어가요. 주기와 황색 시간은 아래 줄에서 바꿔요.'}],
  '4-1':[{sel:'#dx .dxs',t:'북쪽 도로(아스팔트)를 누르면 나오는 메뉴에서 유턴을 켜 보세요. 1차로에서 좌회전과 유턴을 함께 해요.'}],
  '4-2':[{sel:'#dx .dxs',t:'도로를 누르면 나오는 메뉴에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
  '5-1':[{sel:'#dx .dxh',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 동서 도로의 색 띠를 끌어 다 건널 만큼 녹색을 늘려 주세요.'}],
@@ -4072,7 +4075,7 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   // 차로 바꾸는 자리(정지선 뒤 점선 네모)를 처음엔 반짝 알려 줌
   if(unlocked('lanes')&&!DX.paint&&(DX.tick++%20)<10&&!store.get('dx-lane-seen'))for(const a in G){const g=G[a];for(const P of [g.A,g.B]){const m=dxAt(P,g.sc*8);h+=`<circle class="dxlane" cx="${m[0]}" cy="${m[1]}" r="${Math.max(8,g.sc*4)}" fill="none" stroke="#ffd35a" stroke-width="2" stroke-dasharray="3 3" pointer-events="none"/>`;}}
   // 교차로 가운데: 현시 그리기 들어가는 곳
-  if(unlocked('phases')&&!DX.paint){const o=toScreen(0,0);h+=`<g class="dxc" pointer-events="none"><circle cx="${o[0]}" cy="${o[1]}" r="15" fill="#271d31" fill-opacity=".8" stroke="#ffd35a" stroke-width="1.5" stroke-dasharray="3 3"/><text x="${o[0]}" y="${o[1]+.5}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="#ffd35a">현시</text></g>`;}
+  if((unlocked('phases')||unlocked('scheme')||dxGlobal().length)&&!DX.paint){const o=toScreen(0,0);h+=`<g class="dxc" pointer-events="none"><circle cx="${o[0]}" cy="${o[1]}" r="15" fill="#271d31" fill-opacity=".8" stroke="#ffd35a" stroke-width="1.5" stroke-dasharray="3 3"/><text x="${o[0]}" y="${o[1]+.5}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="#ffd35a">신호</text></g>`;}
   if(DX.paint)h+=dxPaintSVG();
   s.innerHTML=h;}
 // ----- 띠 손잡이 끌기 -----
@@ -4097,20 +4100,30 @@ function dxRadial(x,y,items,key){dxClose();if(!items.length)return;const st=$('s
     b.onclick=e=>{e.stopPropagation();it.f(b);};box.appendChild(b);});
   const x0=document.createElement('button');x0.type='button';x0.className='rx';x0.textContent='×';x0.setAttribute('aria-label','닫기');x0.onclick=e=>{e.stopPropagation();dxClose();};box.appendChild(x0);
   st.appendChild(box);requestAnimationFrame(()=>box.classList.add('open'));DX.menu=key;}
-function dxSigMenu(a){closePop();const g=DX.geo[a];if(!g)return;const q=g.B[0],o=OPP[a],c=cfg.appr[a],it=[];
-  if(unlocked('perm'))it.push({ic:'⇄',t:c.perm?'비보호 좌':'보호 좌',on:!c.perm,f:()=>{if(dxLtOn(a)&&!c.perm){dxToast('좌회전 전용 신호가 켜져 있어 보호 좌회전이에요. 비보호로 바꾸려면 좌회전 전용을 먼저 꺼 주세요');return;}c.perm=!c.perm;renderAllStatus();buildApprUI();dxToast(c.perm?`${KO1[a]}쪽 좌회전: 직진 녹색 때 틈을 보고 회전(비보호)`:`${KO1[a]}쪽 좌회전: 좌회전 신호에만 회전(보호)`);dxSigMenu(a);}});
-  if(unlocked('phases')||unlocked('scheme'))it.push({ic:'↰',t:dxLtOn(a)?'좌회전 전용 켬':'좌회전 전용',on:dxLtOn(a),f:()=>{dxLeftOnly(a);dxSigMenu(a);}});
-  if(unlocked('phases'))it.push({ic:'✎',t:'현시 그리기',f:()=>{dxClose();dxPaint(true);}});
+// 신호등 탭: 이 방향 신호만(좌회전 방식, 보행). 교차로 전체 설정은 가운데 탭으로
+function dxLtState(a){return dxLtOn(a)?'전용 신호':cfg.appr[a].perm?'비보호':'보호';}
+function dxLtNext(a){const c=cfg.appr[a],P=unlocked('perm'),F=unlocked('phases')||unlocked('scheme'),st=dxLtState(a);
+  if(st==='전용 신호'){dxLeftOnly(a);if(!P)c.perm=false;}
+  else if(st==='비보호'){if(P){c.perm=false;renderAllStatus();buildApprUI();}else if(F)dxLeftOnly(a);}
+  else{if(F)dxLeftOnly(a);else if(P){c.perm=true;renderAllStatus();buildApprUI();}}
+  const n=dxLtState(a);dxToast(`${KO1[a]}쪽 좌회전: ${n==='비보호'?'직진 녹색 때 틈을 보고 회전':n==='보호'?'정해진 신호에만 회전':'좌회전만 따로 녹색(도로 띠에 좌회전 구간이 생겨요)'}`);}
+function dxSigMenu(a){closePop();const g=DX.geo[a];if(!g)return;const q=g.B[0],it=[];
+  if(unlocked('perm')||unlocked('phases')||unlocked('scheme'))it.push({ic:'↰',t:'좌회전 '+dxLtState(a),on:dxLtState(a)!=='비보호',f:()=>{dxLtNext(a);dxSigMenu(a);}});
   if(unlocked('ped')&&hasPed(cfg))it.push({ic:'人',t:'보행 신호',f:()=>{dxClose();openModal('보행 신호',[$('pedbox')]);renderPed();}});
-  if(unlocked('yellow'))it.push({ic:'Y',t:`황색 ${cfg.yellow}초`,f:()=>{cfg.yellow=cfg.yellow>=6?2:cfg.yellow+1;refreshPlan();dxToast(`황색 ${cfg.yellow}초(모든 방향)`);dxSigMenu(a);}});
-  if(unlocked('rtor'))it.push({ic:'↱',t:cfg.rtor?'적색 우회전':'적색 우회전 X',on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();dxToast(cfg.rtor?'빨간불에도 멈췄다가 우회전 허용(모든 방향)':'빨간불 우회전 금지');dxSigMenu(a);}});
-  if(unlocked('cycle'))it.push({ic:'⊜',t:RG.lock?'주기 고정':'주기 자유',on:!!RG.lock,f:()=>{RG.lock=!RG.lock;dxToast(RG.lock?'띠를 끌면 옆 현시와 녹색을 주고받아요(주기 그대로)':'띠를 끌면 그 현시만 늘고 줄어 주기가 바뀌어요');dxSigMenu(a);}});
-  if(unlocked('cycle')){it.push({ic:'⟳',t:'주기 +5',f:()=>{setCycle(Math.min(200,cycleLen()+5));dxToast(`주기 ${cycleLen()}초`);}});it.push({ic:'⟲',t:'주기 −5',f:()=>{setCycle(Math.max(40,cycleLen()-5));dxToast(`주기 ${cycleLen()}초`);}});}
-  if(unlocked('scheme')||unlocked('phases'))it.push({ic:'☰',t:'신호 표',f:()=>{dxClose();openPhase();}});
-  if(!it.length){dxToast('이 단계에서는 도로 위 색 띠로 녹색 시간만 바꿀 수 있어요. 새 조작은 다음 장에서 열려요');return;}
+  if(!it.length){dxToast(dxGlobal().length||unlocked('phases')?'이 방향 신호는 아직 바꿀 수 없어요. 교차로 가운데를 누르면 전체 신호를 바꿔요':'이 단계에서는 도로 위 색 띠로 녹색 시간만 바꿀 수 있어요. 새 조작은 다음 장에서 열려요');return;}
   dxRadial(q[0],q[1],it,{k:'s',a});}
+// 교차로 전체 신호 설정(주기, 황색, 적색 우회전)
+function dxGlobal(){const it=[];
+  if(unlocked('cycle')){it.push({ic:'−',t:'주기 −5',f:()=>{setCycle(Math.max(40,cycleLen()-5));dxToast(`주기 ${cycleLen()}초`);}});it.push({ic:'⟳',t:`주기 ${cycleLen()}초`,lab:1});it.push({ic:'+',t:'주기 +5',f:()=>{setCycle(Math.min(200,cycleLen()+5));dxToast(`주기 ${cycleLen()}초`);}});
+    it.push({ic:'⊜',t:RG.lock?'주기 고정':'주기 자유',on:!!RG.lock,f:()=>{RG.lock=!RG.lock;dxToast(RG.lock?'띠를 끌면 옆 현시와 녹색을 주고받아요(주기 그대로)':'띠를 끌면 그 현시만 늘고 줄어 주기가 바뀌어요');}});}
+  if(unlocked('yellow'))it.push({ic:'Y',t:`황색 ${cfg.yellow}초`,f:()=>{cfg.yellow=cfg.yellow>=6?2:cfg.yellow+1;refreshPlan();}});
+  if(unlocked('rtor'))it.push({ic:'↱',t:cfg.rtor?'적색 우회전 허용':'적색 우회전 금지',on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();}});
+  return it;}
+function dxCenter(){if(unlocked('phases'))return dxPaint(true);const it=dxGlobal().filter(x=>!x.lab);
+  if(unlocked('scheme'))it.unshift({ic:'☰',t:'신호 방식',f:()=>{dxClose();openPhase();}});
+  if(!it.length)return dxToast('교차로 전체 신호는 다음 장에서 열려요. 지금은 도로 위 색 띠로 녹색을 나눠 보세요');
+  const o=toScreen(0,0);const wrap=it.map(x=>x.f?{...x,f:()=>{x.f();dxCenter();}}:x);dxRadial(o[0],o[1],wrap,{k:'c'});}
 function dxRoadMenu(a,x,y){const c=cfg.appr[a],it=[];
-  if(unlocked('lanes')||unlocked('perm')||unlocked('oneway'))it.push({ic:'≡',t:'차로 자세히',f:()=>{dxClose();openArm(a);}});
   if(unlocked('oneway')){const m=(cfg.ow||{})[a]||'',nx={'':'in',in:'out',out:''}[m],lab={'':'양방향',in:'진입만',out:'진출만'};it.push({ic:'⊘',t:`통행 ${lab[m]}`,on:!!m,f:()=>{setOneway(a,nx);dxToast(`${KO1[a]}쪽 도로: ${{'':'양방향',in:'들어오는 방향만(일방통행)',out:'나가는 방향만(일방통행)'}[nx]}`);dxRoadMenu(a,x,y);}});}
   if(unlocked('bus')&&c.lanes.length>=2){const has=c.lanes.includes('B');it.push({ic:'B',t:'버스 차로',on:has,f:()=>{const n=c.lanes.length;if(has)c.lanes=c.lanes.map((m,i)=>m==='B'?(i===n-1?'TR':'T'):m);else c.lanes[n-1]='B';renderLanes(a);renderAllStatus();dxToast(has?'버스 전용 차로를 일반 차로로':'바깥 차로를 버스 전용으로');dxRoadMenu(a,x,y);}});}
   if(unlocked('uturn')&&c.lanes.length){const has=/U/.test(c.lanes[0]);it.push({ic:'U',t:'유턴',on:has,f:()=>{c.lanes[0]=has?(c.lanes[0]==='U'?'L':'L'):'LU';renderLanes(a);renderAllStatus();dxToast(has?'유턴을 막았어요':'1차로에서 좌회전과 유턴을 함께 해요');dxRoadMenu(a,x,y);}});}
@@ -4155,9 +4168,10 @@ function dxPaintBar(){let b=$('dxbar');if(!DX.paint){if(b)b.remove();return;}
     b.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;e.stopPropagation();
       if(t.dataset.i!=null)selP=+t.dataset.i;else if(t.dataset.add){if(PH.length>=8)return dxToast('현시는 8개까지예요');PH.push({m:[],g:10});selP=PH.length-1;markCustom();refreshPlan();}
       else if(t.dataset.del){if(PH.length<=2)return dxToast('현시는 2개 이상이어야 해요');PH.splice(selP,1);selP=Math.max(0,selP-1);markCustom();refreshPlan();}
+      else if(t.dataset.g!=null){const x=dxGlobal()[+t.dataset.g];if(x&&x.f)x.f();}
       else if(t.dataset.done){dxPaint(false);return;}dxPaintBar();dxRender();});}
   const c=$('cv');b.style.left=(c.offsetLeft+cw/2)+'px';b.style.top=(c.offsetTop+8)+'px';
-  b.innerHTML=PH.map((p,i)=>`<button type="button" data-i="${i}" class="${i===selP?'on':''}" style="${i===selP?`border-color:${dxCol(i)};color:${dxCol(i)}`:''}">${i+1}. ${dxEsc(p.x?'보행 전용':phName(p))} ${p.g}초</button>`).join('')+`<button type="button" data-add="1">＋ 현시</button><button type="button" data-del="1">이 현시 삭제</button><button type="button" class="primary" data-done="1">완료</button>`;}
+  b.innerHTML=PH.map((p,i)=>`<button type="button" data-i="${i}" class="${i===selP?'on':''}" style="${i===selP?`border-color:${dxCol(i)};color:${dxCol(i)}`:''}">${i+1}. ${dxEsc(p.x?'보행 전용':phName(p))} ${p.g}초</button>`).join('')+`<button type="button" data-add="1">＋ 현시</button><button type="button" data-del="1">이 현시 삭제</button><button type="button" class="primary" data-done="1">완료</button>`+(dxGlobal().length?`<div class="dxg">${dxGlobal().map((x,i)=>x.lab?`<span>${x.t}</span>`:`<button type="button" data-g="${i}" class="${x.on?'on':''}">${x.t}</button>`).join('')}</div>`:'');}
 function dxPaint(on){DX.paint=on;dxClose();closePop();document.body.classList.toggle('dxpaint',on);if(on){selP=Math.min(selP,PH.length-1);dxToast('화살표를 누르면 지금 현시에 넣고 빼요. 흰 점선은 빨간불, 노란색은 비보호, 빨간색은 부딪혀서 못 넣어요');}dxPaintBar();dxRender();}
 // ----- 지도 누르기: 차로(기존), 교차로 가운데, 도로. 예전 접근로 창 대신 원형 메뉴 -----
 function dxArmAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.75;
@@ -4168,7 +4182,7 @@ $('cv').addEventListener('click',e=>{if(!dxActive())return;e.stopImmediatePropag
   if(DX.paint){dxPaint(false);return;}
   if(DX.menu){dxClose();return;}
   const w=screenToWorld(e),D=geoDims(cfg.geo),r=$('cv').getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-  if(Math.abs(w[0])<D.hNS&&Math.abs(w[1])<D.hEW){if(unlocked('phases'))dxPaint(true);else if(unlocked('scheme'))openPhase();else dxToast('교차로 현시는 4장에서 열려요. 지금은 도로 위 색 띠로 녹색을 나눠 보세요');return;}
+  if(Math.abs(w[0])<D.hNS&&Math.abs(w[1])<D.hEW){dxCenter();return;}
   const a=dxArmAt(e);if(a){dxRoadMenu(a,x,y);return;}closePop();},true);
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(DX.paint)dxPaint(false);else dxClose();}});
 // 예전 조작 숨김: 접근로 버튼, 귀퉁이 신호 시계 카드(신호 시간은 도로 띠로). 세션 기록은 재생 줄로
