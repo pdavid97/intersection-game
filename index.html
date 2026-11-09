@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261107212452">
+<meta name="gl-build" content="20261108215740">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -827,12 +827,22 @@ body.mobile .dxbar{gap:4px;padding:5px;left:8px!important;right:8px;transform:no
 
 .dxbar .dxg{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;border-top:1px solid #5a4668;padding-top:6px;font-size:12.5px;color:#d8cce4}
 .dxbar .dxg button.on{border-color:#ffd35a;color:#ffd35a}
+
+/* 조작 결과 칩, 도전권 */
+.mvchip{position:absolute;z-index:33;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:120px;max-width:240px;padding:7px 12px;border-radius:14px;background:rgba(39,29,49,.96);border:2px solid #8d7a9c;box-shadow:0 10px 24px rgba(0,0,0,.45);text-align:center;animation:mvin .25s ease-out;transition:opacity .4s,transform .4s}
+.mvchip b{font-size:20px;font-weight:900;line-height:1.15}.mvchip span{font-size:12px;color:#e9dff2;line-height:1.35}.mvchip small{font-size:11px;color:#b9a9c8;margin-top:2px}
+.mvchip.up{border-color:#4fe08a}.mvchip.up b{color:#4fe08a}.mvchip.down{border-color:#ff6b6b}.mvchip.down b{color:#ff6b6b}.mvchip.flat b{color:#ffd35a}
+.mvchip.calc b{font-size:14px;color:#ffd35a}.mvchip.out{opacity:0;transform:translateY(-14px)}
+@keyframes mvin{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+.tixchip{display:flex;gap:8px;align-items:baseline;justify-content:center;margin:4px auto 0;padding:4px 10px;border-radius:999px;background:rgba(255,211,90,.12);border:1px solid rgba(255,211,90,.5);font-size:12.5px;cursor:pointer;width:max-content;max-width:100%}
+.tixchip b{color:#ffd35a}.tixchip span{color:#cbbbd8;font-size:11.5px}.tixchip.empty{border-color:#ff6b6b;background:rgba(255,107,107,.12)}.tixchip.empty b{color:#ff8a8a}
+.mvopts{display:flex;flex-direction:column;gap:8px}.mvopts>b{font-size:13px;margin-top:4px}.mvopts button{text-align:left}.mvopts small{opacity:.7;margin-left:6px;font-size:11px}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.20. 도로 위 색 띠로 녹색 시간을 나누고, 오른쪽 확정 버튼으로 결과를 확인하세요.</div>
+    <div class="sub">프로토타입 v0.20. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -856,7 +866,7 @@ body.mobile .dxbar{gap:4px;padding:5px;left:8px!important;right:8px;transform:no
         <div class="seg" role="group" aria-label="배속">
           <button data-sp="1">1x</button><button data-sp="4" class="on">4x</button><button data-sp="16">16x</button>
         </div>
-        <button id="skip" title="지금 설정으로 확정합니다(세션 1번 사용)">이 설정으로 확정</button>
+        <button id="skip" title="처음 설정으로 돌아가 조작 수를 다시 받습니다">처음부터 다시 도전</button>
         <button id="mapzoom" hidden>지도 넓게 보기</button>
         <button id="btn3d" hidden>3D 보기</button>
         <label class="skin"><span>스킨</span><select id="skinsel" aria-label="교차로 화면 스킨"></select></label>
@@ -866,7 +876,7 @@ body.mobile .dxbar{gap:4px;padding:5px;left:8px!important;right:8px;transform:no
         <button id="resetcfg" title="이 스테이지의 차로, 신호, 비보호 등 모든 설정을 처음 상태로 되돌립니다">처음 설정으로</button>
         <span class="status" id="sig">신호</span>
       </div>
-      <div class="pending" id="pending" hidden><span>도로 구조(차로, 통행 방향 등)가 바뀌었습니다. 화면에 보려면 관찰을 다시 시작하세요. 확정은 지금 설정 그대로 할 수 있습니다.</span><button id="applynow" class="primary">바꾼 도로로 다시 관찰</button></div>
+      <div class="pending" id="pending" hidden><span>도로 구조(차로, 통행 방향 등)가 바뀌었습니다. 점수는 이미 반영됐어요. 화면에 보려면 다시 관찰하세요.</span><button id="applynow" class="primary">바꾼 도로로 다시 관찰</button></div>
       <div class="legend">
         <span><i style="background:hsl(130,62%,52%)"></i>원활</span>
         <span><i style="background:hsl(45,80%,55%)"></i>서행</span>
@@ -1604,14 +1614,15 @@ function thresholds(){if(mode.kind==='level')return curLevel().stars;
   if(mode.kind==='real'&&(mode.daily||(curReal()&&curReal().custom))){const b0=baseline?baseline.score:0,S=Math.max(150,Math.abs(b0));return[.12,.28,.45].map(k=>Math.ceil(b0+S*k));}
  if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
 // 확정 기회: 스테이지마다 5번(실험실은 무제한). 다 쓰면 처음부터 다시. 이 브라우저에 저장
-const TRIES_MAX=5,limited=()=>mode.kind!=='lab';
+// 조작 수(N수 퍼즐): 조작 1번마다 점수가 바로 나오고, 한 번 도전에 쓸 수 있는 조작 수가 정해져 있음. 실험실은 무제한
+const TRIES_MAX=()=>mode.kind==='level'?8:mode.daily?10:12,limited=()=>mode.kind!=='lab';
 // 세션 = 3분 관찰 + 확정 1번. 점수는 관찰 시간과 별개로 5분 시뮬레이션 x 시드 3개(evalCfg)라 별 기준은 그대로
 const OBS_T=180;
-const sessLabel=()=>limited()?`세션 ${Math.min(TRIES_MAX,triesUsed()+1)}/${TRIES_MAX}`:`세션 ${sessNo}`;
-function triesUsed(){return(store.get('tries-v1')||{})[modeId()]||0;}
-function triesLeft(){return limited()?Math.max(0,TRIES_MAX-triesUsed()):Infinity;}
-function triesAdd(){const t=store.get('tries-v1')||{},k=modeId();t[k]=(t[k]||0)+1;store.set('tries-v1',t);return t[k];}
-function restartStage(){const t=store.get('tries-v1')||{};delete t[modeId()];store.set('tries-v1',t);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
+const sessLabel=()=>limited()?`조작 ${triesUsed()}/${TRIES_MAX()}`:`조작 ${Math.max(0,sessNo-1)}번`;
+function triesUsed(){return(store.get('moves-v1')||{})[modeId()]||0;}
+function triesLeft(){return limited()?Math.max(0,TRIES_MAX()-triesUsed()):Infinity;}
+function triesAdd(){const t=store.get('moves-v1')||{},k=modeId();t[k]=(t[k]||0)+1;store.set('moves-v1',t);return t[k];}
+function restartStage(){const t=store.get('moves-v1')||{};delete t[modeId()];store.set('moves-v1',t);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
 // 다음 스테이지: 레벨은 다음 레벨, 마지막 레벨 다음은 첫 실제 교차로, 실제 교차로는 다음 도시
 function nextTarget(){if(mode.kind==='level'){if(mode.idx+1<LEVELS.length){const l=LEVELS[mode.idx+1];return{m:{kind:'level',idx:mode.idx+1},name:lvLabel(l)+' '+l.title};}
     const ids=OFFICIAL().map(R=>R.id);return ids.length?{m:{kind:'real',id:ids[0]},name:'실제 교차로: '+REAL[ids[0]].title}:null;}
@@ -1871,20 +1882,20 @@ const TIMING_KEYS=['phases','yellow','scheme','pedConc'];
 function timingOnly(a,b){const s=o=>cfgSig(Object.fromEntries(Object.entries(o).filter(([k])=>!TIMING_KEYS.includes(k))));return s(a)===s(b);}
 function hotSwap(){const n=sim.nextCfg;sim.nextCfg=null;for(const k of TIMING_KEYS){if(n[k]===undefined)delete sim.cfg[k];else sim.cfg[k]=clone(n[k]);}sim.swapped=true;}
 // 관찰 3분이 끝나면 멈추고 묻기: 확정(세션 1회 사용) 또는 3분 더 관찰(기회는 쓰지 않음)
-function obsEnd(){running=false;$('play').textContent='재생';if(triesLeft()<=0){state='done';openOutOfTries();return;}
+function obsEnd(){resetCounters(sim);return;running=false;$('play').textContent='재생';if(triesLeft()<=0){state='done';openOutOfTries();return;}
   openModal('관찰 시간 3분이 끝났습니다',[]);const L=triesLeft();
   $('modalbody').innerHTML=`<p class="note" style="margin-top:0">지금 설정으로 확정하면 ${L===Infinity?'결과가 나옵니다':`세션 1번을 쓰고 결과가 나옵니다(남은 세션 ${L}번)`}. 설정을 더 바꾸거나 흐름을 더 보고 싶으면 3분을 다시 관찰하세요. 이때는 세션을 쓰지 않습니다.</p>
   <div class="row2"><button type="button" class="primary" id="obsok">이 설정으로 확정</button><button type="button" id="obsmore">3분 더 관찰</button></div>`;
   $('obsok').onclick=()=>{closeModal();$('skip').click();};$('obsmore').onclick=()=>{closeModal();resetCounters(sim);running=true;$('play').textContent='일시정지';updateUI();};}
-function openOutOfTries(){openModal('확정 기회를 모두 썼습니다',[]);$('modalbody').innerHTML=`<p class="note" style="margin-top:0">이 스테이지의 확정 ${TRIES_MAX}번을 모두 썼습니다. 지금까지 받은 별과 최고 기록은 그대로 남습니다. 처음 설정부터 다시 도전하세요.</p><button type="button" class="primary" id="restartbtn">처음부터 다시</button>`;$('restartbtn').onclick=restartStage;}
+function openOutOfTries(){openModal('확정 기회를 모두 썼습니다',[]);$('modalbody').innerHTML=`<p class="note" style="margin-top:0">이 스테이지의 확정 ${TRIES_MAX()}번을 모두 썼습니다. 지금까지 받은 별과 최고 기록은 그대로 남습니다. 처음 설정부터 다시 도전하세요.</p><button type="button" class="primary" id="restartbtn">처음부터 다시</button>`;$('restartbtn').onclick=restartStage;}
 function calcOv(on){let el=$('calcov');if(!el){el=document.createElement('div');el.id='calcov';el.className='calcov';el.textContent='결과 계산 중';$('stage').appendChild(el);}el.hidden=!on;}
 // keep: 확정 버튼으로 낸 결과면 화면 시뮬레이션은 멈추지 않고 계속(다음 확정을 바로 할 수 있게)
-function finishWith(fc,ev,keep){const base=baseCfg(),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
+function finishWith(fc,ev,keep,quiet){const base=baseCfg(),st=ev.st,score=ev.score,prev=history[0],ref=prev?prev.cfg:base;
   const changes=diffCfg(ref,fc),sameDemand=demandSig(fc)===demandSig(base),jam=jammed(st);
   const prevBest=history.filter(h=>h.sameDemand).reduce((m,h)=>Math.max(m,h.score),-Infinity);
   const stars=sameDemand&&!jam?starsOf(score,st.risk):0;
   const rec={no:sessNo,cfg:clone(fc),st,score,changes,sameDemand,stars,jam,record:sameDemand&&!jam&&score>prevBest&&history.length>0};
-  rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX-rec.try);}
+  rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX()-rec.try);}
   if(mode.kind==='real'&&sameDemand){const id=modeId(),p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
   if(mode.kind==='level'&&sameDemand){const id=curLevel().id,p=prog[id]||{stars:0,best:-1e9},nextLocked=mode.idx+1<LEVELS.length&&!levelUnlocked(mode.idx+1);
     prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);
@@ -1892,7 +1903,7 @@ function finishWith(fc,ev,keep){const base=baseCfg(),st=ev.st,score=ev.score,pre
     if(stars>p.stars)rec.newStars=true;}
   if(fc.wx&&fc.wx!=='clear'&&demandSig({...fc,wx:0})===demandSig(base)){const wb=store.get('wxbest-v1')||{},k=modeId()+':'+fc.wx;rec.wxPrev=wb[k]??null;rec.wxBest=Math.max(score,wb[k]??-1e9);wb[k]=rec.wxBest;store.set('wxbest-v1',wb);}
   history.unshift(rec);if(history.length>30)history.pop();store.set(histKey(),history);
-  state='done';running=false;if(keep&&triesLeft()>0){cfg=clone(fc);syncControls();startSession();buildArms();}renderResult(rec,prev);renderHistory();renderLevels();updateUI();if(playMode)openResult();
+  if(quiet)sessNo++;else{state='done';running=false;if(keep&&triesLeft()>0){cfg=clone(fc);syncControls();startSession();buildArms();}}renderResult(rec,prev);renderHistory();renderLevels();updateUI();if(playMode&&!quiet)openResult();
   try{window.dispatchEvent(new CustomEvent('session-done',{detail:{rec,stage:modeId(),title:mode.kind==='level'?lvLabel(curLevel())+' '+curLevel().title:(curReal()&&curReal().title)||'',eligible:mode.kind!=='lab'&&!jam&&!!(rec.sameDemand||rec.wxBest!=null),weather:fc.wx||'clear'}}));}catch(e){}}
 function deltaPill(cur,prev,better,fmt){if(prev==null)return'';const d=cur-prev;if(Math.abs(d)<1e-9)return'<span class="pill flat">변화 없음</span>';
   const good=better==='up'?d>0:d<0;return`<span class="pill ${good?'up':'down'}">${d>0?'+':''}${fmt(d)}</span>`;}
@@ -1953,7 +1964,7 @@ function apprMap(s,focus){if(!s.byA)return'';const col=d=>`hsl(${Math.round(130-
 function driversHTML(an){if(!an.drivers)return'';const mx=Math.max(...an.drivers.map(d=>Math.abs(d[1])),1);
   return`<div class="drv"><span class="lbl">이전 세션 대비 점수 변화의 출처</span>${an.drivers.map(([k,v])=>`<div class="dr"><span>${k}</span><div class="db"><i class="${v>=0?'p':'n'}" style="${v>=0?'left:50%':'right:50%'};width:${(Math.abs(v)/mx*50).toFixed(1)}%"></i></div><b class="${v>=0.5?'up':v<=-.5?'down':''}">${v>=0?'+':''}${Math.round(v)}</b></div>`).join('')}</div>`;}
 function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
-  if(!rec){box.innerHTML=`<div class="note" style="margin-top:0">설정을 확정하면 결과와 이전 세션 대비 변화가 여기에 나옵니다. 시작 설정 점수는 <b>${baseline?baseline.score:'-'}</b>점입니다.</div>`;return;}
+  if(!rec){box.innerHTML=`<div class="note" style="margin-top:0">설정을 바꾸면 결과와 직전 조작 대비 변화가 여기에 나옵니다. 시작 설정 점수는 <b>${baseline?baseline.score:'-'}</b>점입니다.</div>`;return;}
   const s=rec.st,p=prev?prev.st:null,pct=prev&&prev.score?((rec.score-prev.score)/Math.abs(prev.score)*100):null;
   const capped=riskGrade(s.risk)===2&&rec.score>=t[1];
   const next=rec.sameDemand&&rec.stars<3&&!capped?t[rec.stars]-rec.score:null;
@@ -1970,7 +1981,7 @@ function renderResult(rec,prev){const box=$('resbody'),t=thresholds();
         ${pct!=null?`<span class="pill ${pct>=0?'up':'down'}">이전 세션 대비 ${pct>=0?'+':''}${pct.toFixed(1)}%</span>`:''}</div></div>
     ${rec.jam?`<div class="jamres"><b>정체 발생</b> 한 차로 대기열이 ${rec.st.peakQ}대까지 늘어 도로가 막혔습니다. 별을 받으려면 먼저 정체를 풀어야 합니다.</div>`:''}
     ${rec.sameDemand?scoreTrack(rec,prev,best,t):''}
-    ${rec.triesLeft!=null?`<div class="tries ${rec.triesLeft?'':'out'}">${rec.triesLeft?`확정 기회 ${rec.triesLeft}번 남음 (${rec.try}/${TRIES_MAX})`:`확정 기회 ${TRIES_MAX}번을 모두 썼습니다. 받은 별과 최고 기록은 남습니다.`}${rec.triesLeft?'':'<button type="button" class="primary" data-restart="1">처음부터 다시</button>'}</div>`:''}
+    ${rec.triesLeft!=null?`<div class="tries ${rec.triesLeft?'':'out'}">${rec.triesLeft?`조작 ${rec.triesLeft}번 남음 (${rec.try}/${TRIES_MAX()})`:`조작 ${TRIES_MAX()}번을 모두 썼습니다. 받은 별과 최고 기록은 남습니다.`}${rec.triesLeft?'':'<button type="button" class="primary" data-restart="1">처음부터 다시</button>'}</div>`:''}
     ${rec.sameDemand&&rec.stars>=2&&nextTarget()?`<div class="nextq"><b>별 ${rec.stars}개 달성! 다음 스테이지로 넘어갈까요?</b><span>${nextTarget().name}</span><div><button type="button" class="primary" data-next="1">다음 스테이지로</button><button type="button" data-stay="1">여기서 더 도전</button></div></div>`:''}
     ${rec.opened&&!(rec.sameDemand&&rec.stars>=2)?`<div class="clear"><span>레벨 클리어. ${lvLabel(rec.opened)} ${rec.opened.title} 레벨이 열렸습니다.</span><button class="primary" data-go="${LEVELS.indexOf(rec.opened)}">다음 레벨로</button></div>`:''}
     ${!rec.sameDemand?(rec.wxBest!=null?`<div class="exp">날씨 도전 (${wxOf(rec.cfg).n}) 세션입니다. 이 날씨 최고 ${rec.wxBest}점${rec.wxPrev!=null&&rec.score>rec.wxPrev?' (새 기록)':''}. 별과 순위는 맑음 기준에서만 집계합니다.</div>`:'<div class="exp">교통량을 바꿔서 별과 최고 기록에는 반영하지 않았습니다.</div>'):capped?'<div class="nextstar">점수는 충분하지만 위험도가 높아 별은 1개까지만 받습니다. 위험 원인을 먼저 고치세요.</div>':next!=null?`<div class="nextstar">다음 별까지 <b>${next.toLocaleString()}</b>점 남았습니다.</div>`:rec.stars===3?'<div class="nextstar">별 3개 달성. 더 높은 점수에 도전해 보세요.</div>':''}
@@ -2049,7 +2060,7 @@ let resetArm=0;$('resetcfg').addEventListener('click',()=>{const btn=$('resetcfg
   if(Date.now()>resetArm){resetArm=Date.now()+3000;btn.textContent='한 번 더 누르면 초기화';btn.classList.add('primary');setTimeout(()=>{if(Date.now()>=resetArm){btn.textContent='처음 설정으로';btn.classList.remove('primary');}},3100);return;}
   resetArm=0;btn.textContent='처음 설정으로';btn.classList.remove('primary');closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();});$('applynow').addEventListener('click',startSession);
 // 결과 바로 보기 = 지금 편집 중인 설정으로 확정(5분을 기다리지 않음). 예상 점수가 이미 계산돼 있으면 그대로 씀
-$('skip').addEventListener('click',()=>{if(triesLeft()<=0){openOutOfTries();return;}if(state!=='run')return;const fc=clone(cfg),f=typeof fcGet==='function'?fcGet(fc):null;finishSession(f?{cfg:fc,score:f.score,st:f.st}:{cfg:fc});});
+$('skip').addEventListener('click',()=>{if(window.__mv){window.__mv.retry();return;}if(triesLeft()<=0){openOutOfTries();return;}if(state!=='run')return;const fc=clone(cfg),f=typeof fcGet==='function'?fcGet(fc):null;finishSession(f?{cfg:fc,score:f.score,st:f.st}:{cfg:fc});});
 document.querySelectorAll('[data-sp]').forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('on',x===b));}));
 
 // ---------- 그리기 ----------
@@ -2522,7 +2533,7 @@ function positionArms(){if(!playMode||!cfg)return;const placed=[];for(const a of
     const {w}=moveStatus(a),lvl=w.some(x=>x[0]==='bad')?'bad':w.some(x=>x[0]==='risk')?'risk':'';const dot=b.querySelector('.w');dot.className='w '+lvl;dot.style.display=lvl?'':'none';}
   if(popArm&&!$('pop').hidden)placePop(...armAnchor(popArm));}
 function renderHud(){if(!playMode||!sim)return;const st=stats(sim),el=sim.t-sim.t0,t=thresholds();
-  $('hudtl').innerHTML=`<div class="t">${sessLabel()}${state==='done'?' 종료':''}  관찰 ${fmtT(Math.min(el,OBS_T))} / ${fmtT(OBS_T)}</div><div class="prog"><i style="width:${Math.min(100,el/OBS_T*100)}%"></i></div>
+  $('hudtl').innerHTML=`<div class="t">${sessLabel()}${limited()?`, 남은 조작 ${triesLeft()}번`:''}</div><div class="prog"><i style="width:${limited()?Math.min(100,triesUsed()/TRIES_MAX()*100):0}%"></i></div>
     <div class="grid2"><span>통과 인원</span><b>${st.persons}</b><span>평균 속도</span><b>${st.spd.toFixed(1)} km/h</b><span>1인당 지연</span><b>${st.dly.toFixed(0)}초</b><span>기대 사고</span><b class="${riskGrade(st.risk)===2?'bad':riskGrade(st.risk)===1?'risk':''}">${st.risk.toFixed(2)}</b>${hasPed(sim.cfg)?`<span>보행자 대기</span><b class="${st.pedQ>30?'risk':''}">${st.pedQ}명</b>`:''}</div>${goalHTML(st)}`;
   const R=curReal(),lv=curLevel();
   $('lvchip').innerHTML=(lv?`${lvLabel(lv)} ${lv.title}`:mode.daily&&DAILY_S?`오늘의 도전: ${DAILY_S.title}`:R?(R.custom?'나만의 교차로: ':'')+R.title:'실험실')+`  <b>★${t[0]} ★★${t[1]} ★★★${t[2]}</b>  <span class="lvx">레벨 바꾸기</span>`;
@@ -2539,7 +2550,7 @@ new ResizeObserver(()=>positionArms()).observe($('stage'));
 let last=performance.now(),acc=0,uiT=0,simCfgStr='';
 function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim),el=sim.t-sim.t0;
   $('sessname').textContent=`${sessLabel()}${state==='done'?' (종료)':''}`;
-  $('sesstime').textContent=`관찰 ${fmtT(Math.min(el,OBS_T))} / ${fmtT(OBS_T)}`;$('sessbar').style.width=Math.min(100,el/OBS_T*100)+'%';
+  $('sesstime').textContent=limited()?`남은 조작 ${triesLeft()}번`:'조작 무제한';$('sessbar').style.width=(limited()?Math.min(100,triesUsed()/TRIES_MAX()*100):0)+'%';
   $('k-ppl').textContent=st.persons.toLocaleString();$('k-done').textContent=st.done;
   $('k-spd').innerHTML=st.spd.toFixed(1)+'<span class="u">km/h</span>';$('k-dly').innerHTML=st.dly.toFixed(0)+'<span class="u">초</span>';
   $('k-det').innerHTML=st.det+'<span class="u">대</span>';$('k-crash').innerHTML=st.crash+'<span class="u">건 / '+st.risk.toFixed(2)+'</span>';
@@ -2555,7 +2566,7 @@ function updateUI(){if(!sim)return;renderHud();positionArms();const st=stats(sim
   if(live&&cfgSig(sim.nextCfg)!==cs)sim.nextCfg=clone(cfg);else if(!live)sim.nextCfg=null;
   $('pending').hidden=!(pend&&!live&&state==='run');
   $('newsess').classList.toggle('primary',state==='done');$('play').disabled=state!=='run';
-  {const L=triesLeft(),b=$('skip'),t=L===Infinity?'이 설정으로 확정':L>0?`이 설정으로 확정 (${L}회 남음)`:'처음부터 다시';if(b.textContent!==t)b.textContent=t;b.disabled=L>0&&state!=='run';b.classList.toggle('primary',L<=0);}}
+  {const L=triesLeft(),b=$('skip'),t='처음부터 다시 도전';if(b.textContent!==t)b.textContent=t;b.hidden=L===Infinity;b.disabled=false;b.classList.toggle('primary',L<=0);}}
 function frame(now){const real=Math.min(.1,(now-last)/1000);last=now;
   // 창(결과, 신호 구성, 접근로 등)이 열려 있는 동안은 관찰 시간이 흐르지 않음
   if(running&&state==='run'&&$('modal').hidden&&$('pop').hidden&&introBox.hidden&&!document.body.classList.contains('titleon')){acc+=real*speed;let n=0;while(acc>=DT&&n<80){step(sim);acc-=DT;n++;
@@ -2634,7 +2645,7 @@ window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(
 {const mk=(id,label,key)=>{const l=document.createElement('label');l.className='chk sm adv';l.innerHTML=`<input type="checkbox" id="${id}">${label}`;
     $('ctlbar').insertBefore(l,$('resetcfg'));const c=$(id);c.checked=FXP[key];c.addEventListener('change',()=>{FXP[key]=c.checked;fxSave();if(key==='snd'&&c.checked){fxAudio();fxSound('good');}});};
   mk('fxbub','말풍선 효과','bub');mk('fxsnd','효과음','snd');}
-// ---------- 흐름 계기판: 확정한 점수만 바늘로 보여 줌(예상 점수는 보여 주지 않음: 게임이 너무 쉬워짐) ----------
+// ---------- 흐름 계기판: 조작할 때마다 나온 점수를 바늘로 보여 줌(조작 수가 정해진 N수 퍼즐이라 점수를 바로 공개). 흐린 바늘은 직전 점수 ----------
 // 편집 중인 설정은 화면 밖(Web Worker)에서 미리 계산해 두기만 함: 확정 버튼을 누르면 바로 결과가 나오게. 최근 60개 설정 기억
 const FC={cache:new Map(),busy:false,want:null,wantAt:0,shown:null,mode:null,base:null};
 function fcKey(c){return cfgSig(c);}
@@ -2654,16 +2665,16 @@ function gDrawScale(){const {t,lo,hi}=gRange(),A=v=>gAng(v,lo,hi),seg=[[lo,t[0],
 function gSet(el,v){const {lo,hi}=gRange();el.style.transform=`rotate(${gAng(v,lo,hi)}deg)`;}
 // 결과 표시 + 소리: 좋아지면 오르는 음, 나빠지면 내려가는 음, 별 기준을 넘으면 종소리와 말풍선
 function fcShow(){const ra=(store.get('restart-v1')||{})[modeId()]||0,r=history.find(h=>(h.sameDemand||h.jam)&&(h.at||0)>ra)||null;gauge.classList.remove('calc');
-  const b=FC.base?FC.base.score:null,gd=gauge.querySelector('.gd'),tl=triesLeft(),tt=tl===Infinity?'':tl>0?`확정 ${tl}회 남음`:'확정 기회 없음';
+  const b=FC.base?FC.base.score:null,gd=gauge.querySelector('.gd'),tl=triesLeft(),tt=tl===Infinity?'':tl>0?`남은 조작 ${tl}번`:'조작을 모두 씀';
   gauge.querySelector('.gl').textContent=tt?'흐름 점수, '+tt:'흐름 점수';
-  if(!r){gauge.classList.remove('jam');gauge.classList.add('none');gauge.querySelector('.gs').textContent='?';gd.textContent='확정하면 점수가 나옵니다';gd.className='gd';
-    gSet(gauge.querySelector('.needle'),-1e9);gSet(gauge.querySelector('.ghost'),-1e9);FC.shown=null;return;}
+  if(!r){gauge.classList.remove('jam');gauge.classList.add('none');gauge.querySelector('.gs').textContent=b!=null?b.toLocaleString():'?';gd.textContent='시작 점수, 조작하면 바로 바뀌어요';gd.className='gd';
+    gSet(gauge.querySelector('.needle'),b!=null?b:-1e9);gSet(gauge.querySelector('.ghost'),-1e9);FC.shown=null;return;}
   gauge.classList.remove('none');const jam=!!r.jam;gauge.classList.toggle('jam',jam);
   const key=r.no+':'+r.score;if(FC.shown&&FC.shown.key===key)return;const prev=FC.shown;FC.shown={key,score:r.score,jam};
-  gSet(gauge.querySelector('.needle'),jam?-1e9:r.score);gSet(gauge.querySelector('.ghost'),prev&&!prev.jam?prev.score:jam?-1e9:r.score);
+  gSet(gauge.querySelector('.needle'),jam?-1e9:r.score);gSet(gauge.querySelector('.ghost'),prev&&!prev.jam?prev.score:jam?-1e9:(b!=null?b:r.score));
   gauge.querySelector('.gs').textContent=jam?'정체':r.score.toLocaleString();
   const d=b!=null&&!jam?(r.score-b)/Math.max(1,Math.abs(b))*100:null;
-  gd.textContent=jam?`대기열 ${r.st.peakQ}대`:d==null?'확정 점수':Math.abs(d)<.5?'시작 설정과 같음':`시작 대비 ${d>0?'+':''}${Math.round(d)}%`;gd.className='gd '+(jam||d<-.5?'down':d>.5?'up':'');}
+  gd.textContent=jam?`대기열 ${r.st.peakQ}대`:d==null?'지금 점수':Math.abs(d)<.5?'시작 설정과 같음':`시작 대비 ${d>0?'+':''}${Math.round(d)}%`;gd.className='gd '+(jam||d<-.5?'down':d>.5?'up':'');}
 // 확정할 때만 소리: 이전 확정보다 좋아지면 오르는 음, 나빠지면 내려가는 음(별, 기록은 fx.js의 축하 효과)
 window.addEventListener('session-done',ev=>{const r=ev.detail&&ev.detail.rec;if(!r)return;const p=history[1];setTimeout(fcShow,50);
   if(r.jam){fxSound('bad');return;}if(r.newStars||r.record)return;if(p&&!p.jam){if(r.score>p.score)fxSound('up');else if(r.score<p.score)fxSound('down');}});
@@ -2750,8 +2761,8 @@ window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!
 // 안내 말풍선: 레벨에 처음 들어왔을 때 새 조작을 가리킴. 대상이 화면에 나타날 때까지 기다렸다가 표시
 const COACH={
  '0-1':[{sel:'#dx .dxh',t:'도로 위 색 띠가 그 도로의 녹색 시간입니다. 띠 끝의 숫자 손잡이를 도로를 따라 끌면 남북과 동서가 녹색을 주고받아요. 차가 많은 남북 쪽 띠를 늘려 보세요.'},
-        {sel:'#skip',t:'마음에 드는 설정을 찾았으면 확정하세요. 확정할 때마다 세션 1번을 씁니다. 스테이지마다 세션은 5번입니다.'},
-        {sel:'#gauge',t:'확정한 점수가 여기 바늘로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
+        {sel:'#gauge',t:'조작할 때마다 점수가 바로 바뀝니다. 한 번 도전에 쓸 수 있는 조작 수가 정해져 있으니 한 번 한 번 신중하게 바꿔 보세요.'},
+        {sel:'#gauge',t:'조작할 때마다 점수가 여기 바늘로 바로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
  '0-4':[{sel:'#dx .dxh',t:'실제 강남역 신호입니다. 도로마다 받는 현시가 색 구간으로 이어져 있어요. 구간 끝 손잡이를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
  '1-1':[{sel:'#dx .dxc',t:'이제 주기 길이를 바꿀 수 있습니다. 교차로 가운데 "신호"를 누르면 주기 +5/−5와 주기 고정이 나와요. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
  '2-1':[{sel:'#dx .dxs',t:'정지선 바로 뒤 차로(점선 네모)를 누르면 차로 용도(좌회전, 직진, 우회전)가 바뀝니다. '}],
@@ -2788,7 +2799,7 @@ const introBox=(()=>{const d=document.createElement('div');d.className='intro';d
   d.innerHTML=`<div class="ib"><h2>교통 관제 엔지니어가 되어 보세요</h2>
   <p>서울 강남역, 이스탄불, 토론토, 런던, 도쿄. 세계에서 손꼽히게 막히는 실제 교차로들이 기다리고 있습니다. 실제 교통량 자료로 만든 교차로의 신호와 차로를 바꿔 <b>정체를 푸는 것</b>이 최종 목표입니다.</p>
   <div class="road">${STAGES.map(s=>`<span>${s.name}</span>`).join('<i></i>')}<i></i><span class="end">실제 교차로 5곳</span></div>
-  <p class="sm">장마다 도구가 하나씩 늘어납니다. 세션은 3분 관찰 후 확정, 스테이지마다 5번. 확정한 점수가 계기판 바늘로 나오고, 별 2개를 넘으면 다음 스테이지로 갈 수 있습니다.</p>
+  <p class="sm">장마다 도구가 하나씩 늘어납니다. 조작할 때마다 점수가 바로 나오고, 한 번 도전에 쓸 수 있는 조작 수가 정해져 있습니다(N수 퍼즐). 별 2개를 넘으면 다음 스테이지로 갈 수 있습니다.</p>
   <button type="button" class="primary">1장 시작</button></div>`;document.body.appendChild(d);
   d.querySelector('button').addEventListener('click',()=>{d.hidden=true;store.set('intro-v1',1);if(!curLevel()||curLevel().id!=='0-1')loadMode({kind:'level',idx:0});anTrack('coach',{id:'intro',step:1,n:1,skipped:false});});return d;})();
 // 첫 방문 소개는 시작 화면을 닫은 뒤에 보여 줌(title.js)
@@ -3130,7 +3141,7 @@ function pvApply(){const want=playMode&&!document.body.classList.contains('mobil
 function pvGoal(){if(!PV2S.goal)return;const lv=curLevel(),R=curReal(),t=thresholds();
   const g=lv?lv.goal:R?'모든 도구로 이 교차로의 흐름 점수를 최대한 올리세요.':'자유롭게 실험해 보세요.';
   const k=modeId()+'|'+g;if(PV2S.goal.dataset.k===k)return;PV2S.goal.dataset.k=k;
-  PV2S.goal.innerHTML=`<b>할 일</b><span>${g}</span><small>별 ★${t[0]} ★★${t[1]} ★★★${t[2]}점, 확정하면 점수가 나옵니다</small>`;}
+  PV2S.goal.innerHTML=`<b>할 일</b><span>${g}</span><small>별 ★${t[0]} ★★${t[1]} ★★★${t[2]}점. 조작할 때마다 점수가 바로 나와요</small>`;}
 setInterval(()=>{try{pvApply();pvGoal();}catch(e){}},300);
 {const _sp=setPlayMode;setPlayMode=function(on){_sp(on);try{pvApply();}catch(e){}};}
 // ---------- 신호 시계(링 다이얼): 신호 한 바퀴를 원으로 보여 주고, 원 위 손잡이를 끌어 녹색을 옮김 ----------
@@ -3662,7 +3673,7 @@ function dailyCard(){const r=DLY.row;
     <div class="dmain"><div class="dtxt"><b class="dtitle">${dEsc(r.title)}</b><p>${dEsc(r.story)}</p>
       <div class="dchips"><span>${dEsc(D_CITY[r.stage]||REAL[r.stage].title)}</span><span>날씨 ${dEsc(wx)}</span>${up.length?`<span>교통량 ${up.join(', ')}</span>`:''}${r.source==='claude'?'<span class="dai">AI가 만든 시나리오</span>':''}</div></div>
       <div class="dside"><div class="dq"><b>오늘의 퀘스트</b>
-        <span class="${q.played?'ok':''}">${q.played?'✓':'○'} 오늘의 도전 확정 1번</span><span class="${q.star?'ok':''}">${q.star?'✓':'○'} 별 1개 이상</span><span class="${q.lb?'ok':''}">${q.lb?'✓':'○'} 오늘 랭킹에 등록</span>
+        <span class="${q.played?'ok':''}">${q.played?'✓':'○'} 오늘의 도전 1번 하기</span><span class="${q.star?'ok':''}">${q.star?'✓':'○'} 별 1개 이상</span><span class="${q.lb?'ok':''}">${q.lb?'✓':'○'} 오늘 랭킹에 등록</span>
         <small>${st?`연속 ${st}일째 별 획득 중`:'별을 받으면 연속 기록이 시작돼요'}${q.best!=null?`, 오늘 내 최고 ${q.best}점`:''}</small></div>
         <button type="button" class="primary dgo">${q.played?'다시 도전':'도전하기'}</button></div></div>
     <div class="dtopn">${T==null?'<small>오늘 순위 불러오는 중</small>':T.length?`<small>오늘의 순위</small>${T.slice(0,3).map((x,i)=>`<span><em>${i+1}</em>${dEsc(x.nickname)} <b>${x.score}</b></span>`).join('')}`:'<small>아직 오늘 순위에 오른 사람이 없어요. 첫 주인공이 되어 보세요</small>'}</div></div>`;}
@@ -3674,7 +3685,7 @@ function dailyBoard(){const box=$('dboard');if(!box)return;const r=DLY.row,T=DLY
   const rows=T&&T.length?`<table class="dtbl"><thead><tr><th>순위</th><th>닉네임</th><th class="n">점수</th><th class="n">통과 인원</th></tr></thead><tbody>${T.slice(0,10).map((x,i)=>`<tr class="${x.user_id===uid?'me':''}"><td>${i+1}</td><td>${dEsc(x.nickname)}</td><td class="n">${x.score}</td><td class="n">${Number(x.persons||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>${uid&&T.findIndex(x=>x.user_id===uid)>=10?`<small>내 순위 ${T.findIndex(x=>x.user_id===uid)+1}위 / ${T.length}명</small>`:''}`
     :`<p class="dnone">${T==null?'오늘의 랭킹 불러오는 중':'아직 오늘 랭킹에 오른 사람이 없어요. 첫 기록의 주인공이 되어 보세요.'}</p>`;
   box.innerHTML=r?`<div class="dbh"><b>오늘의 랭킹</b><small>서버가 다시 계산해 확인한 기록만, 사람마다 최고 기록 1개</small></div>${rows}
-    <div class="drules"><b>일일 챌린지 규칙</b><span>매일 한국 시간 자정에 새 교통 상황이 열려요. 같은 날에는 모두 같은 상황입니다.</span><span>하루 5번까지 확정할 수 있고, 별 기준은 그날 시작 설정 점수에서 얼마나 올렸는지로 정해요.</span><span>퀘스트 3개를 채우고, 별을 받은 날이 이어지면 연속 기록이 쌓여요.</span></div>`:'';}
+    <div class="drules"><b>일일 챌린지 규칙</b><span>매일 한국 시간 자정에 새 교통 상황이 열려요. 같은 날에는 모두 같은 상황입니다.</span><span>도전마다 조작 10번, 도전을 시작할 때 도전권 1장을 쓰고, 별 기준은 그날 시작 설정 점수에서 얼마나 올렸는지로 정해요.</span><span>퀘스트 3개를 채우고, 별을 받은 날이 이어지면 연속 기록이 쌓여요.</span></div>`:'';}
 HUB.render.daily=()=>{DLY.top=null;dailyRender();dailyBoard();dailyLoad().then(()=>{dailyRender();dailyBoard();dailyTop().then(dailyBoard);});};
 HUB.sum.daily=()=>{const r=DLY.row;if(!r){if(!DLY.loading&&!DLY.err)dailyLoad().then(()=>{if(!JR.hidden&&JS.view==='modes')hubModes();});return{sub:DLY.err?'불러오지 못했어요. 자세히에서 다시 시도':'불러오는 중'};}
   const q=dQuest(r.day),n=(q.played?1:0)+(q.star?1:0)+(q.lb?1:0),st=dStreak();return{title:r.title,ready:true,sub:`남은 시간 ${dLeft()}, 퀘스트 ${n} / 3${st?`, 연속 ${st}일`:''}${q.best!=null?`, 오늘 최고 ${q.best}점`:''}`};};
@@ -4172,7 +4183,7 @@ function dxPaintBar(){let b=$('dxbar');if(!DX.paint){if(b)b.remove();return;}
       else if(t.dataset.done){dxPaint(false);return;}dxPaintBar();dxRender();});}
   const c=$('cv');b.style.left=(c.offsetLeft+cw/2)+'px';b.style.top=(c.offsetTop+8)+'px';
   b.innerHTML=PH.map((p,i)=>`<button type="button" data-i="${i}" class="${i===selP?'on':''}" style="${i===selP?`border-color:${dxCol(i)};color:${dxCol(i)}`:''}">${i+1}. ${dxEsc(p.x?'보행 전용':phName(p))} ${p.g}초</button>`).join('')+`<button type="button" data-add="1">＋ 현시</button><button type="button" data-del="1">이 현시 삭제</button><button type="button" class="primary" data-done="1">완료</button>`+(dxGlobal().length?`<div class="dxg">${dxGlobal().map((x,i)=>x.lab?`<span>${x.t}</span>`:`<button type="button" data-g="${i}" class="${x.on?'on':''}">${x.t}</button>`).join('')}</div>`:'');}
-function dxPaint(on){DX.paint=on;dxClose();closePop();document.body.classList.toggle('dxpaint',on);if(on){selP=Math.min(selP,PH.length-1);dxToast('화살표를 누르면 지금 현시에 넣고 빼요. 흰 점선은 빨간불, 노란색은 비보호, 빨간색은 부딪혀서 못 넣어요');}dxPaintBar();dxRender();}
+function dxPaint(on){DX.paint=on;dxClose();closePop();document.body.classList.toggle('dxpaint',on);if(on){selP=Math.min(selP,PH.length-1);dxToast('화살표를 누르면 지금 현시에 넣고 빼요. 흰 점선은 빨간불, 노란색은 비보호, 빨간색은 부딪혀서 못 넣어요. 완료를 누르면 조작 1번으로 세고 점수가 나와요');}dxPaintBar();dxRender();}
 // ----- 지도 누르기: 차로(기존), 교차로 가운데, 도로. 예전 접근로 창 대신 원형 메뉴 -----
 function dxArmAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.75;
   for(const a of APPR){const segs=[...(net.inL[a]||[]),...(net.outL[hk([-HEAD[a][0],-HEAD[a][1]])]||[])];for(const sg of segs){const P=sg.pts;for(let i=1;i<P.length;i++){const ax=P[i-1][0],ay=P[i-1][1],bx=P[i][0],by=P[i][1],dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best=a;}}}}
@@ -4186,10 +4197,103 @@ $('cv').addEventListener('click',e=>{if(!dxActive())return;e.stopImmediatePropag
   const a=dxArmAt(e);if(a){dxRoadMenu(a,x,y);return;}closePop();},true);
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(DX.paint)dxPaint(false);else dxClose();}});
 // 예전 조작 숨김: 접근로 버튼, 귀퉁이 신호 시계 카드(신호 시간은 도로 띠로). 세션 기록은 재생 줄로
-{const b=document.createElement('button');b.type='button';b.id='dxhist';b.textContent='세션 기록';b.addEventListener('click',openHistory);const s=$('skip');if(s&&s.parentNode)s.parentNode.insertBefore(b,$('resetcfg'));}
+{const b=document.createElement('button');b.type='button';b.id='dxhist';b.textContent='조작 기록';b.addEventListener('click',openHistory);const s=$('skip');if(s&&s.parentNode)s.parentNode.insertBefore(b,$('resetcfg'));}
 dxBuild();setInterval(()=>{try{if(!DX.drag)dxRender();}catch(e){}},150);
 {const _lm=loadMode;loadMode=function(m){if(DX.paint)dxPaint(false);dxClose();return _lm(m);};}
 window.__dx={render:dxRender,sig:a=>dxSigMenu(a),road:(a,x,y)=>dxRoadMenu(a,x,y),paint:dxPaint,get geo(){return DX.geo},get K(){return DX.K}};
+// ---------- 조작 단위 진행(N수 퍼즐) + 도전권 ----------
+// 조작 1번 = 설정이 바뀌고 0.8초 동안 그대로 있으면 1번으로 셈(띠를 끄는 중, 현시 그리기 중에는 세지 않음). 바로 점수를 계산해 조작한 자리에 결과를 띄움
+// 한 번 도전에 쓸 수 있는 조작 수: 튜토리얼 8, 실제 교차로 12, 일일 챌린지 10(TRIES_MAX). 실험실은 무제한
+// 도전권: 실제 교차로, 일일 챌린지, 나만의 교차로에서 도전의 첫 조작 때 1장. 5장까지 30분마다 1장 충전. 도전 중 내 최고 기록을 넘기면 돌려받음
+// 무료 충전: 일일 챌린지 퀘스트 3개 완료 +2, 튜토리얼 스테이지 첫 클리어 +1. 광고와 유료 상품은 자리만(누른 횟수만 기록)
+const MV={id:null,sig:null,cfg:null,pend:null,stableAt:0,busy:false,pt:null,ref:null};
+const TIX_MAX=5,TIX_REGEN=30*60e3;
+const tixNeed=()=>mode.kind==='real';
+function tixGet(){const now=Date.now(),o=store.get('tix-v1')||{n:TIX_MAX,t:now};
+  if(o.n<TIX_MAX){const k=Math.floor((now-o.t)/TIX_REGEN);if(k>0){o.n=Math.min(TIX_MAX,o.n+k);o.t=o.n>=TIX_MAX?now:o.t+k*TIX_REGEN;store.set('tix-v1',o);}}return o;}
+function tixAdd(d,why){const o=tixGet(),was=o.n;o.n=Math.max(0,o.n+d);if(was>=TIX_MAX&&o.n<TIX_MAX)o.t=Date.now();store.set('tix-v1',o);tixRender();
+  if(d>0&&why)mvToast(`도전권 +${d}: ${why}`);try{anTrack('tix',{d,why:why||'',n:o.n});}catch(e){}}
+function tixNext(){const o=tixGet();if(o.n>=TIX_MAX)return'';const s=Math.max(0,Math.ceil((o.t+TIX_REGEN-Date.now())/1000));return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function attGet(){return(store.get('att-v1')||{})[modeId()]||null;}
+function attSet(v){const a=store.get('att-v1')||{};if(v)a[modeId()]=v;else delete a[modeId()];store.set('att-v1',a);}
+function mvToast(t,fn,lab){if(typeof dxToast==='function')dxToast(t,fn,lab);}
+function mvMon(k){try{anTrack('mon_click',{k,stage:modeId()});}catch(e){}mvToast('준비 중인 기능이에요. 관심 표시를 기록해 두었어요');}
+// 도전권 표시(계기판 아래)
+const tixEl=(()=>{const d=document.createElement('div');d.id='tixchip';d.className='tixchip';d.hidden=true;const g=$('gauge');(g&&g.parentNode||$('hudtop')).insertBefore(d,g?g.nextSibling:null);
+  d.addEventListener('click',()=>mvNoTix(true));return d;})();
+function tixRender(){const on=!!(cfg&&tixNeed()&&typeof playMode!=='undefined'&&playMode);tixEl.hidden=!on;if(!on)return;const o=tixGet(),nx=tixNext();
+  const h=`<b>도전권 ${o.n}</b><span>${nx?`다음 충전 ${nx}`:'가득'}</span>`;if(tixEl.innerHTML!==h)tixEl.innerHTML=h;tixEl.classList.toggle('empty',o.n<=0);}
+// 조작한 자리(마지막으로 누른 곳)에 결과 칩
+document.addEventListener('pointerup',e=>{if(e.target.closest&&e.target.closest('#stage'))MV.pt=[e.clientX,e.clientY];},true);
+function mvChip(html,cls,ms){const st=$('stage');if(!st)return null;const r=st.getBoundingClientRect(),c=document.createElement('div');c.className='mvchip '+(cls||'');c.innerHTML=html;st.appendChild(c);
+  const p=MV.pt||[r.left+r.width/2,r.top+r.height/2];const w=c.offsetWidth||160,h=c.offsetHeight||40;
+  c.style.left=Math.max(6,Math.min(r.width-w-6,p[0]-r.left-w/2))+'px';c.style.top=Math.max(6,Math.min(r.height-h-6,p[1]-r.top-h-26))+'px';
+  if(ms)setTimeout(()=>{c.classList.add('out');setTimeout(()=>c.remove(),400);},ms);return c;}
+function mvDeltaHTML(ev,ref){const d=ref?ev.score-ref.score:0,st=ev.st,rs=ref&&ref.st;
+  if(jammed(st))return{cls:'down',h:`<b>정체</b><span>한 차로 대기열 ${st.peakQ}대. 이 설정은 별을 받을 수 없어요</span>`};
+  const sg=(x,f)=>(x>0?'+':'')+f(x);const parts=[];
+  if(rs){const dp=st.persons-rs.persons,ds=st.spd-rs.spd,dl=st.dly-rs.dly;
+    if(Math.abs(dp)>=1)parts.push(`통과 ${sg(dp,x=>Math.round(x))}명`);if(Math.abs(ds)>=.1)parts.push(`속도 ${sg(ds,x=>x.toFixed(1))}km/h`);if(!parts.length&&Math.abs(dl)>=1)parts.push(`지연 ${sg(dl,x=>Math.round(x))}초`);
+    if(riskGrade(st.risk)>riskGrade(rs.risk))parts.push('사고 위험 높아짐');}
+  const cls=!ref||Math.abs(d)<1?'flat':d>0?'up':'down';
+  return{cls,h:`<b>${!ref?ev.score:Math.abs(d)<1?'변화 없음':(d>0?'▲ +':'▼ ')+Math.round(d)}</b><span>${parts.join(', ')||`흐름 점수 ${ev.score}`}</span>`};}
+function mvRevert(){if(!MV.cfg)return;cfg=clone(MV.cfg);syncControls();if(typeof buildArms==='function')buildArms();MV.sig=cfgSig(cfg);MV.pend=null;}
+function mvSync(){MV.sig=cfgSig(cfg);MV.cfg=clone(cfg);MV.pend=null;MV.ref=null;}
+async function mvCommit(){const fc=clone(cfg),s=cfgSig(fc);
+  if(limited()&&triesLeft()<=0){mvRevert();mvOut();return;}
+  const mid=modeId();
+  if(limited()&&triesUsed()===0){const pb=(prog[modeId()]||{}).best,best0=pb!=null&&pb>-1e8?pb:(FC.base?FC.base.score:null);
+    if(tixNeed()){if(tixGet().n<=0){mvRevert();mvNoTix();return;}tixAdd(-1);attSet({paid:1,best0,at:Date.now()});mvToast(`도전 시작: 도전권 1장을 썼어요. 조작 ${TRIES_MAX()}번 안에 최고 점수를 내세요. 내 최고 기록을 넘기면 돌려받아요`);}
+    else attSet({paid:0,best0,at:Date.now()});}
+  MV.busy=true;MV.sig=s;MV.cfg=clone(fc);MV.pend=null;
+  const wait=mvChip('<b>계산 중</b><span>이 조작의 효과를 재고 있어요</span>','calc');
+  try{const k=fcKey(fc);let ev=FC.cache.get(k);if(!ev){ev=await evalAsync(fc,null);fcPut(k,{score:ev.score,st:ev.st});}
+    if(wait)wait.remove();if(modeId()!==mid)return;const ref=MV.ref||fcGet(baseCfg())||(FC.baseId===mid?FC.base:null),dh=mvDeltaHTML(ev,ref);
+    finishWith(fc,{score:ev.score,st:ev.st},false,true);if(sim&&!timingOnly(fc,sim.cfg)&&state==='run'){startSession();if(typeof buildArms==='function')buildArms();}MV.ref={score:ev.score,st:ev.st};const rec=history[0];
+    mvChip(dh.h+(limited()?`<small>남은 조작 ${triesLeft()}번</small>`:''),dh.cls,2600);
+    const at=attGet();if(at&&at.paid&&!at.back&&rec&&rec.sameDemand&&!rec.jam&&(at.best0==null||rec.score>at.best0)){at.back=1;attSet(at);tixAdd(1,'내 최고 기록 경신으로 돌려받음');}
+    if(rec&&rec.newStars&&rec.stars>=2&&nextTarget())setTimeout(()=>mvToast(`별 ${rec.stars}개 달성! 다음 스테이지로 갈까요?`,()=>loadMode(nextTarget().m),'다음 스테이지'),900);
+    if(limited()&&triesLeft()<=0)setTimeout(mvOut,1800);}
+  catch(e){if(wait)wait.remove();}finally{MV.busy=false;}}
+function mvTick(){try{if(!cfg||!sim)return;const id=modeId();if(MV.id!==id){MV.id=id;mvSync();return;}    tixRender();const s=cfgSig(cfg);if(s===MV.sig){MV.pend=null;return;}
+    if(MV.busy||DX.drag||DX.paint||document.body.classList.contains('titleon'))return;if(MV.pend!==s){MV.pend=s;MV.stableAt=performance.now();return;}
+    if(performance.now()-MV.stableAt<800)return;mvCommit();}catch(e){MV.err=String(e);}}
+setInterval(mvTick,150);
+// 처음 설정으로 돌아가는 것은 조작이 아님
+{const rs=restartStage;restartStage=function(){rs();attSet(null);mvSync();};}
+{const lm=loadMode;loadMode=function(m){lm(m);MV.id=null;};}
+function mvBest(){const at=attGet(),t0=at?at.at:0;let b=null;for(const h of history)if((h.at||0)>=t0&&h.sameDemand&&!h.jam&&(!b||h.score>b.score))b=h;return b;}
+// 조작을 모두 썼을 때
+function mvOut(){const b=mvBest(),L=TRIES_MAX();openModal(`조작 ${L}번을 모두 썼어요`,[]);
+  $('modalbody').innerHTML=`<p class="note" style="margin-top:0">${b?`이번 도전 최고 <b>${b.score}점</b>, 별 ${b.stars}개. `:''}받은 별과 최고 기록은 그대로 남아요. 처음 설정부터 다시 도전하거나 조작을 더 받아 이어 가세요.</p>
+  <div class="mvopts"><button type="button" class="primary" data-k="retry">처음부터 다시 도전${tixNeed()?' (도전권 1장)':''}</button>
+  <button type="button" data-k="plus5">조작 +5번 더 <small>준비 중</small></button>
+  <button type="button" data-k="modes">다른 모드 하기</button></div>`;
+  $('modalbody').querySelector('.mvopts').onclick=e=>{const k=(e.target.closest('button')||{}).dataset;if(!k||!k.k)return;
+    if(k.k==='retry'){closeModal();restartStage();}else if(k.k==='plus5')mvMon('plus5');else{closeModal();journeyOpen();}};}
+// 도전권이 없을 때(또는 도전권 표시를 눌렀을 때)
+function mvNoTix(info){const o=tixGet(),nx=tixNext(),dq=mvDqDone();
+  openModal(info&&o.n>0?`도전권 ${o.n}장`:'도전권이 없어요',[]);
+  $('modalbody').innerHTML=`<p class="note" style="margin-top:0">실제 교차로, 일일 챌린지, 나만의 교차로는 도전을 시작할 때(첫 조작) 도전권 1장을 써요. 도전 중 내 최고 기록을 넘기면 돌려받아요. ${TIX_MAX}장까지 30분마다 1장씩 차요${nx?`, 다음 충전까지 <b>${nx}</b>`:''}.</p>
+  <div class="mvopts"><b>무료로 채우기</b>
+  <button type="button" data-k="daily" ${dq?'disabled':''}>일일 챌린지 퀘스트 3개 완료 +2${dq?' (오늘 받음)':''}</button>
+  <button type="button" data-k="tut">튜토리얼 스테이지 처음 깨기 +1 (튜토리얼은 도전권 없이 플레이)</button>
+  <b>더 빨리</b>
+  <button type="button" data-k="ad">광고 보고 +1 <small>준비 중</small></button>
+  <button type="button" data-k="pack">도전권 묶음 <small>준비 중</small></button></div>`;
+  $('modalbody').querySelector('.mvopts').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const k=b.dataset.k;
+    if(k==='daily'||k==='tut'){closeModal();hubShow(k);}else mvMon(k);};}
+// 무료 충전: 튜토리얼 첫 클리어, 일일 퀘스트 3개
+window.addEventListener('session-done',ev=>{const d=ev.detail,r=d&&d.rec;if(!r||mode.kind!=='level'||!r.sameDemand||r.stars<1)return;const id=curLevel().id,got=store.get('tixtut-v1')||{};
+  if(got[id])return;got[id]=1;store.set('tixtut-v1',got);setTimeout(()=>tixAdd(1,'튜토리얼 스테이지 첫 클리어'),1200);});
+function mvDqDone(){const r=window.__D&&window.__D.row;return!!(r&&(store.get('tixdq-v1')||{})[r.day]);}
+setInterval(()=>{try{const r=window.__D&&window.__D.row;if(!r)return;const q=dQuest(r.day);if(!(q.played&&q.star&&q.lb))return;const g=store.get('tixdq-v1')||{};if(g[r.day])return;g[r.day]=1;store.set('tixdq-v1',g);tixAdd(2,'오늘의 퀘스트 3개 완료');}catch(e){}},3000);
+// 처음부터 다시 도전 버튼
+function mvRetry(){if(!limited())return;if(triesUsed()===0){mvToast('아직 조작하지 않았어요. 도로 위 색 띠를 끌거나 신호등, 차로를 눌러 보세요');return;}
+  openModal('처음부터 다시 도전할까요?',[]);$('modalbody').innerHTML=`<p class="note" style="margin-top:0">설정이 처음으로 돌아가고 조작 ${TRIES_MAX()}번이 다시 주어져요. 받은 별과 최고 기록은 남아요.${tixNeed()?' 다음 첫 조작 때 도전권 1장을 써요.':''}</p><div class="row2"><button type="button" class="primary" id="mvre">다시 도전</button><button type="button" id="mvno">계속하기</button></div>`;
+  $('mvre').onclick=()=>{closeModal();restartStage();};$('mvno').onclick=closeModal;}
+openOutOfTries=mvOut;
+window.__mv={retry:mvRetry,tix:tixGet,add:tixAdd,out:mvOut,noTix:mvNoTix,get state(){return{...MV,cfg:null}}};
 // ---------- 새 버전 알림: 공개 주소에서 5분마다 배포본의 빌드 번호를 확인해, 바뀌었으면 새로고침 안내 ----------
 // GitHub Pages는 페이지를 10분까지 캐시하므로, 열어 둔 화면이 옛 버전인 채로 남는 것을 막음
 {const me=(document.querySelector('meta[name="gl-build"]')||{}).content;
