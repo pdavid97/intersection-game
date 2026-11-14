@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261113170234">
+<meta name="gl-build" content="20261113170515">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4058,7 +4058,7 @@ function dxArmGeo(){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,o
     const f=s=>s.pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(L[0]),B=f(L[L.length-1]),la=dxPolyLen(A),lb=dxPolyLen(B),len=Math.min(la,lb);
     const C=[];for(let s=0;s<=len;s+=6){const p=dxAt(A,s),q=dxAt(B,s);C.push([(p[0]+q[0])/2,(p[1]+q[1])/2]);}
     let avail=0;for(let i=1;i<C.length;i++){const p=C[i];if(p[0]<8||p[1]<8||p[0]>cw-8||p[1]>ch-8)break;avail+=Math.hypot(p[0]-C[i-1][0],p[1]-C[i-1][1]);}
-    out[a]={C,len,avail,wpx:Math.max(10,L.length*W*sc*.9),skip:15*sc,A,B,n:L.length,sc};}
+    out[a]={C,len,avail,wpx:Math.max(10,L.length*W*sc*.9),skip:0,A,B,n:L.length,sc};}
   return out;}
 // 이 갈래가 녹색을 받는 현시(보행 전용 제외)
 const dxPhasesOf=a=>PH.map((p,i)=>({p,i})).filter(({p})=>!p.x&&p.g>0&&p.m.some(m=>m[0]===a));
