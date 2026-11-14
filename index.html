@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261108215740">
+<meta name="gl-build" content="20261113164459">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4093,7 +4093,13 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
 function dxDown(e){const t=e.target.closest('[class]');if(!t)return;const cl=t.getAttribute('class');
   if(cl==='dxh'){e.preventDefault();e.stopPropagation();dxClose();DX.drag={a:t.dataset.a,p:+t.dataset.p,s0:+t.dataset.s};DX.svg.setPointerCapture&&DX.svg.setPointerCapture(e.pointerId);return;}
   if(cl==='dxs'){e.preventDefault();e.stopPropagation();dxSigMenu(t.dataset.a);return;}
-  if(cl==='dxmv'){e.preventDefault();e.stopPropagation();dxToggleMove(t.dataset.id);return;}}
+  if(cl==='dxmv'){e.preventDefault();e.stopPropagation();dxToggleMove(dxPick(e)||t.dataset.id);return;}}
+// 겹친 화살표 중 고르기: 시작 부분(같은 정지선에서 출발해 겹침)은 빼고, 누른 곳에서 가장 가까운 이동
+function dxPick(e){const r=DX.svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=26;
+  for(const a of APPR)for(const mv of ['L','T','R']){const P=dxMovePath(a,mv);if(!P||P.length<2)continue;let tot=0;const cum=[0];for(let i=1;i<P.length;i++){tot+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);cum.push(tot);}
+    for(let i=1;i<P.length;i++){if(cum[i]<tot*.3)continue;const ax=P[i-1][0],ay=P[i-1][1],dx=P[i][0]-ax,dy=P[i][1]-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/L2)),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<bd){bd=d;best=a+mv;}}}
+  return best;}
+addEventListener('pointermove',e=>{if(!DX.paint||!DX.svg||e.pointerType==='touch')return;const h=dxPick(e);if(h!==DX.hov){DX.hov=h;dxRender();}});
 function dxMove(e){if(!DX.drag)return;const r=DX.svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,g=DX.geo[DX.drag.a];if(!g)return;
   let best=0,bd=1e9;for(let s=0;s<=g.len;s+=4){const p=dxAt(g.C,s),d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=s;}}
   const want=Math.round((best-DX.drag.s0)/DX.K),i=DX.drag.p,cur=PH[i].g;if(want===cur)return;
@@ -4163,17 +4169,31 @@ function dxLaneHint(a){store.set('dx-lane-seen',1);const c=cfg.appr[a];if(c.lane
 function dxMovePath(a,mv){const net=sim.net,k=Object.keys(net.conn).find(x=>x.startsWith(a+mv));if(!k)return null;const P=net.conn[k].pts.map(p=>toScreen(p[0],p[1]));return P;}
 function dxPaintSVG(){const ph=PH[selP];if(!ph)return'';const CF=getConf(cfg.geo);let h='';
   for(const a of APPR)for(const mv of ['L','T','R']){const P=dxMovePath(a,mv);if(!P||P.length<2)continue;const id=a+mv,on=!ph.x&&ph.m.includes(id),blocked=!on&&ph.m.some(y=>CF[id]&&CF[id][y]),perm=!on&&phaseGives(cfg,ph,a,mv)==='P';
-    const col=on?dxCol(selP):blocked?'#ff5a5a':perm?'#ffc94a':'#fff',d='M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),e=P[P.length-1],f=P[P.length-2],an=Math.atan2(e[1]-f[1],e[0]-f[0]);
+    const hv=DX.hov===id,col=on?dxCol(selP):blocked?'#ff5a5a':perm?'#ffc94a':'#fff',d='M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),e=P[P.length-1],f=P[P.length-2],an=Math.atan2(e[1]-f[1],e[0]-f[0]);
     h+=`<path class="dxmv" data-id="${id}" d="${d}" stroke="#000" stroke-opacity=".001" stroke-width="18" fill="none" style="cursor:pointer"/>`+
-      `<path d="${d}" stroke="${col}" stroke-opacity="${on?1:blocked?.35:.45}" stroke-width="${on?5:2.5}" fill="none" stroke-linecap="round" ${on?'':'stroke-dasharray="5 5"'} pointer-events="none"/>`+
-      `<path d="M${e[0]+7*Math.cos(an)} ${e[1]+7*Math.sin(an)} L${e[0]+7*Math.cos(an+2.5)} ${e[1]+7*Math.sin(an+2.5)} L${e[0]+7*Math.cos(an-2.5)} ${e[1]+7*Math.sin(an-2.5)}Z" fill="${col}" fill-opacity="${on?1:.45}" pointer-events="none"/>`;}
+      `<path d="${d}" stroke="${col}" stroke-opacity="${on||hv?1:blocked?.35:.45}" stroke-width="${on?5:hv?4.5:2.5}" fill="none" stroke-linecap="round" ${on?'':'stroke-dasharray="5 5"'} pointer-events="none"/>`+
+      `<path d="M${e[0]+7*Math.cos(an)} ${e[1]+7*Math.sin(an)} L${e[0]+7*Math.cos(an+2.5)} ${e[1]+7*Math.sin(an+2.5)} L${e[0]+7*Math.cos(an-2.5)} ${e[1]+7*Math.sin(an-2.5)}Z" fill="${col}" fill-opacity="${on||hv?1:.45}" pointer-events="none"/>`+(hv?`<text x="${e[0]+16*Math.cos(an)}" y="${e[1]+16*Math.sin(an)}" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="800" fill="#fff" stroke="#271d31" stroke-width="3.5" paint-order="stroke" pointer-events="none">${codeName(id)}${on?' 빼기':blocked?' 넣기(부딪히는 이동은 옮김)':' 넣기'}</text>`:'');}
   return h;}
-function dxToggleMove(x){const ph=PH[selP];if(!ph||ph.x)return;const CF=getConf(cfg.geo);
-  if(ph.m.includes(x))ph.m=ph.m.filter(y=>y!==x);
-  else{const cf=ph.m.filter(y=>CF[x][y]);if(cf.length){const yieldOnly=x[1]==='L'&&cf.every(y=>y[0]===OPP[x[0]]&&y[1]!=='L');
-      dxToast(`${codeName(x)}은 ${cf.map(codeName).join(', ')}과 부딪혀 같은 현시에 넣을 수 없어요${yieldOnly&&unlocked('perm')?'. 직진 녹색 때 틈을 보고 돌게 하려면 신호등 메뉴에서 비보호 좌회전을 켜세요':''}`);return;}
-    ph.m.push(x);}
-  markCustom();refreshPlan();dxPaintBar();dxRender();}
+// 이동 넣기: 지금 현시에서 부딪히는 이동은 빼고, 그 이동이 다른 현시에도 없으면 부딪히지 않는 다른 현시로 옮김(없으면 새 현시). 주기 고정이면 주기 유지
+function dxToggleMove(x){const ph=PH[selP];if(!ph||ph.x)return;const CF=getConf(cfg.geo),snap=clone(PH),C0=cycleLen();
+  const served=y=>PH.some(q=>!q.x&&q.m.includes(y));
+  if(ph.m.includes(x)){ph.m=ph.m.filter(y=>y!==x);markCustom();refreshPlan();dxPaintBar();dxRender();
+    if(!served(x))dxToast(`${codeName(x)}이 이제 어느 현시에도 없어 계속 빨간불이에요. 다른 현시에 넣어 주세요`,()=>dxUndo(snap),'되돌리기');return;}
+  const cf=ph.m.filter(y=>CF[x][y]);ph.m.push(x);
+  if(!cf.length){markCustom();refreshPlan();dxPaintBar();dxRender();return;}
+  ph.m=ph.m.filter(y=>!cf.includes(y));
+  const moved={},fresh=[];
+  for(const y of cf){if(served(y))continue;
+    const cand=PH.filter(q=>q!==ph&&!q.x&&!q.m.some(z=>CF[y][z])).sort((p,q)=>q.m.filter(z=>z[0]===y[0]).length-p.m.filter(z=>z[0]===y[0]).length);
+    if(cand.length){cand[0].m.push(y);(moved[PH.indexOf(cand[0])+1]=moved[PH.indexOf(cand[0])+1]||[]).push(y);continue;}
+    let f=fresh.find(q=>!q.m.some(z=>CF[y][z]));if(!f){if(PH.length+fresh.length>=8){dxUndo(snap);dxToast('현시는 8개까지라 자동으로 옮길 수 없어요. 먼저 다른 현시를 정리해 주세요');return;}f={m:[],g:10};fresh.push(f);}f.m.push(y);}
+  for(const f of fresh){PH.push(f);(moved[PH.length]=moved[PH.length]||[]).push(...f.m);}
+  if(fresh.length&&(RG.lock||!unlocked('cycle'))){const need=cycleLen()-C0;if(need>0){let left=need;while(left>0){const k=PH.reduce((b,p,j)=>!fresh.includes(p)&&p.g>PH[b].g?j:b,PH.findIndex(p=>!fresh.includes(p)));if(PH[k].g<=MIN_G)break;const t=Math.min(left,PH[k].g-MIN_G);PH[k].g-=t;left-=t;}}}
+  markCustom();refreshPlan();dxPaintBar();dxRender();
+  const where=Object.entries(moved).map(([n,ys])=>`${ys.map(codeName).join(', ')} → ${n}번${fresh.some(f=>PH.indexOf(f)+1==n)?'(새 현시)':''}`).join(', ');
+  const out=cf.filter(y=>!Object.values(moved).flat().includes(y));
+  dxToast(`${codeName(x)}을 넣고, 부딪히는 ${cf.map(codeName).join(', ')}은 이 현시에서 뺐어요${where?`. 옮긴 곳: ${where}`:''}${out.length?`. ${out.map(codeName).join(', ')}은 다른 현시에도 있어 그대로 돌아요`:''}`,()=>dxUndo(snap),'되돌리기');}
+function dxUndo(snap){PH.length=0;for(const p of clone(snap))PH.push(p);selP=Math.min(selP,PH.length-1);markCustom();refreshPlan();dxPaintBar();dxRender();}
 function dxPaintBar(){let b=$('dxbar');if(!DX.paint){if(b)b.remove();return;}
   if(!b){b=document.createElement('div');b.id='dxbar';b.className='dxbar';$('stage').appendChild(b);
     b.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;e.stopPropagation();
@@ -4183,7 +4203,7 @@ function dxPaintBar(){let b=$('dxbar');if(!DX.paint){if(b)b.remove();return;}
       else if(t.dataset.done){dxPaint(false);return;}dxPaintBar();dxRender();});}
   const c=$('cv');b.style.left=(c.offsetLeft+cw/2)+'px';b.style.top=(c.offsetTop+8)+'px';
   b.innerHTML=PH.map((p,i)=>`<button type="button" data-i="${i}" class="${i===selP?'on':''}" style="${i===selP?`border-color:${dxCol(i)};color:${dxCol(i)}`:''}">${i+1}. ${dxEsc(p.x?'보행 전용':phName(p))} ${p.g}초</button>`).join('')+`<button type="button" data-add="1">＋ 현시</button><button type="button" data-del="1">이 현시 삭제</button><button type="button" class="primary" data-done="1">완료</button>`+(dxGlobal().length?`<div class="dxg">${dxGlobal().map((x,i)=>x.lab?`<span>${x.t}</span>`:`<button type="button" data-g="${i}" class="${x.on?'on':''}">${x.t}</button>`).join('')}</div>`:'');}
-function dxPaint(on){DX.paint=on;dxClose();closePop();document.body.classList.toggle('dxpaint',on);if(on){selP=Math.min(selP,PH.length-1);dxToast('화살표를 누르면 지금 현시에 넣고 빼요. 흰 점선은 빨간불, 노란색은 비보호, 빨간색은 부딪혀서 못 넣어요. 완료를 누르면 조작 1번으로 세고 점수가 나와요');}dxPaintBar();dxRender();}
+function dxPaint(on){DX.paint=on;dxClose();closePop();document.body.classList.toggle('dxpaint',on);if(on){selP=Math.min(selP,PH.length-1);dxToast('화살표를 누르면 지금 현시에 넣고 빼요. 빨간 점선(부딪히는 이동)을 누르면 부딪히는 이동을 다른 현시로 알아서 옮겨요. 완료를 누르면 조작 1번으로 세고 점수가 나와요');}dxPaintBar();dxRender();}
 // ----- 지도 누르기: 차로(기존), 교차로 가운데, 도로. 예전 접근로 창 대신 원형 메뉴 -----
 function dxArmAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.75;
   for(const a of APPR){const segs=[...(net.inL[a]||[]),...(net.outL[hk([-HEAD[a][0],-HEAD[a][1]])]||[])];for(const sg of segs){const P=sg.pts;for(let i=1;i<P.length;i++){const ax=P[i-1][0],ay=P[i-1][1],bx=P[i][0],by=P[i][1],dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best=a;}}}}
