@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261113165550">
+<meta name="gl-build" content="20261113170234">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4050,6 +4050,7 @@ function dxToast(t,act,actLabel){const e=$('dxtoast');e.innerHTML=`<span>${t}</s
   if(act)e.querySelector('button').onclick=()=>{e.hidden=true;act();};clearTimeout(e._t);e._t=setTimeout(()=>{e.hidden=true;},act?7000:3200);}
 // ----- 화면 좌표 도우미 -----
 const dxPolyLen=P=>{let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s;};
+function dxOff(P,d){return P.map((q,i)=>{const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1;return[q[0]-(b[1]-a[1])/l*d,q[1]+(b[0]-a[0])/l*d];});}
 function dxAt(P,s){for(let i=1;i<P.length;i++){const L=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);if(s<=L||i===P.length-1){const t=L?Math.min(1,s/L):0;return[P[i-1][0]+(P[i][0]-P[i-1][0])*t,P[i-1][1]+(P[i][1]-P[i-1][1])*t];}s-=L;}return P[P.length-1];}
 // 갈래마다: 정지선에서 바깥으로 가는 진입 차로 묶음의 가운데 선(화면 좌표), 화면 안에서 쓸 수 있는 길이
 function dxArmGeo(){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,out={};
@@ -4074,7 +4075,10 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   if(!DX.paint){
     for(const a in G){const g=G[a];let s0=g.skip;
       for(const {p,i} of dxPhasesOf(a)){const L=p.g*K,col=dxCol(i),pts=[];for(let s=s0;s<=s0+L;s+=5)pts.push(dxAt(g.C,s));pts.push(dxAt(g.C,s0+L));
-        const dd='M'+pts.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L');h+=`<path d="${dd}" stroke="#fff" stroke-opacity=".9" stroke-width="${(g.wpx+3).toFixed(1)}" fill="none" stroke-linecap="butt" pointer-events="none"/><path d="${dd}" stroke="${col}" stroke-opacity=".82" stroke-width="${g.wpx.toFixed(1)}" fill="none" stroke-linecap="butt" pointer-events="none"/>`;
+        // 띠: 안은 옅게(차가 보이게), 양쪽 테두리는 진하게
+        const pl=P=>'M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),dd=pl(pts),hw=g.wpx/2;
+        h+=`<path d="${dd}" stroke="${col}" stroke-opacity=".32" stroke-width="${g.wpx.toFixed(1)}" fill="none" stroke-linecap="butt" pointer-events="none"/>`;
+        for(const sd of [1,-1]){const ed=pl(dxOff(pts,sd*(hw-1.5)));h+=`<path d="${ed}" stroke="#fff" stroke-opacity=".85" stroke-width="5" fill="none" pointer-events="none"/><path d="${ed}" stroke="${col}" stroke-width="3" fill="none" pointer-events="none"/>`;}
         const e=dxAt(g.C,s0+L).slice(),only=p.m.filter(m=>m[0]===a).every(m=>m[1]==='L'||m[1]==='U');
         if(canSplit){const e0=dxAt(g.C,s0+L-2),e1=dxAt(g.C,s0+L+2),tl=Math.hypot(e1[0]-e0[0],e1[1]-e0[1])||1;let ux=(e1[0]-e0[0])/tl,uy=(e1[1]-e0[1])/tl;const R=15;
           // 화살표를 연달아 누르는 동안은 손잡이를 제자리에 둠(누를 곳이 움직이지 않게)
