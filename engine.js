@@ -116,6 +116,8 @@ function conflictGap(veh,A,sv){let g=1e9;if(!A.conf)return g;const etaBase=Math.
   for(const c of A.conf){if(sv>c.sA-0.5)continue;const B=c.B;if(!B.vehicles.length)continue;
     const etaV=(c.sA-sv)/etaBase;
     for(const u of B.vehicles){if(u===veh)continue;const uf=u.s,ur=u.s-u.len;
+      // 교차로 안 교착 풀기: 교차로 안에서 5초 넘게 2m도 못 나간 차는 함께 멈춰 있는 차에게는 양보하지 않고 빠져나감(서로 양보하다 영원히 서는 것 방지)
+      if((veh.bt||0)>5&&u.v<0.2)continue;
       if(ur>c.sB+1.2)continue;
       let y=uf>c.sB-1.6;
       if(!y){const etaU=(c.sB-uf)/Math.max(u.v,1);if(etaU<4&&(etaU<etaV||(etaU===etaV&&u.id<veh.id)))y=true;}
@@ -271,7 +273,7 @@ function step(sim){const dt=DT,cfg=sim.cfg,net=sim.net;sim.t+=dt;
   // 가속도, 이동
   const all=[...net.outs,...net.conns,...net.ins];
   for(const seg of all)for(let k=0;k<seg.vehicles.length;k++){const v=seg.vehicles[k];v.acc=accel(sim,v,seg,k);}
-  for(const v of sim.vehicles){if(v.crashed){v.v=0;continue;}v.v=Math.max(0,v.v+v.acc*dt);const ds=v.v*dt;v.s+=ds;sim.totDist+=ds*v.occ;}
+  for(const v of sim.vehicles){if(v.crashed){v.v=0;continue;}v.v=Math.max(0,v.v+v.acc*dt);if(v.si===1){if(v.bs==null||v.s-v.bs>2){v.bs=v.s;v.bt=0;}else v.bt+=dt;}else{v.bs=null;v.bt=0;}const ds=v.v*dt;v.s+=ds;sim.totDist+=ds*v.occ;}
   // 정지선 대기, 겸용 차로 막힘 → 끼어들기 사고
   for(const seg of net.ins){const vs=seg.vehicles;if(!vs.length)continue;const h=vs[0];
     if(h.v<0.5&&seg.length-h.s<4)h.waitT=(h.waitT||0)+dt;
