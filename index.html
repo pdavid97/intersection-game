@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114214456">
+<meta name="gl-build" content="20261114214916">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4099,6 +4099,10 @@ function dxArmGeo(){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,o
     let avail=0;for(let i=1;i<C.length;i++){const p=C[i];if(p[0]<8||p[1]<8||p[0]>cw-8||p[1]>ch-8)break;avail+=Math.hypot(p[0]-C[i-1][0],p[1]-C[i-1][1]);}
     out[a]={C,len,avail,wpx:Math.max(10,L.length*W*sc*.9),skip:0,A,B,n:L.length,sc};}
   return out;}
+// 차로 묶음(lo~hi)의 가운데 선과 폭
+function dxBandGeo(a,lo,hi){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,Ls=net.inL[a]||[];if(!Ls[lo]||!Ls[hi])return null;
+  const f=s=>s.pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(Ls[lo]),B=f(Ls[hi]),len=Math.min(dxPolyLen(A),dxPolyLen(B)),C=[];for(let s=0;s<=len;s+=6){const p=dxAt(A,s),q=dxAt(B,s);C.push([(p[0]+q[0])/2,(p[1]+q[1])/2]);}
+  return{C,len,wpx:Math.max(8,(hi-lo+1)*W*sc*.9),skip:0,n:hi-lo+1,sc};}
 // 이 갈래가 녹색을 받는 현시(보행 전용 제외)
 const dxPhasesOf=a=>PH.map((p,i)=>({p,i})).filter(({p})=>!p.x&&p.g>0&&p.m.some(m=>m[0]===a));
 // 좌회전 전용 신호: 좌회전(유턴)만 있는 현시에 이 갈래 좌회전이 있음
@@ -4112,8 +4116,14 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   if(!DX.drag){let k=4.5;for(const a in G){const ps=dxPhasesOf(a),sum=ps.reduce((t,{p})=>t+p.g,0)+ps.length*2;if(sum>0)k=Math.min(k,(G[a].avail-G[a].skip-26)/sum);}DX.K=Math.max(.9,k);}
   const K=DX.K,canSplit=unlocked('split')||unlocked('cycle');let h='';h+=dxLaneSVG();{const sb=$('dxsig');if(sb)sb.hidden=!(unlocked('phases')||unlocked('scheme')||dxGlobal().length);}
   if(!DX.paint){
-    for(const a in G){const g=G[a];let s0=g.skip;
-      for(const {p,i} of dxPhasesOf(a)){const L=p.g*K,col=dxCol(i),pts=[];for(let s=s0;s<=s0+L;s+=5)pts.push(dxAt(g.C,s));pts.push(dxAt(g.C,s0+L));
+    DX.bandC={};
+    for(const a in G){const G0=G[a],used={},inl=(sim.net.inL[a]||[]).map((sg,k)=>({sg,k})).filter(x=>!x.sg.slip),nL=Math.min(inl.length,cfg.appr[a].lanes.length);
+      for(const {p,i} of dxPhasesOf(a)){
+        // 이 현시가 녹색(또는 비보호)을 주는 차로 위에만 띠를 그림: 좌회전 현시는 좌회전 차로 위, 직진 현시는 직진 차로 위
+        let ks=inl.filter(({k})=>k<nL&&[...laneMode(cfg.appr[a],k)].some(mv=>{const r=phaseGives(cfg,p,a,mv);return r==='G'||r==='P';})).map(x=>x.k),g=G0;
+        if(ks.length&&ks.length<inl.length){const lo=Math.min(...ks),hi=Math.max(...ks);g=dxBandGeo(a,lo,hi)||G0;}else ks=inl.map(x=>x.k);
+        let s0=Math.max(0,...ks.map(k=>used[k]||0));DX.bandC[a+':'+i]=g.C;
+        const L=p.g*K,col=dxCol(i),pts=[];for(let s=s0;s<=s0+L;s+=5)pts.push(dxAt(g.C,s));pts.push(dxAt(g.C,s0+L));
         // 띠: 안은 옅게(차가 보이게), 양쪽 테두리는 진하게
         const pl=P=>'M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),dd=pl(pts),hw=g.wpx/2;
         h+=`<path d="${dd}" stroke="${col}" stroke-opacity=".32" stroke-width="${g.wpx.toFixed(1)}" fill="none" stroke-linecap="butt" pointer-events="none"/>`;
@@ -4126,7 +4136,7 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
           for(const sg of [1,-1])h+=`<g class="dxn" data-a="${a}" data-p="${i}" data-d="${sg}" style="cursor:pointer"><circle cx="${e[0]+ux*sg*(R+11)}" cy="${e[1]+uy*sg*(R+11)}" r="12" fill="#000" fill-opacity=".001"/><path d="${tri(sg)}" fill="#fff" stroke="#271d31" stroke-width="1.5"/></g>`;
           h+=`<g class="dxh" data-a="${a}" data-p="${i}" data-s="${s0}" style="cursor:grab"><circle cx="${e[0]}" cy="${e[1]}" r="21" fill="#000" fill-opacity=".001"/><circle cx="${e[0]}" cy="${e[1]}" r="${R}" fill="${col}" stroke="#fff" stroke-width="2.5"/><text x="${e[0]}" y="${e[1]+.5}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#fff" stroke="#271d31" stroke-width="2" paint-order="stroke" pointer-events="none">${p.g}초</text></g>`;}
         if(only&&L>34){const m=dxAt(g.C,s0+L/2);h+=`<text x="${m[0]}" y="${m[1]}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="800" fill="#fff" stroke="#3a2313" stroke-width="2.5" paint-order="stroke" pointer-events="none">좌</text>`;}
-        s0+=L+3;}}}
+        for(const k of ks)used[k]=s0+L+3;}}}
   // 신호등(누르면 신호 메뉴) + 대기 대수
   for(const a in G){const g=G[a],p=g.A[0],q=g.B[0],dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy)||1,u=[dx/l,dy/l];
     const x=q[0]+u[0]*(g.wpx/g.n*.55+14),y=q[1]+u[1]*(g.wpx/g.n*.55+14),st=sigState(sim,a,cfg.appr[a].lanes.some(m=>m.includes('T'))?'T':'L');
@@ -4147,7 +4157,7 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   s.innerHTML=h;}
 // ----- 띠 손잡이 끌기 -----
 function dxDown(e){const t=e.target.closest('[class]');if(!t)return;const cl=t.getAttribute('class');
-  if(cl==='dxh'){e.preventDefault();e.stopPropagation();dxClose();DX.drag={a:t.dataset.a,p:+t.dataset.p,s0:+t.dataset.s};DX.svg.setPointerCapture&&DX.svg.setPointerCapture(e.pointerId);return;}
+  if(cl==='dxh'){e.preventDefault();e.stopPropagation();dxClose();DX.drag={a:t.dataset.a,p:+t.dataset.p,s0:+t.dataset.s,C:(DX.bandC||{})[t.dataset.a+':'+t.dataset.p]};DX.svg.setPointerCapture&&DX.svg.setPointerCapture(e.pointerId);return;}
   if(cl==='dxn'){e.preventDefault();e.stopPropagation();dxClose();const i=+t.dataset.p,d=+t.dataset.d;if(!DX.hold||DX.hold.a!==t.dataset.a||DX.hold.i!==i||performance.now()-(DX.nudgeAt||0)>=1500){DX.hold={a:t.dataset.a,i,e:null};DX.nudgeAt=performance.now();dxRender();}dxNudge(i,d);clearInterval(DX.rep);clearTimeout(DX.rep0);DX.rep0=setTimeout(()=>{DX.rep=setInterval(()=>dxNudge(i,d),110);},420);return;}
   if(cl==='dxs'){e.preventDefault();e.stopPropagation();dxSigMenu(t.dataset.a);return;}
   if(cl==='dxmv'){e.preventDefault();e.stopPropagation();dxToggleMove(dxPick(e)||t.dataset.id);return;}}
@@ -4157,7 +4167,7 @@ function dxPick(e){const r=DX.svg.getBoundingClientRect(),x=e.clientX-r.left,y=e
     for(let i=1;i<P.length;i++){if(cum[i]<tot*.3)continue;const ax=P[i-1][0],ay=P[i-1][1],dx=P[i][0]-ax,dy=P[i][1]-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/L2)),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<bd){bd=d;best=a+mv;}}}
   return best;}
 addEventListener('pointermove',e=>{if(!DX.paint||!DX.svg||e.pointerType==='touch')return;const h=dxPick(e);if(h!==DX.hov){DX.hov=h;dxRender();}});
-function dxMove(e){if(!DX.drag)return;const r=DX.svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,g=DX.geo[DX.drag.a];if(!g)return;
+function dxMove(e){if(!DX.drag)return;const r=DX.svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,g=DX.drag.C?{C:DX.drag.C,len:dxPolyLen(DX.drag.C)}:DX.geo[DX.drag.a];if(!g)return;
   let best=0,bd=1e9;for(let s=0;s<=g.len;s+=4){const p=dxAt(g.C,s),d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=s;}}
   const want=Math.round((best-DX.drag.s0)/DX.K),i=DX.drag.p,cur=PH[i].g;if(want===cur)return;
   dxSetG(i,want);refreshPlan();dxRender();}
