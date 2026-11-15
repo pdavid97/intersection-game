@@ -32,8 +32,10 @@ const SCEN={
   leftHeavy:{name:'좌회전 집중',appr:{N:[650,40,10],S:[650,35,10],E:[500,30,15],W:[500,15,20]}}
 };
 const DEFAULT_PLAN={NS_T:30,NS_L:12,EW_T:25,EW_L:10,S_A:25,N_A:25,E_A:20,W_A:20};
-const LANE_MINI={L:'좌',LU:'좌유',U:'유턴',LT:'좌직',T:'직',TR:'직우',R:'우',B:'버스'};
-const LANE_LBL={L:'좌회전 전용',LU:'좌회전 + 유턴',U:'유턴 전용',LT:'좌회전 + 직진',T:'직진 전용',TR:'직진 + 우회전',R:'우회전 전용',B:'버스/다인승 전용'};
+// 차로 용도 이름: 정해 둔 것 외의 조합(예: LUT 유턴+좌회전+직진, LTR)도 글자대로 이어 붙여 만듦
+const LN_MINI1={L:'좌',U:'유',T:'직',R:'우'},LN_FULL1={L:'좌회전',U:'유턴',T:'직진',R:'우회전'};
+const LANE_MINI=new Proxy({L:'좌',LU:'좌유',U:'유턴',LT:'좌직',T:'직',TR:'직우',R:'우',B:'버스'},{get:(o,k)=>k in o?o[k]:String(k).split('').map(x=>LN_MINI1[x]||'').join('')});
+const LANE_LBL=new Proxy({L:'좌회전 전용',LU:'좌회전 + 유턴',U:'유턴 전용',LT:'좌회전 + 직진',T:'직진 전용',TR:'직진 + 우회전',R:'우회전 전용',B:'버스/다인승 전용'},{get:(o,k)=>k in o?o[k]:String(k).split('').map(x=>LN_FULL1[x]||'').join(' + ')});
 // 차로 배치 기하: 접근로별 진입 차로 수, 팔(arm)별 나가는 차로 수, 우회전 전용 도로(슬립) 유무
 const GEO2={LW:3.5,nIn:{N:2,E:2,S:2,W:2},nOut:{N:2,E:2,S:2,W:2},slip:{}};
 function geoDims(G){const half=ax=>G.LW*Math.max(...(ax==='NS'?['N','S']:['E','W']).flatMap(x=>[G.nIn[x],G.nOut[x]]));
