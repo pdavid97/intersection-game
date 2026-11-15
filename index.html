@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261113172518">
+<meta name="gl-build" content="20261114210256">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1480,7 +1480,7 @@ const LEVELS=[
  {id:'1-1',stage:1,title:'한밤의 교차로',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:56,EW_T:56},
   appr:{N:[220,0,10,'T','TR'],S:[220,0,10,'T','TR'],E:[220,0,10,'T','TR'],W:[220,0,10,'T','TR']},
   story:'자정의 교차로. 차는 거의 없는데 신호 주기가 120초라 빈 도로 앞에서 1분 가까이 기다립니다.',
-  goal:'이제 주기 길이를 바꿀 수 있습니다. 한산한 시간에 맞는 주기를 찾으세요.',
+  goal:'이제 녹색 띠를 늘리고 줄이면 주기도 함께 바뀝니다. 모든 방향 띠를 줄여 한산한 시간에 맞는 짧은 주기를 만드세요.',
   hint:'주기가 짧을수록 빨간불에서 기다리는 시간이 줄어듭니다. 대신 주기마다 황색과 전적색으로 버려지는 시간이 있습니다.',goals:[{k:'dly',max:17}],stars:[234,280,315]},
  {id:'1-2',stage:1,title:'포화 직전',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:16,EW_T:16},
   appr:{N:[1400,0,10,'T','TR'],S:[1450,0,10,'T','TR'],E:[1100,0,10,'T','TR'],W:[1050,0,10,'T','TR']},
@@ -2770,9 +2770,9 @@ const COACH={
         {sel:'#gauge',t:'조작할 때마다 점수가 바로 바뀝니다. 한 번 도전에 쓸 수 있는 조작 수가 정해져 있으니 한 번 한 번 신중하게 바꿔 보세요.'},
         {sel:'#gauge',t:'조작할 때마다 점수가 여기 바늘로 바로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
  '0-4':[{sel:'#dx .dxh',t:'실제 강남역 신호입니다. 도로마다 받는 현시가 색 구간으로 이어져 있어요. 구간 끝 손잡이를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
- '1-1':[{sel:'#dx .dxring',t:'교차로를 둘러싼 링이 신호 주기입니다. 한 바퀴가 주기, 색 조각이 도로 띠와 같은 현시, 노랑과 빨강 틈이 황색과 전적색이에요. 이제 주기를 바꿀 수 있습니다. 링 옆 "신호 주기" 칸의 −5, +5와 고정을 눌러 보세요. 차가 거의 없는 밤에는 주기를 짧게 해 보세요.'}],
+ '1-1':[{sel:'#dx .dxring',t:'교차로를 둘러싼 링이 신호 주기입니다. 한 바퀴가 주기, 색 조각이 도로 띠와 같은 현시예요. 이 장부터는 띠를 늘리면 다른 방향이 줄지 않고 주기가 그만큼 길어지고, 줄이면 주기가 짧아져요. 차가 거의 없으니 모든 띠를 줄여 보세요.'}],
  '2-1':[{sel:'#dx .dxs',t:'정지선 바로 뒤 차로(점선 네모)를 누르면 차로 용도(좌회전, 직진, 우회전)가 바뀝니다. '}],
- '3-1':[{sel:'#dx .dxring',t:'"신호 주기" 칸을 누르면 현시 그리기가 열려요. 화살표를 눌러 현시마다 녹색을 줄 이동류를 고르세요. 신호등을 누르고 좌회전을 "전용 신호"로 바꾸면 좌회전 신호가 바로 들어가요. 주기와 황색 시간은 아래 줄에서 바꿔요.'}],
+ '3-1':[{sel:'#dx .dxring',t:'"신호 주기" 칸을 누르면 현시 그리기가 열려요. 화살표를 눌러 현시마다 녹색을 줄 이동류를 고르세요. 신호등을 누르고 좌회전을 "전용 신호"로 바꾸면 좌회전 신호가 바로 들어가요. 황색 시간은 아래 줄에서 바꿔요.'}],
  '4-1':[{sel:'#dx .dxs',t:'북쪽 도로(아스팔트)를 누르면 나오는 메뉴에서 유턴을 켜 보세요. 1차로에서 좌회전과 유턴을 함께 해요.'}],
  '4-2':[{sel:'#dx .dxs',t:'도로를 누르면 나오는 메뉴에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
  '5-1':[{sel:'#dx .dxh',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 동서 도로의 색 띠를 끌어 다 건널 만큼 녹색을 늘려 주세요.'}],
@@ -4106,19 +4106,21 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   s.innerHTML=h;}
 // ----- 신호 시계: 교차로와 같은 중심의 큰 링. 한 바퀴 = 주기. 현시마다 띠와 같은 색 조각, 사이 노랑(황색), 빨강(전적색)
 // 링은 교차로 상자 바깥(모서리 도시 공간)을 지나고, 조작 버튼(주기 숫자, −5, 고정, +5)은 링이 지나는 빈 도시 모서리 한 곳에 둠. 링 자체는 누르지 않음(차로, 띠 조작을 막지 않게)
-function dxRingGeo(){const key=[modeId(),cw|0,ch|0,VIEW,document.body.classList.contains('mobile')].join('|');if(DX.ringKey===key&&DX.ringG)return DX.ringG;
+function dxRingGeo(){const key=[modeId(),cw|0,ch|0,VIEW,document.body.classList.contains('mobile')].join('|');if(DX.ringKey===key&&DX.ringG&&performance.now()-(DX.ringAt||0)<1000)return DX.ringG;DX.ringAt=performance.now();
   const D=geoDims(cfg.geo),sc=Math.min(cw,ch)/(2*VIEW),o=toScreen(0,0),diag=Math.hypot(D.hNS,D.hEW)*sc;
   const R=Math.min(Math.max(diag*1.5+20,diag+40,Math.min(cw,ch)*.22),Math.min(cw,ch)/2-26);
-  const Gd=typeof jogGridC==='function'?jogGridC():null,bw=112,bh=58;let lab=null;
+  const Gd=typeof jogGridC==='function'?jogGridC():null,mob=document.body.classList.contains('mobile'),bw=mob?150:176,bh=60;let lab=null;
   const cvr=$('cv').getBoundingClientRect(),skip=new Set(['dx','cv','dxtoast','calcov','dxbar']);
-  const busy=[...$('stage').children].filter(e=>!skip.has(e.id)&&!e.classList.contains('mvchip')&&!e.classList.contains('dxrad')&&e.offsetWidth&&getComputedStyle(e).position==='absolute'&&getComputedStyle(e).visibility!=='hidden'&&!e.hidden&&getComputedStyle(e).pointerEvents!=='none'&&e.offsetWidth*e.offsetHeight<cw*ch*.5).map(e=>{const r=e.getBoundingClientRect();return[r.left-cvr.left,r.top-cvr.top,r.right-cvr.left,r.bottom-cvr.top];});
+  const busy=[...$('stage').children].filter(e=>!skip.has(e.id)&&!e.classList.contains('mvchip')&&!e.classList.contains('dxrad')&&e.offsetWidth&&getComputedStyle(e).position==='absolute'&&getComputedStyle(e).visibility!=='hidden'&&!e.hidden&&e.offsetWidth*e.offsetHeight<cw*ch*.5).map(e=>{const r=e.getBoundingClientRect();return[r.left-cvr.left,r.top-cvr.top,r.right-cvr.left,r.bottom-cvr.top];});
+  // 띠 손잡이, 화살표, 신호등도 피함(지난 그리기 기준)
+  const hs=DX.svg?[...DX.svg.querySelectorAll('.dxh,.dxn,.dxs')]:[];for(const e of hs){const r=e.getBoundingClientRect();busy.push([r.left-cvr.left,r.top-cvr.top,r.right-cvr.left,r.bottom-cvr.top]);}
   const free=(px,py,road)=>px>=8&&py>=8&&px+bw<=cw-8&&py+bh<=ch-8&&!busy.some(q=>px+bw>q[0]-4&&px<q[2]+4&&py+bh>q[1]-4&&py<q[3]+4)&&(!road||!Gd||Gd.free(px,py,px+bw,py+bh));
   // 링 바깥쪽에 붙여 둘 자리: 대각선(도시 모서리) 먼저, 없으면 링 둘레 아무 곳, 그래도 없으면 도로 위라도 다른 카드와 안 겹치는 곳
   const angs=[45,315,135,225];for(let a2=0;a2<360;a2+=10)if(!angs.includes(a2))angs.push(a2);
-  for(const road of [true,false]){for(const ang of angs){const x=o[0]+(R+10)*Math.sin(ang*Math.PI/180),y=o[1]-(R+10)*Math.cos(ang*Math.PI/180),sx=Math.sin(ang*Math.PI/180),sy=-Math.cos(ang*Math.PI/180);
+  for(const road of [true,false]){for(const ex of [10,40,70,100,140])for(const ang of angs){if(lab)break;const x=o[0]+(R+ex)*Math.sin(ang*Math.PI/180),y=o[1]-(R+ex)*Math.cos(ang*Math.PI/180),sx=Math.sin(ang*Math.PI/180),sy=-Math.cos(ang*Math.PI/180);
       const px=x+(sx>=0?0:-bw)+(Math.abs(sx)<.3?-bw/2:0),py=y+(sy>=0?0:-bh)+(Math.abs(sy)<.3?-bh/2:0);if(free(px,py,road)){lab={x:px,y:py,ang};break;}}if(lab)break;}
   if(!lab)lab={x:cw-bw-10,y:10,ang:45};
-  DX.ringKey=key;DX.ringG={o,R,lab,bw,bh};return DX.ringG;}
+  DX.ringKey=hs.length?key:'';DX.ringG={o,R,lab,bw,bh};return DX.ringG;}
 function dxRingSVG(){if(!sim||!sim.tl)return'';const {o,R,lab,bw,bh}=dxRingGeo(),cx=o[0],cy=o[1],W=Math.max(9,Math.min(16,R*.07)),Y=cfg.yellow,AR=AR_T;
   const C=PH.reduce((t,p)=>t+p.g+Y+AR,0),pt=(a,r)=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)],arc=(a0,a1,r)=>{const [x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r);return`M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;};
   let h=`<g pointer-events="none"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#1c1524" stroke-opacity=".55" stroke-width="${W+5}"/>`,s0=0;
@@ -4130,16 +4132,14 @@ function dxRingSVG(){if(!sim||!sim.tl)return'';const {o,R,lab,bw,bh}=dxRingGeo()
   const x=lab.x,y=lab.y,cyc=unlocked('cycle');
   h+=`<g class="dxring" style="cursor:pointer"><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="12" fill="#271d31" fill-opacity=".94" stroke="#ffd35a" stroke-width="1.5"/>
     <text x="${x+12}" y="${y+18}" font-size="11" font-weight="700" fill="#b9a9c8" pointer-events="none">신호 주기</text><text x="${x+bw-12}" y="${y+18}" text-anchor="end" font-size="15" font-weight="900" fill="#fff" pointer-events="none">${C}초</text></g>`;
-  if(cyc)[['m','−5'],['l',RG.lock?'고정':'자유'],['p','+5']].forEach(([k,t2],n)=>{const w=(bw-24-8)/3,bx=x+12+n*(w+4),by=y+28,on=k==='l'&&RG.lock;
-    h+=`<g class="dxrb" data-k="${k}" style="cursor:pointer"><rect x="${bx}" y="${by}" width="${w}" height="22" rx="8" fill="#33263f" stroke="${on?'#ffd35a':'#8d7a9c'}" stroke-width="1.3"/><text x="${bx+w/2}" y="${by+11.5}" text-anchor="middle" dominant-baseline="middle" font-size="10.5" font-weight="800" fill="${on?'#ffd35a':'#fff'}" pointer-events="none">${t2}</text></g>`;});
-  else h+=`<text x="${x+12}" y="${y+42}" font-size="10" fill="#ffd35a" pointer-events="none">이 단계는 주기 고정</text>`;
+  const G=PH.reduce((t,p)=>t+p.g,0),LS=PH.length*(Y+AR);
+  h+=`<text x="${x+12}" y="${y+38}" font-size="10" fill="#d8cce4" pointer-events="none">녹색 ${G} + 황색/전적색 ${LS}</text><text x="${x+12}" y="${y+51}" font-size="9.5" fill="${cyc?'#b9a9c8':'#ffd35a'}" pointer-events="none">${cyc?'띠를 늘리고 줄이면 주기가 바뀌어요':'이 단계는 주기 고정'}</text>`;
   return h;}
 // ----- 띠 손잡이 끌기 -----
 function dxDown(e){const t=e.target.closest('[class]');if(!t)return;const cl=t.getAttribute('class');
   if(cl==='dxh'){e.preventDefault();e.stopPropagation();dxClose();DX.drag={a:t.dataset.a,p:+t.dataset.p,s0:+t.dataset.s};DX.svg.setPointerCapture&&DX.svg.setPointerCapture(e.pointerId);return;}
   if(cl==='dxn'){e.preventDefault();e.stopPropagation();dxClose();const i=+t.dataset.p,d=+t.dataset.d;if(!DX.hold||DX.hold.a!==t.dataset.a||DX.hold.i!==i||performance.now()-(DX.nudgeAt||0)>=1500){DX.hold={a:t.dataset.a,i,e:null};DX.nudgeAt=performance.now();dxRender();}dxNudge(i,d);clearInterval(DX.rep);clearTimeout(DX.rep0);DX.rep0=setTimeout(()=>{DX.rep=setInterval(()=>dxNudge(i,d),110);},420);return;}
   if(cl==='dxring'){e.preventDefault();e.stopPropagation();dxCenter();return;}
-  if(cl==='dxrb'){e.preventDefault();e.stopPropagation();dxClose();const k=t.dataset.k;if(k==='l'){RG.lock=!RG.lock;dxToast(RG.lock?'주기 고정: 띠를 늘리면 다른 현시가 그만큼 줄어 주기가 그대로예요':'주기 자유: 띠를 늘리면 그만큼 주기가 길어져요');}else{setCycle(Math.max(40,Math.min(200,cycleLen()+(k==='p'?5:-5))));dxToast(`주기 ${cycleLen()}초`);}dxRender();return;}
   if(cl==='dxs'){e.preventDefault();e.stopPropagation();dxSigMenu(t.dataset.a);return;}
   if(cl==='dxmv'){e.preventDefault();e.stopPropagation();dxToggleMove(dxPick(e)||t.dataset.id);return;}}
 // 겹친 화살표 중 고르기: 시작 부분(같은 정지선에서 출발해 겹침)은 빼고, 누른 곳에서 가장 가까운 이동
@@ -4154,7 +4154,8 @@ function dxMove(e){if(!DX.drag)return;const r=DX.svg.getBoundingClientRect(),x=e
   // 주기가 잠겨 있거나 '주기 고정'이면 옆 현시와 주고받기(신호 시계와 같은 규칙), 아니면 이 현시만
   dxSetG(i,want);refreshPlan();dxRender();}
 function dxSetG(i,want){const cur=PH[i].g;if(want===cur)return;
-  if(!unlocked('cycle')||RG.lock){const j=i<PH.length-1?i:i-1;if(PH.length<2)return;const dg=want-cur;setBoundary(j,boundary(j)+(j===i?dg:-dg));}
+  // 주기는 따로 조작하지 않음: 녹색을 늘리면 주기가 그만큼 길어짐. 주기가 잠긴 단계에서만 옆 현시와 주고받음
+  if(!unlocked('cycle')){const j=i<PH.length-1?i:i-1;if(PH.length<2)return;const dg=want-cur;setBoundary(j,boundary(j)+(j===i?dg:-dg));}
   else PH[i].g=Math.max(MIN_G,Math.min(150,want));}
 // 손잡이 양옆 화살표: 누를 때마다 1초(길게 누르면 계속)
 function dxNudge(i,d){DX.nudgeAt=performance.now();dxSetG(i,PH[i].g+d);refreshPlan();dxRender();}
@@ -4182,8 +4183,6 @@ function dxSigMenu(a){closePop();const g=DX.geo[a];if(!g)return;const q=g.B[0],i
   dxRadial(q[0],q[1],it,{k:'s',a});}
 // 교차로 전체 신호 설정(주기, 황색, 적색 우회전)
 function dxGlobal(){const it=[];
-  if(unlocked('cycle')){it.push({ic:'−',t:'주기 −5',f:()=>{setCycle(Math.max(40,cycleLen()-5));dxToast(`주기 ${cycleLen()}초`);}});it.push({ic:'⟳',t:`주기 ${cycleLen()}초`,lab:1});it.push({ic:'+',t:'주기 +5',f:()=>{setCycle(Math.min(200,cycleLen()+5));dxToast(`주기 ${cycleLen()}초`);}});
-    it.push({ic:'⊜',t:RG.lock?'주기 고정':'주기 자유',on:!!RG.lock,f:()=>{RG.lock=!RG.lock;dxToast(RG.lock?'띠를 끌면 옆 현시와 녹색을 주고받아요(주기 그대로)':'띠를 끌면 그 현시만 늘고 줄어 주기가 바뀌어요');}});}
   if(unlocked('yellow'))it.push({ic:'Y',t:`황색 ${cfg.yellow}초`,f:()=>{cfg.yellow=cfg.yellow>=6?2:cfg.yellow+1;refreshPlan();}});
   if(unlocked('rtor'))it.push({ic:'↱',t:cfg.rtor?'적색 우회전 허용':'적색 우회전 금지',on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();}});
   return it;}
@@ -4245,7 +4244,7 @@ function dxToggleMove(x){const ph=PH[selP];if(!ph||ph.x)return;const CF=getConf(
     if(cand.length){cand[0].m.push(y);(moved[PH.indexOf(cand[0])+1]=moved[PH.indexOf(cand[0])+1]||[]).push(y);continue;}
     let f=fresh.find(q=>!q.m.some(z=>CF[y][z]));if(!f){if(PH.length+fresh.length>=8){dxUndo(snap);dxToast('현시는 8개까지라 자동으로 옮길 수 없어요. 먼저 다른 현시를 정리해 주세요');return;}f={m:[],g:10};fresh.push(f);}f.m.push(y);}
   for(const f of fresh){PH.push(f);(moved[PH.length]=moved[PH.length]||[]).push(...f.m);}
-  if(fresh.length&&(RG.lock||!unlocked('cycle'))){const need=cycleLen()-C0;if(need>0){let left=need;while(left>0){const k=PH.reduce((b,p,j)=>!fresh.includes(p)&&p.g>PH[b].g?j:b,PH.findIndex(p=>!fresh.includes(p)));if(PH[k].g<=MIN_G)break;const t=Math.min(left,PH[k].g-MIN_G);PH[k].g-=t;left-=t;}}}
+  if(fresh.length&&!unlocked('cycle')){const need=cycleLen()-C0;if(need>0){let left=need;while(left>0){const k=PH.reduce((b,p,j)=>!fresh.includes(p)&&p.g>PH[b].g?j:b,PH.findIndex(p=>!fresh.includes(p)));if(PH[k].g<=MIN_G)break;const t=Math.min(left,PH[k].g-MIN_G);PH[k].g-=t;left-=t;}}}
   markCustom();refreshPlan();dxPaintBar();dxRender();
   const where=Object.entries(moved).map(([n,ys])=>`${ys.map(codeName).join(', ')} → ${n}번${fresh.some(f=>PH.indexOf(f)+1==n)?'(새 현시)':''}`).join(', ');
   const out=cf.filter(y=>!Object.values(moved).flat().includes(y));
