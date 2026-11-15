@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114214916">
+<meta name="gl-build" content="20261114221010">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4079,7 +4079,8 @@ window.__cx={open:cxOpen,board:cxBoard,build:(osm,q)=>cxBuild(osm,q),register:cx
 // 단계(레벨)마다 열린 조작만 나타남(unlocked). 예전 접근로 버튼과 귀퉁이 신호 시계 카드는 이 조작으로 대신함
 const DX={svg:null,drag:null,paint:false,K:3,menu:null,geo:{},tick:0};
 const dxActive=()=>playMode&&!!sim&&!!cfg&&!document.body.classList.contains('titleon');
-const dxCol=i=>(RG&&RG.col&&RG.col[i%8])||['#2fa36b','#2f7fc1','#b8862b','#8a5cc7','#c2504a','#3aa6a0','#c7739a','#7a8a3c'][i%8];
+// 현시(조) 색: 신호등 색(초록, 노랑, 빨강)과 주황을 피한 파랑, 보라 계열. 같은 조라는 표시일 뿐 신호 상태가 아님
+const dxCol=i=>['#4f8cff','#a26bff','#e05ad6','#2fb8c9','#6b6fe0','#c58cff','#7cc4ff','#8aa0b8'][i%8];
 const dxEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KO1={N:'북',E:'동',S:'남',W:'서'};
 function dxBuild(){if(DX.svg)return;const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.id='dx';s.setAttribute('class','dxsvg');$('stage').insertBefore(s,$('cv').nextSibling);DX.svg=s;
