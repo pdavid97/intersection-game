@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114223002">
+<meta name="gl-build" content="20261114223324">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4486,7 +4486,7 @@ function mvDeltaHTML(ev,ref){const d=ref?ev.score-ref.score:0,st=ev.st,rs=ref&&r
   const cls=!ref||Math.abs(d)<1?'flat':d>0?'up':'down';
   return{cls,h:`<b>${!ref?ev.score:Math.abs(d)<1?'변화 없음':(d>0?'▲ +':'▼ ')+Math.round(d)}</b><span>${parts.join(', ')||`흐름 점수 ${ev.score}`}</span>`};}
 function mvRevert(){if(!MV.cfg)return;cfg=clone(MV.cfg);syncControls();if(typeof buildArms==='function')buildArms();MV.sig=cfgSig(cfg);MV.pend=null;}
-function mvSync(){MV.sig=cfgSig(cfg);MV.cfg=clone(cfg);MV.pend=null;MV.ref=null;}
+function mvSync(){MV.sig=cfgSig(cfg);MV.cfg=clone(cfg);MV.pend=null;MV.ref=null;MV.asked=0;}
 async function mvCommit(){const fc=clone(cfg),s=cfgSig(fc);
   if(limited()&&triesLeft()<=0){mvRevert();mvOut();return;}
   const mid=modeId();
@@ -4501,8 +4501,8 @@ async function mvCommit(){const fc=clone(cfg),s=cfgSig(fc);
     finishWith(fc,{score:ev.score,st:ev.st},false,true);if(sim&&!timingOnly(fc,sim.cfg)&&state==='run'){startSession();if(typeof buildArms==='function')buildArms();}MV.ref={score:ev.score,st:ev.st};const rec=history[0];
     mvChip(dh.h+(limited()?`<small>남은 조작 ${triesLeft()}번</small>`:''),dh.cls,2600);
     const at=attGet();if(at&&at.paid&&!at.back&&rec&&rec.sameDemand&&!rec.jam&&(at.best0==null||rec.score>at.best0)){at.back=1;attSet(at);tixAdd(1,'내 최고 기록 경신으로 돌려받음');}
-    // 별을 처음 받거나 더 받은 순간: 다음 단계로 갈지 물어봄
-    if(rec&&rec.sameDemand&&!rec.jam&&rec.stars>=1&&rec.stars>prevStars&&mode.kind!=='lab'){const mid2=modeId();setTimeout(()=>{if(modeId()===mid2)mvNext(rec.stars);},1400);}
+    // 이번 도전에서 별을 처음 받거나 더 받은 순간: 다음 단계로 갈지 물어봄(예전에 같은 별을 받았어도 이번 도전 기준으로 다시 물음)
+    if(rec&&rec.sameDemand&&!rec.jam&&rec.stars>=1&&rec.stars>(MV.asked||0)&&mode.kind!=='lab'){MV.asked=rec.stars;const mid2=modeId();setTimeout(()=>{if(modeId()===mid2)mvNext(rec.stars);},1400);}
     if(limited()&&triesLeft()<=0)setTimeout(mvOut,1800);}
   catch(e){if(wait)wait.remove();}finally{MV.busy=false;}}
 function mvTick(){try{if(!cfg||!sim)return;const id=modeId();if(MV.id!==id){MV.id=id;mvSync();return;}    tixRender();const s=cfgSig(cfg);if(s===MV.sig){MV.pend=null;return;}
