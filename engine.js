@@ -189,6 +189,10 @@ function crash(sim,vehs,reason){const p=vehPose(vehs[0]);const dur=60+sim.rng()*
   sim.events.unshift({t:sim.t-sim.t0,reason:`${reason}. 약 ${Math.round(dur/10)*10}초간 통행 차단`});if(sim.events.length>5)sim.events.pop();}
 function nearestOther(sim,veh,R){const p=vehPose(veh);let best=null,bd=R;
   for(const v of sim.vehicles){if(v===veh||v.crashed)continue;const q=vehPose(v),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=v;}}return best;}
+// 지금 현시에서 직각 방향(남북 대 동서)과 서로 부딪히는데도 함께 녹색인 이동들(현시가 바뀔 때만 다시 계산)
+function crossGreen(sim){const P=sim.curIv&&sim.curIv.p;if(sim._xgP===P)return sim._xg;const out=new Set();
+  if(P&&P.m){const CF=sim._cf||(sim._cf=getConf(sim.cfg.geo)),ns=m=>m[0]==='N'||m[0]==='S';for(const a of P.m)for(const b of P.m)if(a!==b&&ns(a)!==ns(b)&&CF[a]&&CF[a][b]){out.add(a);out.add(b);}}
+  sim._xgP=P;sim._xg=out;return out;}
 function riskCheck(sim,veh,p,reason,type){if(p<=0)return;sim.risk+=p;sim.riskBy[type]=(sim.riskBy[type]||0)+p;if(sim.rng()<p){veh.doomed=true;veh.doomReason=reason;}}
 function permGap(sim,veh){const o=OPP[veh.a],net=sim.net;let tta=Infinity,near=0;
   for(const k of net.conns)if(k.appr===o&&k.move!=='L'&&k.move!=='U')for(const ov of k.vehicles)if(ov.s<k.length-1)return{ok:false};
@@ -210,7 +214,11 @@ function yellowDecide(sim,veh,seg){const d=seg.length-veh.s;veh.yIv=sim.curIv;ve
 function canGo(sim,veh,seg){if(veh.committed)return true;
   if(seg.slip)return true;
   const st=sigState(sim,veh.a,veh.move),d=seg.length-veh.s;
-  if(st==='G'){if(d<1.5)veh.committed=true;return true;}
+  if(st==='G'){if(d<1.5){veh.committed=true;
+      // 엇갈린 신호: 지금 조(현시)에 직각으로 만나는 방향(남북 대 동서)이 함께 녹색이면, 교차로에 그쪽 차가 있을 때 충돌 위험
+      const xs=crossGreen(sim);if(xs.has(veh.a+veh.move)){const busy=sim.net.conns.some(k=>xs.has(k.appr+k.move)&&(k.appr==='N'||k.appr==='S')!==(veh.a==='N'||veh.a==='S')&&k.vehicles.length);
+        riskCheck(sim,veh,busy?0.06:0.01,`${NAME[veh.a]} 엇갈린 신호 충돌 (직각 방향이 함께 녹색)`,'엇갈린 신호');}}
+    return true;}
   if(st==='Y'){if(veh.yIv!==sim.curIv)yellowDecide(sim,veh,seg);
     if(veh.yGo){veh.committed=true;return true;}return false;}
   if(st==='P'){const g=permGap(sim,veh);if(g.ok){if(d<1.5){veh.committed=true;
@@ -488,9 +496,10 @@ REAL.tokyo.ped={N:200,S:200,E:200,W:200};
 // ---------- 레벨 ----------
 // appr: [교통량(대/시), 좌회전%, 우회전%, 1차로, 2차로]
 // goals: 행동 목표(별과 별개로 보여 주는 체크리스트). dly 1인당 지연(초), q 접근로 최대 대기열(대), det 우회 차량(대), risk 기대 사고(건), pedW 보행자 평균 대기(초)
-const STAGES=[{n:0,name:'1장 신호 나누기'},{n:1,name:'2장 신호 리듬'},{n:2,name:'3장 차로 정리'},{n:3,name:'4장 현시 설계'},{n:4,name:'5장 길 바꾸기'},{n:5,name:'6장 사람과 함께'}];
+const STAGES=[{n:0,name:'1장 신호 나누기'},{n:1,name:'2장 신호 리듬'},{n:2,name:'3장 차로 정리'},{n:3,name:'4장 신호 순서(현시)'},{n:4,name:'5장 길 바꾸기'},{n:5,name:'6장 사람과 함께'}];
 // 화면 표시용 번호(장-순서). 내부 id(0-1 등)는 기록, 랭킹 키라서 그대로 둠
-const lvLabel=lv=>(lv.stage+1)+'-'+lv.id.split('-')[1];
+// 화면 번호는 장 안에서의 순서로(새 레벨을 장 앞에 끼워 넣어도 id는 그대로 두기 위해)
+const lvLabel=lv=>(lv.stage+1)+'-'+(LEVELS.filter(l=>l.stage===lv.stage).indexOf(lv)+1);
 // jam: 한 차로 대기열이 이 대수를 넘으면 '정체 발생'으로 별 0개(1장 튜토리얼)
 const CTRL_NAME={uturn:'유턴',oneway:'일방통행',split:'신호 비중',cycle:'주기 길이',lanes:'차로 배정',scheme:'현시 방식',phases:'신호 방식',perm:'비보호',yellow:'황색 시간',rtor:'적색 우회전',demand:'교통량',bus:'버스 전용 차로',ped:'보행 신호 방식'};
 const LEVELS=[
@@ -551,6 +560,18 @@ const LEVELS=[
   story:'3장의 마지막은 런던 북부 순환도로 A406과 A109가 만나는 뉴사우스게이트 교차로입니다. 2016년 영국 정체 상위 10곳 중 8위로 꼽힌 곳이고, 교통량은 영국 교통부의 실제 계수값입니다. 영국은 좌측 통행이라 우회전이 맞은편 차로를 가로지릅니다. 지금은 신호 시간과 차로 배정만 바꿀 수 있습니다.',
   goal:'차로 용도를 실제 회전 수요에 맞게 정리하고 신호를 다듬어 흐름 점수를 올리세요.',
   hint:'좌측 통행에서는 우회전이 어려운 회전입니다. 우회전 대기 차량이 직진 차로를 막고 있지 않은지 보세요.',stars:[567,612,650]},
+ {id:'3-5',stage:3,title:'같이 가면 부딪힌다',unlock:['split','phases'],
+  phases:[{m:['NT','NR','ST','SR','ET','ER','WT','WR'],g:40}],
+  appr:{N:[600,0,10,'T','TR'],S:[650,0,10,'T','TR'],E:[500,0,10,'T','TR'],W:[480,0,10,'T','TR']},
+  story:'새로 생긴 교차로의 신호가 엉망으로 설정됐습니다. 네 방향 직진이 모두 한 조라서 동시에 녹색을 받습니다. 가운데서 서로 부딪힐 듯 멈춰 서고, 아무도 제대로 지나가지 못합니다.',
+  goal:'위쪽 "신호 순서" 막대를 보세요. 카드가 한 장뿐입니다(네 방향이 한 조). "신호 방식"을 눌러 남북과 동서가 다른 조가 되게 나누세요.',
+  hint:'한 조 = 동시에 녹색을 받는 방향의 묶음입니다. 남북 직진과 동서 직진은 가운데서 십자로 만나므로 같은 조가 될 수 없습니다. 남북을 "직진 동시"로 고르면 남북 조가 따로 생겨요.',goals:[{k:'risk',max:0.1}],stars:[33,333,590]},
+ {id:'3-6',stage:3,title:'마주 보는 직진은 함께',unlock:['split','phases'],
+  phases:[{m:['NT','NR'],g:18},{m:['ST','SR'],g:18},{m:['ET','ER'],g:16},{m:['WT','WR'],g:16}],
+  appr:{N:[650,0,10,'T','TR'],S:[700,0,10,'T','TR'],E:[520,0,10,'T','TR'],W:[500,0,10,'T','TR']},
+  story:'이번엔 반대로 너무 조심스럽게 짰습니다. 네 방향이 한 방향씩 따로 녹색을 받습니다. 남측이 갈 때 맞은편 북측은 텅 빈 녹색을 기다리고, 조가 바뀔 때마다 황색과 전적색으로 4초씩 버려집니다.',
+  goal:'마주 보는 직진은 서로 부딪히지 않습니다. "신호 방식"에서 남북과 동서를 "직진 동시"로 묶어 조를 4개에서 2개로 줄이세요.',
+  hint:'신호 순서 막대의 카드 수가 줄면 한 바퀴가 짧아지고 버려지는 시간도 줄어듭니다. 묶은 다음 녹색 띠로 붐비는 쪽에 시간을 더 주세요.',goals:[{k:'dly',max:20}],stars:[415,539,646]},
  {id:'3-1',stage:3,title:'사라진 직진 신호',unlock:['split','cycle','phases'],
   phases:[{m:['NL','NT','NR'],g:22},{m:['SL','SR'],g:20},{m:['ET','ER','WT','WR'],g:20}],
   appr:{N:[700,10,10,'LT','TR'],S:[800,10,10,'LT','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
@@ -562,11 +583,11 @@ const LEVELS=[
   story:'남북 1차로는 좌회전과 직진을 함께 쓰는 겸용 차로입니다. 그런데 신호는 좌회전과 직진을 따로 내보냅니다. 맨 앞 차가 다른 신호를 기다리는 동안 뒤차가 막히고, 참다못한 차가 옆 차로로 끼어들다 사고가 납니다.',
   goal:'차로는 그대로 두고, 신호 구성을 바꿔 겸용 차로가 막히지 않게 하세요.',
   hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. "신호 방식"에서 남북을 "방향별 순차"로 바꿔 보세요.',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
- {id:'3-3',stage:3,title:'위험한 비보호 좌회전',unlock:['split','cycle','phases','perm'],perm:{N:1,S:1},
+ {id:'3-3',stage:3,title:'세 가지 신호 방식 비교',unlock:['split','cycle','phases','perm'],perm:{N:1,S:1},
   phases:[{m:['NT','NR','ST','SR'],g:30},{m:['ET','ER','WT','WR'],g:24}],
   appr:{N:[700,30,10,'L','TR'],S:[750,30,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
   story:'남북 차량의 30%가 좌회전하는데 좌회전 신호가 따로 없어서, 모두 맞은편 직진 차량 틈을 노려 비보호로 돕니다. 틈은 거의 없고, 무리하게 도는 차 때문에 사고 위험이 큽니다.',
-  goal:'현시를 설계해 좌회전에 안전한 신호를 주세요. 비보호 좌회전을 계속 쓸지도 정할 수 있습니다.',
+  goal:'좌회전이 많은 교차로입니다. "신호 방식"에서 세 가지 방식을 모두 골라 보고, 점수와 사고 위험을 비교해 가장 맞는 방식을 찾으세요. 표지판 타일마다 장단점이 적혀 있어요.',
   hint:'남북 좌회전 둘은 서로 부딪히지 않습니다. "신호 방식"에서 남북을 "직진 동시 + 좌회전 따로"로 바꾸면 좌회전만 함께 나가는 현시가 생기고 비보호가 꺼져 위험이 사라집니다.',goals:[{k:'risk',max:0.1},{k:'dly',max:26}],stars:[325,392,449]},
  {id:'3-4',stage:3,real:'edirnekapi',title:'실제 교차로: 이스탄불 에디르네카프',unlock:['split','cycle','phases'],
   story:'4장의 마지막은 이스탄불 구시가 성벽의 에디르네 문 앞 교차로입니다. 이스탄불은 INRIX 2025 기준 세계에서 정체가 가장 심한 도시입니다. 남북 직진은 지하차도로 빠지고, 지상에서는 동서 직진과 남북 좌회전이 신호를 나눠 씁니다. 지금은 신호 시간과 현시 구성만 바꿀 수 있습니다.',
