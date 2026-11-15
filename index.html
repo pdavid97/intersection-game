@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114213335">
+<meta name="gl-build" content="20261114214456">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -865,6 +865,14 @@ body.mobile .dxbar{gap:4px;padding:5px;left:8px!important;right:8px;transform:no
 .lnopt.bus{background:#2459a8!important;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #2459a8}
 .lnopt:hover,.lncol:hover{filter:brightness(1.1)}
 body.mobile .lnsign{width:calc(100% - 12px);padding:8px}body.mobile .lnopts{grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}body.mobile .lnopt{font-size:11px}
+
+.sgrow{display:flex;flex-direction:column;gap:6px}
+.sgax{font-weight:800;color:#fff;font-size:14px;display:flex;gap:8px;align-items:baseline}.sgax small{color:#ffd35a;font-weight:600;font-size:11.5px}
+.lnopts.sg{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.lnopt.sch{align-items:flex-start;text-align:left;padding:9px 11px!important;gap:3px}.lnopt.sch b{font-size:13px}.lnopt.sch span{font-size:11.5px;font-weight:500;opacity:.92}
+.sgglob{display:flex;flex-wrap:wrap;gap:6px}.sgmini{font-size:12px;padding:5px 10px}.sgmini.on{border-color:#ffd35a!important;color:#ffd35a!important}
+.sgnote{color:#b9a9c8;font-size:11.5px}
+body.mobile .lnopts.sg{grid-template-columns:1fr}
 </style>
 
 <div class="wrap">
@@ -1484,7 +1492,7 @@ const STAGES=[{n:0,name:'1장 신호 나누기'},{n:1,name:'2장 신호 리듬'}
 // 화면 표시용 번호(장-순서). 내부 id(0-1 등)는 기록, 랭킹 키라서 그대로 둠
 const lvLabel=lv=>(lv.stage+1)+'-'+lv.id.split('-')[1];
 // jam: 한 차로 대기열이 이 대수를 넘으면 '정체 발생'으로 별 0개(1장 튜토리얼)
-const CTRL_NAME={uturn:'유턴',oneway:'일방통행',split:'신호 비중',cycle:'주기 길이',lanes:'차로 배정',scheme:'현시 방식',phases:'현시 편집',perm:'비보호',yellow:'황색 시간',rtor:'적색 우회전',demand:'교통량',bus:'버스 전용 차로',ped:'보행 신호 방식'};
+const CTRL_NAME={uturn:'유턴',oneway:'일방통행',split:'신호 비중',cycle:'주기 길이',lanes:'차로 배정',scheme:'현시 방식',phases:'신호 방식',perm:'비보호',yellow:'황색 시간',rtor:'적색 우회전',demand:'교통량',bus:'버스 전용 차로',ped:'보행 신호 방식'};
 const LEVELS=[
  {id:'0-1',stage:0,jam:15,title:'첫 신호',unlock:['split'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:26,EW_T:26},
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},
@@ -1547,19 +1555,19 @@ const LEVELS=[
   phases:[{m:['NL','NT','NR'],g:22},{m:['SL','SR'],g:20},{m:['ET','ER','WT','WR'],g:20}],
   appr:{N:[700,10,10,'LT','TR'],S:[800,10,10,'LT','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
   story:'공사 뒤에 신호 프로그램을 다시 짜면서 실수가 생겼습니다. 남측에는 직진 차로가 두 개나 있는데, 남측 현시에 직진이 빠졌습니다. 직진하려던 차는 모두 다른 길로 돌아갑니다.',
-  goal:'차로는 바꿀 수 없습니다. "현시 편집"을 눌러 신호 쪽 모순을 찾아 고치세요.',
-  hint:'"현시 편집"에서 위쪽 바의 남측 현시를 고른 뒤 남측 직진 화살표를 눌러 넣어 보세요. 같은 접근로의 좌회전, 직진, 우회전은 서로 부딪히지 않습니다.',goals:[{k:'det',max:5},{k:'dly',max:20}],stars:[266,384,487]},
+  goal:'차로는 바꿀 수 없습니다. "신호 방식"을 눌러 남측 직진이 빠진 신호를 바로잡으세요.',
+  hint:'"신호 방식"에서 남북 방식을 다시 골라 보세요. 방향별 순차와 직진 동시 중 이 차로 배치에 맞는 쪽을 비교해 보세요.',goals:[{k:'det',max:5},{k:'dly',max:20}],stars:[266,384,487]},
  {id:'3-2',stage:3,title:'겸용 차로를 신호로 살리기',unlock:['split','phases'],scheme:{NS:'protL',EW:'thru'},plan:{NS_T:28,NS_L:12,EW_T:22},
   appr:{N:[750,20,10,'LT','TR'],S:[800,20,10,'LT','TR'],E:[400,0,10,'T','TR'],W:[400,0,10,'T','TR']},
   story:'남북 1차로는 좌회전과 직진을 함께 쓰는 겸용 차로입니다. 그런데 신호는 좌회전과 직진을 따로 내보냅니다. 맨 앞 차가 다른 신호를 기다리는 동안 뒤차가 막히고, 참다못한 차가 옆 차로로 끼어들다 사고가 납니다.',
   goal:'차로는 그대로 두고, 신호 구성을 바꿔 겸용 차로가 막히지 않게 하세요.',
-  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. "현시 편집"에서 남북 현시를 접근로별로 나눠 보세요(+ 현시로 새 현시를 만들고 화살표를 옮김).',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
+  hint:'겸용 차로의 좌회전과 직진이 같은 녹색에 함께 나가면 서로 막을 일이 없습니다. "신호 방식"에서 남북을 "방향별 순차"로 바꿔 보세요.',goals:[{k:'risk',max:0.15},{k:'dly',max:25}],stars:[334,400,453]},
  {id:'3-3',stage:3,title:'위험한 비보호 좌회전',unlock:['split','cycle','phases','perm'],perm:{N:1,S:1},
   phases:[{m:['NT','NR','ST','SR'],g:30},{m:['ET','ER','WT','WR'],g:24}],
   appr:{N:[700,30,10,'L','TR'],S:[750,30,10,'L','TR'],E:[450,0,10,'T','TR'],W:[450,0,10,'T','TR']},
   story:'남북 차량의 30%가 좌회전하는데 좌회전 신호가 따로 없어서, 모두 맞은편 직진 차량 틈을 노려 비보호로 돕니다. 틈은 거의 없고, 무리하게 도는 차 때문에 사고 위험이 큽니다.',
   goal:'현시를 설계해 좌회전에 안전한 신호를 주세요. 비보호 좌회전을 계속 쓸지도 정할 수 있습니다.',
-  hint:'남북 좌회전 둘은 서로 부딪히지 않습니다. 좌회전만 함께 나가는 현시를 하나 만들어 보세요. 그다음 비보호를 끄면 위험이 사라집니다.',goals:[{k:'risk',max:0.1},{k:'dly',max:26}],stars:[325,392,449]},
+  hint:'남북 좌회전 둘은 서로 부딪히지 않습니다. "신호 방식"에서 남북을 "직진 동시 + 좌회전 따로"로 바꾸면 좌회전만 함께 나가는 현시가 생기고 비보호가 꺼져 위험이 사라집니다.',goals:[{k:'risk',max:0.1},{k:'dly',max:26}],stars:[325,392,449]},
  {id:'3-4',stage:3,real:'edirnekapi',title:'실제 교차로: 이스탄불 에디르네카프',unlock:['split','cycle','phases'],
   story:'4장의 마지막은 이스탄불 구시가 성벽의 에디르네 문 앞 교차로입니다. 이스탄불은 INRIX 2025 기준 세계에서 정체가 가장 심한 도시입니다. 남북 직진은 지하차도로 빠지고, 지상에서는 동서 직진과 남북 좌회전이 신호를 나눠 씁니다. 지금은 신호 시간과 현시 구성만 바꿀 수 있습니다.',
   goal:'현시 구성을 다시 설계해 흐름 점수를 올리세요.',
@@ -2801,7 +2809,7 @@ const COACH={
  '0-4':[{sel:'#dx .dxh',t:'실제 강남역 신호입니다. 도로마다 받는 현시가 색 구간으로 이어져 있어요. 구간 끝 손잡이를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
  '1-1':[{sel:'#dx .dxh',t:'띠 끝 숫자는 그 방향의 녹색 초입니다. 늘리고 줄인 만큼만 바뀌고 다른 방향은 그대로예요. 차가 거의 없는 밤이니 모든 띠를 줄여 기다리는 시간을 줄여 보세요.'}],
  '2-1':[{sel:'#dx .dxs',t:'들어오는 차로를 누르면 차로 표지판이 열려요. 위 초록 표지판에서 몇 차로인지 고르고, 아래 표지 중에서 그 차로의 용도(좌회전 전용, 좌회전 + 직진 등)를 고르세요. 지도에는 고른 차로가 노랗게 표시돼요.'}],
- '3-1':[{sel:'#dxsig',t:'"현시 편집" 버튼을 누르면 현시 그리기가 열려요. 화살표를 눌러 현시마다 녹색을 줄 이동류를 고르세요. 신호등을 누르고 좌회전을 "전용 신호"로 바꾸면 좌회전 신호가 바로 들어가요. 황색 시간은 아래 줄에서 바꿔요.'}],
+ '3-1':[{sel:'#dxsig',t:'"신호 방식" 버튼을 누르면 남북, 동서마다 어느 방향끼리 함께 녹색을 받을지 표지판에서 고를 수 있어요. 고르면 현시가 자동으로 만들어지고, 녹색 시간은 도로 위 띠로 맞춥니다. 방향마다 좌회전 방식은 신호등을 눌러 바꿔요.'}],
  '4-1':[{sel:'#dx .dxs',t:'북쪽 도로(아스팔트)를 누르면 나오는 메뉴에서 유턴을 켜 보세요. 1차로에서 좌회전과 유턴을 함께 해요.'}],
  '4-2':[{sel:'#dx .dxs',t:'도로를 누르면 나오는 메뉴에서 통행 방향을 바꿀 수 있습니다(일방통행).'}],
  '5-1':[{sel:'#dx .dxh',t:'남북 대로를 건너는 사람은 동서 녹색에 함께 건넙니다. 동서 도로의 색 띠를 끌어 다 건널 만큼 녹색을 늘려 주세요.'}],
@@ -4159,7 +4167,7 @@ function dxSetG(i,want){PH[i].g=Math.max(MIN_G,Math.min(150,want));}
 function dxNudge(i,d){DX.nudgeAt=performance.now();dxSetG(i,PH[i].g+d);refreshPlan();dxRender();}
 function dxUp(){clearTimeout(DX.rep0);clearInterval(DX.rep);if(DX.drag){DX.drag=null;if(!store.get('dx-band-seen')){store.set('dx-band-seen',1);dxToast('같은 현시를 쓰는 다른 도로의 같은 색 구간도 함께 바뀌어요');}}}
 // ----- 원형 메뉴 -----
-function dxClose(){const m=document.querySelector('.dxrad');if(m)m.remove();const b=$('lnsign');if(b)b.hidden=true;DX.menu=null;DX.lane=null;}
+function dxClose(){const m=document.querySelector('.dxrad');if(m)m.remove();const b=$('lnsign');if(b)b.hidden=true;const g=$('sgsign');if(g)g.hidden=true;DX.menu=null;DX.lane=null;}
 function dxRadial(x,y,items,key){dxClose();if(!items.length)return;const st=$('stage'),c=$('cv'),box=document.createElement('div');box.className='dxrad';
   const ox=c.offsetLeft+x,oy=c.offsetTop+y;box.style.left=ox+'px';box.style.top=oy+'px';const n=items.length,rad=Math.max(62,Math.min(84,Math.min(cw,ch)/7));
   items.forEach((it,i)=>{const a=-Math.PI/2+i/n*2*Math.PI,b=document.createElement('button');b.type='button';b.className='rb'+(it.on?' on':'');b.innerHTML=`<b>${it.ic}</b>${it.t}`;
@@ -4184,7 +4192,7 @@ function dxGlobal(){const it=[];
   if(unlocked('yellow'))it.push({ic:'Y',t:`황색 ${cfg.yellow}초`,f:()=>{cfg.yellow=cfg.yellow>=6?2:cfg.yellow+1;refreshPlan();}});
   if(unlocked('rtor'))it.push({ic:'↱',t:cfg.rtor?'적색 우회전 허용':'적색 우회전 금지',on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();}});
   return it;}
-function dxCenter(){if(unlocked('phases'))return dxPaint(true);const it=dxGlobal().filter(x=>!x.lab);
+function dxCenter(){if(unlocked('phases')||unlocked('scheme'))return dxSchemePick();const it=dxGlobal().filter(x=>!x.lab);
   if(unlocked('scheme'))it.unshift({ic:'☰',t:'신호 방식',f:()=>{dxClose();openPhase();}});
   if(!it.length)return dxToast('교차로 전체 신호는 다음 장에서 열려요. 지금은 도로 위 색 띠로 녹색을 나눠 보세요');
   const o=toScreen(0,0);const wrap=it.map(x=>x.f?{...x,f:()=>{x.f();dxCenter();}}:x);dxRadial(o[0],o[1],wrap,{k:'c'});}
@@ -4299,6 +4307,43 @@ function dxLaneSVG(){const L=DX.lane;if(!L||!sim)return'';const sg=(sim.net.inL[
   const bx=e[0]-Math.cos(an)*(W*1.2+14),by=e[1]-Math.sin(an)*(W*1.2+14);
   return`<g pointer-events="none"><path d="${d}" stroke="#ffd35a" stroke-opacity=".28" stroke-width="${W}" fill="none"/><path d="${d}" stroke="#ffd35a" stroke-width="2.5" stroke-dasharray="7 5" fill="none"/>
     <rect x="${bx-26}" y="${by-11}" width="52" height="22" rx="6" fill="#1f6f43" stroke="#fff" stroke-width="2"/><text x="${bx}" y="${by+.5}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="900" fill="#fff">${L.i+1}차로</text></g>`;}
+// ----- 신호 방식 표지판: 축(남북, 동서)마다 현시 구성을 고름. 현시는 자동으로 만들어지고 녹색 초는 그 축의 합을 유지 -----
+const SCH_OPT=[{k:'split',t:'방향별 순차',d:(a,b)=>`① ${a} 직진, 좌회전 함께 ② ${b} 직진, 좌회전 함께`},
+  {k:'protL',t:'직진 동시 + 좌회전 따로',d:(a,b,ax)=>`① ${ax} 직진 ② ${ax} 좌회전`},
+  {k:'thruP',t:'직진 동시 + 비보호 좌회전',d:(a,b,ax)=>`① ${ax} 직진, 좌회전은 틈을 보고`,perm:1}];
+const AXN={NS:['남측','북측','남북'],EW:['동측','서측','동서']};
+function dxPhAxis(p){if(p.x)return'X';const ap=new Set(p.m.map(m=>m[0]));if([...ap].every(a=>a==='N'||a==='S'))return'NS';if([...ap].every(a=>a==='E'||a==='W'))return'EW';return'?';}
+function dxSchemeOf(ax){const sc=cfg.scheme&&cfg.scheme[ax];if(sc==='thru'){const [a,b]=ax==='NS'?['N','S']:['E','W'];return cfg.appr[a].perm&&cfg.appr[b].perm?'thruP':'thru';}
+  if(sc==='protL'||sc==='split')return sc;
+  // 직접 만든 현시면 모양으로 짐작
+  const ps=PH.filter(p=>dxPhAxis(p)===ax),key=ps.map(p=>[...p.m].sort().join('')).sort().join('|');
+  for(const k of ['split','protL','thru']){const t=SCHEME_PH[ax][k].map(id=>[...PHASE_MOVES[id]].sort().join('')).sort().join('|');if(t===key){if(k!=='thru')return k;const [a,b]=ax==='NS'?['N','S']:['E','W'];return cfg.appr[a].perm&&cfg.appr[b].perm?'thruP':'thru';}}
+  return'custom';}
+function dxApplyScheme(ax,k){const base=k==='thruP'?'thru':k,[a,b]=ax==='NS'?['N','S']:['E','W'];
+  const old=PH.filter(p=>dxPhAxis(p)===ax),tot=old.reduce((t,p)=>t+p.g,0)||(base==='thru'?30:44);
+  const ids=SCHEME_PH[ax][base],w=ids.map(id=>id.endsWith('_L')?10:24),ws=w.reduce((x,y)=>x+y,0);
+  const fresh=ids.map((id,j)=>({m:[...PHASE_MOVES[id]],g:Math.max(MIN_G,Math.round(tot*w[j]/ws))}));
+  const keep=PH.filter(p=>dxPhAxis(p)!==ax);const nsFirst=ax==='NS';const other=keep.filter(p=>!p.x),xs=keep.filter(p=>p.x);
+  const next=nsFirst?[...fresh,...other,...xs]:[...other,...fresh,...xs];PH.length=0;for(const p of next)PH.push(p);
+  cfg.scheme=cfg.scheme||{};cfg.scheme[ax]=base;const ot=ax==='NS'?'EW':'NS';if(!cfg.scheme[ot]||cfg.scheme[ot]==='custom')cfg.scheme[ot]=dxSchemeOf(ot)==='custom'?'custom':(dxSchemeOf(ot)==='thruP'?'thru':dxSchemeOf(ot));
+  if(unlocked('perm')||k==='thruP')for(const x of [a,b])cfg.appr[x].perm=k==='thruP';
+  selP=0;try{syncSchemeSel();}catch(e){}refreshPlan();buildApprUI();renderAllStatus();}
+function dxSchemePick(){dxClose();DX.menu={k:'sch'};const st=$('stage');let b=$('sgsign');
+  if(!b){b=document.createElement('div');b.id='sgsign';b.className='lnsign bot';st.appendChild(b);
+    b.addEventListener('click',e=>{e.stopPropagation();const t=e.target.closest('[data-k]');if(!t)return;const k=t.dataset.k;
+      if(k==='x'){dxClose();return;}
+      if(k==='sch'){dxApplyScheme(t.dataset.ax,t.dataset.v);const o=SCH_OPT.find(o=>o.k===t.dataset.v);dxToast(`${AXN[t.dataset.ax][2]}: ${o.t}. 현시가 바뀌었고 녹색 시간은 띠에서 다시 맞추세요`);dxSchemePick();return;}
+      if(k==='g'){const x=dxGlobal()[+t.dataset.i];if(x&&x.f)x.f();dxSchemePick();return;}
+      if(k==='ped'){$('pedscr').click();dxSchemePick();return;}
+      if(k==='paint'){dxClose();dxPaint(true);}});}
+  const permOk=unlocked('perm'),rows=['NS','EW'].map(ax=>{const cur=dxSchemeOf(ax),[A,B,X]=AXN[ax];
+    const tiles=SCH_OPT.filter(o=>o.k!=='thruP'||permOk).map(o=>`<button type="button" class="lnopt sch${o.k===cur?' on':''}" data-k="sch" data-ax="${ax}" data-v="${o.k}"><b>${o.t}</b><span>${o.d(A,B,X)}</span></button>`).join('');
+    return`<div class="sgrow"><div class="sgax">${X}<small>${cur==='custom'?'직접 만든 현시':cur==='thru'?'직진만(좌회전 신호 없음)':''}</small></div><div class="lnopts sg">${tiles}</div></div>`;}).join('');
+  const gl=dxGlobal().map((x,i)=>x.lab?'':`<button type="button" class="sgmini${x.on?' on':''}" data-k="g" data-i="${i}">${x.t}</button>`).join('')
+    +(unlocked('ped')&&hasPed(cfg)?`<button type="button" class="sgmini${hasScr(cfg)?' on':''}" data-k="ped">보행 전용 현시 ${hasScr(cfg)?'있음':'없음'}</button>`:'')
+    +(mode.kind==='lab'?`<button type="button" class="sgmini" data-k="paint">현시 직접 그리기(고급)</button>`:'');
+  b.innerHTML=`<div class="lnhead"><span>신호 방식: 어느 방향끼리 함께 녹색을 받을까요?</span><button type="button" class="lnx" data-k="x" aria-label="닫기">×</button></div>${rows}${gl?`<div class="sgglob">${gl}</div>`:''}<small class="sgnote">방향마다 좌회전을 바꾸려면 신호등을 누르세요. 녹색 시간은 도로 위 띠로 맞춥니다.</small>`;
+  b.hidden=false;}
 // ----- 지도 누르기: 차로(기존), 교차로 가운데, 도로. 예전 접근로 창 대신 원형 메뉴 -----
 function dxArmAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.75;
   for(const a of APPR){const segs=[...(net.inL[a]||[]),...(net.outL[hk([-HEAD[a][0],-HEAD[a][1]])]||[])];for(const sg of segs){const P=sg.pts;for(let i=1;i<P.length;i++){const ax=P[i-1][0],ay=P[i-1][1],bx=P[i][0],by=P[i][1],dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best=a;}}}}
@@ -4317,7 +4362,7 @@ function dxInLaneAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let b
   return best;}
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(DX.paint)dxPaint(false);else dxClose();}});
 // 예전 조작 숨김: 접근로 버튼, 귀퉁이 신호 시계 카드(신호 시간은 도로 띠로). 세션 기록은 재생 줄로
-{const b=document.createElement('button');b.type='button';b.id='dxsig';b.textContent='현시 편집';b.title='현시 그리기, 황색, 적색 우회전';b.addEventListener('click',()=>dxCenter());const s0=$('skip');if(s0&&s0.parentNode)s0.parentNode.insertBefore(b,$('resetcfg'));}
+{const b=document.createElement('button');b.type='button';b.id='dxsig';b.textContent='신호 방식';b.title='어느 방향끼리 함께 녹색을 받을지, 황색, 적색 우회전';b.addEventListener('click',()=>dxCenter());const s0=$('skip');if(s0&&s0.parentNode)s0.parentNode.insertBefore(b,$('resetcfg'));}
 {const b=document.createElement('button');b.type='button';b.id='dxhist';b.textContent='조작 기록';b.addEventListener('click',openHistory);const s=$('skip');if(s&&s.parentNode)s.parentNode.insertBefore(b,$('resetcfg'));}
 dxBuild();setInterval(()=>{try{if(!DX.drag)dxRender();}catch(e){}},150);
 {const _lm=loadMode;loadMode=function(m){if(DX.paint)dxPaint(false);dxClose();return _lm(m);};}
