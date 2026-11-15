@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114223324">
+<meta name="gl-build" content="20261114230619">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -890,12 +890,88 @@ body.mobile .phc svg{width:20px;height:20px}body.mobile .phc .nm,body.mobile .ph
 body.mobile.phon #hudtop,body.mobile.phon #hudtl,body.mobile.phon #citcard{margin-top:50px}
 body:not(.mobile).phon .lnsign.top{top:84px}
 .lnopt.sch .pc{font-size:11px;font-weight:500;line-height:1.35;opacity:.95}.lnopt.sch .pc em{font-style:normal;font-weight:900;margin-right:2px}
+/* ---------- 데스크톱 A안(네 모서리 카드, hud4.js) ---------- */
+body.hq .stage{display:block!important}
+body.hq .stage>canvas#cv{width:100%;height:100%}
+body.hq .side,.hqstash{display:none!important}
+.hqc{display:none}
+body.hq .hqc{display:flex;flex-direction:column;gap:6px;position:absolute;z-index:31;box-sizing:border-box;background:rgba(39,29,49,.93);border:1px solid #5a4668;border-radius:12px;padding:8px 10px;box-shadow:0 8px 20px rgba(0,0,0,.35);font-size:12.5px;color:var(--fg,#f1eaf6)}
+body.hq .hqc[hidden]{display:none}
+body.hq .hqc .ov{position:static!important;transform:none!important;max-width:none!important;width:auto!important;margin:0!important;box-shadow:none!important;background:none!important;border:0!important;padding:0!important;backdrop-filter:none!important}
+.hqh{display:flex;align-items:center;gap:8px}
+/* 할 일 */
+body.hq #hqtask{width:310px}
+#hqtask .hqh{justify-content:space-between;align-items:flex-start}
+#hqtask .hqlv{min-width:0;flex:1}
+#hqtask #lvchip{all:unset;cursor:pointer;font-weight:800;font-size:13.5px;line-height:1.35;display:block}
+#hqtask #lvchip b{display:none}#hqtask #lvchip .lvx{font-size:11px;font-weight:600;color:#b9a9c8;margin-left:6px;text-decoration:underline}
+#hqtask #lvchip:focus-visible{outline:2px solid #ffd35a;outline-offset:2px;border-radius:4px}
+.hqfold{font:inherit;font-size:11px;color:#b9a9c8;background:none;border:0;padding:0 2px;cursor:pointer;white-space:nowrap}
+#hqtask .sgoal{display:flex!important;flex-direction:column;gap:2px;font-size:12.5px;line-height:1.45}
+#hqtask .sgoal b,#hqtask .sgoal small{display:none}
+#hqtask .citcard{position:static!important;margin-top:4px!important;font-size:12px;animation:none;max-height:none!important}
+#hqtask.umin .hqb{display:none}
+/* 점수 막대 */
+body.hq #hqscore{width:290px}
+.hqtop{align-items:baseline}
+.hqn{font-size:24px;font-weight:900;font-family:var(--mono,ui-monospace,monospace);line-height:1.1}
+.hqd{font-size:12px;font-weight:800;color:#b9a9c8}.hqd.down{color:#ff6b6b}.hqd.up{color:#4fe08a}
+.hqst{margin-left:auto;font-size:15px;letter-spacing:1px;color:#ffd35a}.hqst i{font-style:normal;color:#5a4668}
+#hqscore.jam .hqn{color:#ff6b6b}
+.hqtrack{position:relative;height:40px;margin:0 10px}
+.hqln{position:absolute;left:0;right:0;top:15px;height:6px;border-radius:3px}
+.hqmk{position:absolute;inset:0}.hqmk i{position:absolute;display:block;line-height:10px;transform:translateX(-50%);font-style:normal;white-space:nowrap}
+.hqmk .hqtk{top:12px;width:2px;height:12px;background:#fff;opacity:.75}.hqmk .hqtk.ai{background:#7cc4ff;opacity:1}.hqmk .hqtk.lo{opacity:.45}
+.hqmk .hqlb{font-size:10px;color:#b9a9c8;line-height:1}.hqmk .hqlb.hi{top:0;color:#ffd35a}.hqmk .hqlb.lo{top:28px}.hqmk .hqlb.ai{color:#7cc4ff;font-weight:800}
+.hqmk .hqdot{top:11px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #4f8cff;transition:left .4s}
+.hqmk .hqdot.base{box-shadow:0 0 0 3px #8d7a9c}.hqmk .hqdot.prev{top:13px;width:10px;height:10px;opacity:.4;box-shadow:none}
+.hqgoals{display:flex;flex-direction:column;gap:1px;font-size:11.5px}
+.hqgoals .gh{display:none}.hqgoals .g{display:flex;gap:5px;align-items:baseline}.hqgoals .g span{flex:1}.hqgoals .g.ok{color:#4fe08a}.hqgoals .g.no{color:#d8cce4}
+.hqgoals:empty,.hqpend:empty{display:none}
+#hqscore .pending{display:flex;flex-direction:column;gap:4px;font-size:11.5px}
+/* 지금 흐름 */
+body.hq #hqflow{width:236px}
+#hqflow .hqh b{font-size:12px;color:#b9a9c8}#hqflow .hqsum{display:none;font-family:var(--mono,ui-monospace,monospace);font-size:12px}
+#hqflow .hud-tl .t,#hqflow .hud-tl .prog,#hqflow .hud-tl .goals{display:none!important}
+#hqflow .hud-tl .grid2{font-size:12px;row-gap:1px}
+#hqflow .lcpip{position:static!important;width:auto!important;margin-top:6px!important}
+/* 접힌 카드: 머리줄만 */
+body.hq .hqc.min:not(.open)>:not(.hqh){display:none!important}
+body.hq #hqflow.min{width:auto;border-radius:999px;padding:5px 12px;cursor:pointer}body.hq #hqflow.min .hqsum{display:inline}
+body.hq #hqflow.min.open{border-radius:12px}
+body.hq #hqtask.min #hqtask .hqb{display:none}
+/* 조작 */
+body.hq #hqctl{gap:7px}
+.hqpips{display:flex;gap:4px;align-items:center;font-size:11.5px;color:#b9a9c8;flex-wrap:wrap}
+.hqpips span{margin-right:4px}.hqpips i{width:9px;height:9px;border-radius:50%;background:#ffd35a}.hqpips i.u{background:#5a4668}
+#hqctl .tixchip{position:static!important;align-self:flex-start;margin:0!important}
+.hqrow{flex-wrap:nowrap}
+.hqplay{display:flex;gap:4px;align-items:center}
+#hqctl #play{font-size:12px;padding:6px 10px}
+#hqctl .seg button{padding:6px 9px;font-size:12px}
+#hqctl #dxsig{font-weight:800;color:#fff;background:#1f6f43;border:0;border-radius:8px;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #1f6f43;padding:6px 10px}
+#hqskip{white-space:nowrap}
+.hqmore{font:inherit;font-weight:900;font-size:16px;line-height:1;color:#f1eaf6;background:#33263f;border:1.5px solid #ffd35a;border-radius:999px;width:38px;height:32px;cursor:pointer;flex:none}
+/* 원형 메뉴 */
+.hqrad{position:absolute;inset:0;z-index:60;background:rgba(10,6,16,.25)}
+.hqring{position:absolute;width:0;height:0}
+.hqring button{position:absolute;transform:translate(-50%,-50%);width:80px;height:56px;border-radius:14px;font:inherit;font-size:11.5px;font-weight:800;color:#f1eaf6;background:#33263f;border:1.5px solid #8d7a9c;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:0 6px 16px rgba(0,0,0,.4);padding:0}
+.hqring button em{font-style:normal;font-size:15px}.hqring button small{font-size:9.5px;color:#b9a9c8;font-weight:600}
+.hqring button.on,.hqring button:hover{border-color:#ffd35a;background:#3f2f4e}
+.hqring .hqx{width:36px;height:36px;border-radius:50%;border-color:#ffd35a;font-size:17px}
+.hqsub{position:absolute;width:210px;max-height:320px;overflow-y:auto;background:#271d31;border:1px solid #ffd35a;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:4px;box-shadow:0 8px 20px rgba(0,0,0,.45);box-sizing:border-box}
+.hqsub button{font:inherit;font-size:12.5px;text-align:left;color:#f1eaf6;background:#33263f;border:1px solid #4a3a58;border-radius:8px;padding:6px 9px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.hqsub button:hover{border-color:#8d7a9c}.hqsub button.on{border-color:#ffd35a}.hqsub kbd{font-family:var(--mono,ui-monospace,monospace);font-size:10.5px;color:#b9a9c8}
+.hqnone{font-size:12px;color:#b9a9c8;padding:4px}
+@media (prefers-reduced-motion:reduce){.hqmk .hqdot{transition:none}}
+body.hq .phstrip{box-sizing:border-box}
+#hqrad .hqring button{border-radius:14px!important}#hqrad .hqring .hqx{border-radius:50%!important}#hqrad .hqsub button{border-radius:8px!important;min-height:0}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.20. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.21. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -2843,7 +2919,7 @@ window.addEventListener('session-done',ev=>{const d=ev.detail,lv=curLevel();if(!
 const COACH={
  '0-1':[{sel:'#dx .dxh',t:'도로 위 색 띠가 그 도로의 녹색 시간입니다. 띠 끝 숫자는 녹색 초입니다. 바깥쪽 화살표를 누르면 1초 늘고, 안쪽 화살표는 1초 줄어요(길게 누르면 계속). 숫자를 끌어도 됩니다. 다른 방향은 그대로예요. 차가 많은 남북 쪽 띠를 늘려 보세요.'},
         {sel:'#gauge',t:'조작할 때마다 점수가 바로 바뀝니다. 한 번 도전에 쓸 수 있는 조작 수가 정해져 있으니 한 번 한 번 신중하게 바꿔 보세요.'},
-        {sel:'#gauge',t:'조작할 때마다 점수가 여기 바늘로 바로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
+        {sel:'#gauge',t:'조작할 때마다 점수가 여기 바로 나옵니다. 오른쪽 별 쪽으로 갈수록 좋습니다. 별 2개를 넘으면 다음 스테이지로 갈 수 있어요.'}],
  '0-4':[{sel:'#dx .dxh',t:'실제 강남역 신호입니다. 도로마다 받는 현시가 색 구간으로 이어져 있어요. 구간 끝 손잡이를 끌어 녹색을 다시 나눠 보세요. 주기 길이는 바뀌지 않습니다.'}],
  '1-1':[{sel:'#dx .dxh',t:'띠 끝 숫자는 그 방향의 녹색 초입니다. 늘리고 줄인 만큼만 바뀌고 다른 방향은 그대로예요. 차가 거의 없는 밤이니 모든 띠를 줄여 기다리는 시간을 줄여 보세요.'}],
  '2-1':[{sel:'#dx .dxs',t:'들어오는 차로를 누르면 차로 표지판이 열려요. 위 초록 표지판에서 몇 차로인지 고르고, 아래 표지 중에서 그 차로의 용도(좌회전 전용, 좌회전 + 직진 등)를 고르세요. 지도에는 고른 차로가 노랗게 표시돼요.'}],
@@ -2864,7 +2940,7 @@ coachBox.querySelector('.cnext').addEventListener('click',coachNext);coachBox.qu
 document.addEventListener('pointerdown',e=>{if(coach.steps&&coach.el&&!coachBox.hidden&&coach.el.contains(e.target))setTimeout(coachNext,250);},true);
 function coachTick(){const id=curLevel()?curLevel().id:null;if(id!==coach.id){coachStart(id);tutSimple();}
   if(!coach.steps||!introBox.hidden||document.body.classList.contains('titleon')||document.body.classList.contains('jopen'))return;
-  const st=coach.steps[coach.i];if(!st)return;const el=document.querySelector(st.sel);
+  const st=coach.steps[coach.i];if(!st)return;const el=(st.sel==='#gauge'&&document.body.classList.contains('hq')&&$('hqscore'))||document.querySelector(st.sel);
   const r=el&&el.getBoundingClientRect(),vis=r&&r.width>0&&r.height>0&&el.offsetParent!==null&&r.bottom>0&&r.top<innerHeight&&($('modal').hidden||$('modal').contains(el));
   if(!vis){coachBox.hidden=true;coach.el=null;return;}
   coach.el=el;coachBox.hidden=false;const ring=coachBox.querySelector('.ring'),cb=coachBox.querySelector('.cb');coachBox.querySelector('p').textContent=st.t;
@@ -3141,7 +3217,8 @@ function layoutUI(){const S=$('stage');if(!S||!playMode)return;const B=roadBand(
   const Q=B.Q,qw=q=>q[2]-q[0]-2*g,qh=q=>q[3]-q[1]-2*g;
   // 플레이 화면 v2(playui.js): 패널은 지도 밖 옆 칸에 있으므로 접근로 버튼, 차로 편집 창만 배치
   const PVON=document.body.classList.contains('pv2'),M2ON=document.body.classList.contains('m2');
-  const m2r=M2ON?m2Place(B):PVON?jogPlace(B):null;
+  const HQON=document.body.classList.contains('hq');
+  const m2r=M2ON?m2Place(B):HQON&&typeof hqPlace==='function'?hqPlace(B):PVON?jogPlace(B):null;
   if(!PVON&&!M2ON){
   // 1) 세션 HUD: 왼쪽 위
   let yL=g;if(mob&&tl){for(const k of ['left','right','top','bottom','max-width','transform','transform-origin','box-sizing'])tl.style.removeProperty(k);}
@@ -4551,6 +4628,131 @@ function mvRetry(){if(!limited())return;if(triesUsed()===0){mvToast('아직 조�
   $('mvre').onclick=()=>{closeModal();restartStage();};$('mvno').onclick=closeModal;}
 openOutOfTries=mvOut;
 window.__mv={retry:mvRetry,tix:tixGet,add:tixAdd,out:mvOut,noTix:mvNoTix,get state(){return{...MV,cfg:null}}};
+// ---------- 데스크톱 화면 A안(네 모서리): 오른쪽 옆 칸을 없애고 지도를 가로 전체로 씀 ----------
+// 도로 밖 네 블록에 카드 하나씩: 왼쪽 위 할 일, 오른쪽 위 점수 막대, 왼쪽 아래 지금 흐름, 오른쪽 아래 조작
+// 나머지 메뉴(게임 모드, 도움말, 기록, 다시, 보기, 설정)는 ⋯ 버튼, 지도 우클릭, 휠 클릭으로 여는 원형 메뉴 하나로
+// 기존 버튼과 입력은 그대로 두고(숨김 보관함) 원형 메뉴가 그것을 눌러 줌: 기능, 이벤트 처리는 바뀌지 않음
+const HQ={on:false,c:{},stash:null,rad:null,sub:-1,prev:null,lastKey:null,umin:{}};
+function hqEl(tag,id,cls,html){const e=document.createElement(tag);if(id)e.id=id;if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function hqBuild(){if(HQ.c.task)return;const S=$('stage');
+  HQ.stash=hqEl('div','hqstash','hqstash');HQ.stash.hidden=true;S.appendChild(HQ.stash);
+  HQ.c.task=hqEl('div','hqtask','hqc hq-tl','<div class="hqh"><span class="hqlv"></span><button type="button" class="hqfold">접기</button></div><div class="hqb"></div>');
+  HQ.c.score=hqEl('div','hqscore','hqc hq-tr',`<div class="hqh hqtop"><span class="hqn">-</span><span class="hqd"></span><span class="hqst"></span></div>
+    <div class="hqtrack" aria-hidden="true"><div class="hqln"></div><div class="hqmk"></div></div><div class="hqgoals"></div><div class="hqpend"></div>`);
+  HQ.c.flow=hqEl('div','hqflow','hqc hq-bl','<div class="hqh"><b>지금 흐름</b><span class="hqsum"></span></div><div class="hqb"></div>');
+  HQ.c.ctl=hqEl('div','hqctl','hqc hq-br',`<div class="hqpips"></div><div class="hqh hqrow"><span class="hqplay"></span><span class="hqsig"></span>
+    <button type="button" id="hqskip" class="primary" hidden>처음부터 다시 도전</button><button type="button" id="hqmore" class="hqmore" aria-label="메뉴 (우클릭, 휠 클릭)" title="메뉴 (지도 우클릭, 휠 클릭)">⋯</button></div>`);
+  for(const k of ['task','score','flow','ctl'])S.appendChild(HQ.c[k]);
+  HQ.c.task.querySelector('.hqfold').onclick=()=>{HQ.umin.task=!HQ.umin.task;HQ.c.task.classList.toggle('umin',HQ.umin.task);HQ.c.task.querySelector('.hqfold').textContent=HQ.umin.task?'펼치기':'접기';try{layoutUI();}catch(e){}};
+  HQ.c.flow.querySelector('.hqh').onclick=()=>{if(HQ.c.flow.classList.contains('min')){HQ.umin.flowOpen=!HQ.umin.flowOpen;try{layoutUI();}catch(e){}}};
+  $('hqskip').onclick=()=>$('skip').click();
+  $('hqmore').onclick=e=>{e.stopPropagation();if(HQ.rad){hqRadClose();return;}const r=e.currentTarget.getBoundingClientRect(),s=S.getBoundingClientRect();hqRadOpen(r.left-s.left+r.width/2,r.top-s.top-70);};}
+// 옮기기와 되돌리기(휴대폰 화면으로 바뀌면 원래 옆 칸 순서로)
+function hqMount(){hqBuild();const S=$('stage');HQ.on=true;document.body.classList.add('hq');
+  const lv=$('lvchip'),g=$('gauge');HQ.c.task.querySelector('.hqlv').appendChild(lv);
+  const tb=HQ.c.task.querySelector('.hqb');tb.appendChild($('sgoal'));if(typeof citCard!=='undefined')tb.appendChild(citCard);
+  const pend=$('pending');if(pend)HQ.c.score.querySelector('.hqpend').appendChild(pend);
+  HQ.c.flow.querySelector('.hqb').appendChild($('hudtl'));const pip=$('lcpip');if(pip)HQ.c.flow.querySelector('.hqb').appendChild(pip);
+  const tix=$('tixchip');if(tix)HQ.c.ctl.querySelector('.hqpips').after(tix);
+  const pl=HQ.c.ctl.querySelector('.hqplay');pl.appendChild($('play'));const seg=$('ctlbar').querySelector('.seg');if(seg)pl.appendChild(seg);
+  const ds=$('dxsig');if(ds)HQ.c.ctl.querySelector('.hqsig').appendChild(ds);
+  HQ.stash.appendChild($('hudtop'));HQ.stash.appendChild($('hudtr'));
+  for(const k in HQ.c)HQ.c[k].hidden=false;
+  requestAnimationFrame(()=>{try{resize();positionArms();layoutUI();}catch(e){}});}
+function hqUnmount(){if(!HQ.on)return;HQ.on=false;hqRadClose();document.body.classList.remove('hq');const side=$('side'),top=$('hudtop'),bar=$('ctlbar'),g=$('gauge');
+  if(g)top.insertBefore($('lvchip'),g);else top.appendChild($('lvchip'));const tix=$('tixchip');if(tix&&g)g.after(tix);const pend=$('pending');if(pend)(tix||g||top.lastChild).after(pend);
+  bar.insertBefore($('play'),bar.firstChild);const seg=HQ.c.ctl.querySelector('.seg');if(seg)$('play').after(seg);
+  const ds=$('dxsig'),dh=$('dxhist');if(ds){if(dh)bar.insertBefore(ds,dh);else bar.appendChild(ds);}
+  if(side){side.appendChild(top);side.appendChild($('sgoal'));if(typeof citCard!=='undefined')side.appendChild(citCard);side.appendChild($('hudtl'));side.appendChild($('hudtr'));const pip=$('lcpip');if(pip)side.appendChild(pip);}
+  for(const k in HQ.c)HQ.c[k].hidden=true;}
+{const _pa=pvApply;pvApply=function(){const want=playMode&&!document.body.classList.contains('mobile');if(!want&&HQ.on)hqUnmount();_pa();if(want&&!HQ.on)hqMount();};}
+// 점수 막대: 시작, 직전, 지금, 별 셋 기준, AI 최고 점수를 한 줄에
+function hqScore(){const C=HQ.c.score;if(!C||!HQ.on)return;const t=thresholds(),b=FC.base?FC.base.score:null,sh=FC.shown,jam=!!(sh&&sh.jam),cur=sh&&!jam?sh.score:null;
+  const rv=typeof rivalOf==='function'?rivalOf():null,ai=rv&&rv.score!=null?rv.score:null;
+  const key=sh?sh.key:'none';if(key!==HQ.lastKey){if(HQ.lastKey!=null&&HQ.lastCur!=null)HQ.prev=HQ.lastCur;HQ.lastKey=key;HQ.lastCur=cur;}
+  if(!sh){HQ.prev=null;}
+  const vals=[...t,b,cur,ai,HQ.prev].filter(v=>v!=null&&isFinite(v));let lo=Math.min(...vals),hi=Math.max(...vals);const pad=(hi-lo||1)*.06;lo-=pad;hi+=pad;
+  const P=v=>((v-lo)/(hi-lo)*100).toFixed(2)+'%';
+  const gd=$('gauge')&&$('gauge').querySelector('.gd');
+  C.querySelector('.hqn').textContent=jam?'정체':cur!=null?cur.toLocaleString():b!=null?b.toLocaleString():'?';
+  const d=C.querySelector('.hqd');d.textContent=gd?gd.textContent:'';d.className='hqd '+(gd?gd.className.replace('gd',''):'');
+  const sc=cur!=null?cur:jam?-Infinity:(b!=null?b:-Infinity),n=t.filter(x=>sc>=x).length;
+  C.querySelector('.hqst').innerHTML='★'.repeat(n)+`<i>${'★'.repeat(3-n)}</i>`;
+  const mk=[];if(b!=null)mk.push(`<i class="hqlb lo" style="left:${P(b)}">시작</i><i class="hqtk lo" style="left:${P(b)}"></i>`);
+  t.forEach((v,i)=>mk.push(`<i class="hqtk st" style="left:${P(v)}"></i><i class="hqlb hi" style="left:${P(v)}">${'★'.repeat(i+1)}</i>`));
+  if(ai!=null)mk.push(`<i class="hqtk ai" style="left:${P(ai)}"></i><i class="hqlb lo ai" style="left:${P(ai)}">AI</i>`);
+  if(HQ.prev!=null&&cur!=null)mk.push(`<i class="hqdot prev" style="left:${P(HQ.prev)}" title="직전 ${HQ.prev}"></i>`);
+  if(cur!=null)mk.push(`<i class="hqdot now" style="left:${P(cur)}"></i>`);else if(b!=null&&!jam)mk.push(`<i class="hqdot now base" style="left:${P(b)}"></i>`);
+  const h=mk.join('');const M=C.querySelector('.hqmk');if(M.dataset.h!==h){M.dataset.h=h;M.innerHTML=h;}
+  const z=v=>((v-lo)/(hi-lo)*100).toFixed(1)+'%';C.querySelector('.hqln').style.background=`linear-gradient(90deg,#4a3a58 0 ${z(t[0])},#7a6a3a ${z(t[0])} ${z(t[1])},#a99a5a ${z(t[1])} ${z(t[2])},#ffd35a ${z(t[2])})`;
+  C.classList.toggle('jam',jam);C.title=`흐름 점수. 별 ★${t[0]} ★★${t[1]} ★★★${t[2]}${ai!=null?`, AI 최고 ${ai}`:''}`;
+  // 목표는 점수 아래로 복사(원본은 흐름 카드 안에서 계속 갱신됨)
+  const go=$('hudtl')&&$('hudtl').querySelector('.goals'),G=C.querySelector('.hqgoals'),gh=go?go.innerHTML:'';if(G.dataset.h!==gh){G.dataset.h=gh;G.innerHTML=gh;}
+  // 흐름 카드 요약(접혔을 때)
+  const kv=[...$('hudtl').querySelectorAll('.grid2 span')].map(s=>[s.textContent,s.nextElementSibling?s.nextElementSibling.textContent:'']);const dl=kv.find(x=>/지연/.test(x[0]));
+  HQ.c.flow.querySelector('.hqsum').textContent=dl?`${dl[0]} ${dl[1]}`:'';
+  {const tl=$('hudtl'),pip=$('lcpip'),hide=(tl.hidden||document.body.classList.contains('tutlv'))&&(!pip||pip.hidden);if(HQ.c.flow.hidden!==hide)HQ.c.flow.hidden=hide;}
+  // 남은 조작: 점으로
+  const pp=HQ.c.ctl.querySelector('.hqpips');let ph;if(!limited())ph='<span>조작 무제한</span>';else{const N=TRIES_MAX(),u=Math.min(N,triesUsed());
+    ph=N<=14?`<span>남은 조작 ${N-u}</span>${'<i class="u"></i>'.repeat(u)}${'<i></i>'.repeat(N-u)}`:`<span>남은 조작 ${N-u} / ${N}</span>`;}
+  if(pp.dataset.h!==ph){pp.dataset.h=ph;pp.innerHTML=ph;}
+  const sk=$('skip'),hs=$('hqskip');if(sk&&hs){const show=!sk.hidden&&sk.classList.contains('primary');if(hs.hidden===show)hs.hidden=!show;}}
+setInterval(()=>{try{hqScore();}catch(e){if(!window.__hqerr){window.__hqerr=1;console.log('hqScore',e&&e.stack);}}},200);
+// 카드 배치: layoutUI가 부름. 각 카드는 제 사분면(도로 밖)에, 안 들어가면 줄이고, 그래도 안 되면 접어서 머리줄만
+function hqPlace(B){if(!HQ.on)return[];const g=8,ps=$('phstrip');const top0=ps&&ps.offsetParent&&!ps.hidden?ps.offsetTop+ps.offsetHeight+g:g;
+  const sp=(el,k,v)=>el.style.setProperty(k,v,'important'),out=[];
+  const plan=[['score','tr'],['task','tl'],['ctl','br'],['flow','bl']];
+  for(const [k,qk] of plan){const el=HQ.c[k];if(!el||el.hidden)continue;const q=B.Q[qk],R=qk[1]==='r',Bt=qk[0]==='b';
+    const x0=q[0]+g,x1=q[2]-g,y0=Bt?q[1]+g:Math.max(q[1]+g,top0),y1=q[3]-g,W=x1-x0,H=y1-y0;
+    sp(el,'transform','none');el.classList.remove('min');if(k==='flow'&&HQ.umin.flowOpen===undefined)HQ.umin.flowOpen=false;
+    let w=el.offsetWidth,h=el.offsetHeight,kk=Math.min(1,W/w,H/h);
+    if(kk<(k==='task'?.6:.72)){el.classList.add('min');if(k==='flow'&&HQ.umin.flowOpen)el.classList.add('open');else el.classList.remove('open');w=el.offsetWidth;h=el.offsetHeight;kk=Math.max(.55,Math.min(1,W/w,H/h));}
+    else el.classList.remove('open');
+    sp(el,'transform-origin',(Bt?'bottom ':'top ')+(R?'right':'left'));if(kk<.999)sp(el,'transform',`scale(${kk.toFixed(3)})`);
+    sp(el,'left',R?'auto':x0+'px');sp(el,'right',R?(cw-x1)+'px':'auto');sp(el,'top',Bt?'auto':y0+'px');sp(el,'bottom',Bt?(ch-y1)+'px':'auto');
+    const ww=w*kk,hh=h*kk,L=R?x1-ww:x0,T=Bt?y1-hh:y0;out.push([L,T,L+ww,T+hh]);}
+  return out;}
+// 원형 메뉴: 여섯 갈래, 고르면 옆에 하위 목록
+const hqB=(id,label,key)=>()=>{const e=$(id);if(!e||e.hidden)return null;return{t:label||e.textContent.trim(),k:key,run:()=>e.click()};};
+const hqK=id=>()=>{const e=$(id);if(!e)return null;const l=e.closest('label');if(l&&l.hidden)return null;return{t:(l?l.textContent:id).trim(),on:e.checked,keep:1,run:()=>e.click()};};
+const hqS=(id,name)=>()=>{const e=$(id);if(!e)return null;const l=e.closest('label');if(l&&l.hidden)return null;return[...e.options].map(o=>({t:`${name}: ${o.text}`,on:o.value===e.value,keep:1,run:()=>{e.value=o.value;e.dispatchEvent(new Event('change',{bubbles:true}));}}));};
+const HQRAD=[{ic:'☰',t:'게임 모드',s:'모드, 레벨',it:[hqB('jbtn','메뉴 (모드 고르기)'),hqB('lvchip','레벨 바꾸기'),hqB('cxchip')]},
+  {ic:'?',t:'도움말',s:'안내, 카메라',it:[hqB('coachbtn','이 단계 안내 다시 보기','H'),hqB('lcbtn','실시간 카메라')]},
+  {ic:'≡',t:'기록',s:'조작, 랭킹',it:[hqB('dxhist','조작 기록'),hqB('lbbtn','랭킹')]},
+  {ic:'↺',t:'다시',s:'처음부터',it:[hqB('skip','처음부터 다시 도전','R'),hqB('resetcfg','처음 설정으로'),hqB('newsess','관찰 다시 시작')]},
+  {ic:'◎',t:'보기',s:'지도, 스킨',it:[hqB('mapzoom'),hqB('btn3d'),hqK('spdcol'),hqS('skinsel','스킨'),hqB('modebtn')]},
+  {ic:'♪',t:'설정',s:'소리, 날씨',it:[hqK('fxbub'),hqK('fxsnd'),hqK('anon'),hqK('aion'),hqB('bgmbtn'),hqB('bgmnext'),hqS('wxsel','날씨')]}];
+function hqItems(i){return HQRAD[i].it.flatMap(f=>{const r=f();return r==null?[]:Array.isArray(r)?r:[r];});}
+function hqRadOpen(x,y){const S=$('stage');HQ.rad={x:Math.max(140,Math.min(cw-140,x)),y:Math.max(140,Math.min(ch-140,y))};HQ.sub=-1;hqRadDraw();}
+function hqRadClose(){HQ.rad=null;HQ.sub=-1;const r=$('hqrad');if(r)r.remove();}
+function hqRadDraw(){let R=$('hqrad');if(!R){R=hqEl('div','hqrad','hqrad');$('stage').appendChild(R);R.addEventListener('click',hqRadClick);R.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();});}
+  const {x,y}=HQ.rad;let h=`<div class="hqring" style="left:${x}px;top:${y}px">`+HQRAD.map((r,i)=>{const a=-Math.PI/2+i/HQRAD.length*2*Math.PI,D=92;
+    return`<button type="button" data-r="${i}" class="${HQ.sub===i?'on':''}" style="left:${(Math.cos(a)*D).toFixed(1)}px;top:${(Math.sin(a)*D).toFixed(1)}px"><em>${r.ic}</em>${r.t}<small>${r.s}</small></button>`;}).join('')
+    +`<button type="button" class="hqx" data-r="x" aria-label="닫기 (Esc)" style="left:0;top:0">×</button></div>`;
+  if(HQ.sub>=0){const it=hqItems(HQ.sub),a=-Math.PI/2+HQ.sub/HQRAD.length*2*Math.PI,bx=x+Math.cos(a)*92,by=y+Math.sin(a)*92,right=bx<cw-230;
+    const L=right?bx+46:bx-46-210,T=Math.max(8,Math.min(ch-8-Math.min(320,it.length*34+16),by-20));
+    h+=`<div class="hqsub" style="left:${Math.max(8,L)}px;top:${T}px">${it.length?it.map((o,j)=>`<button type="button" data-s="${j}" class="${o.on?'on':''}"><span>${o.keep&&o.on!=null?(o.on?'✓ ':'　'):''}${o.t}</span><kbd>${o.k||''}</kbd></button>`).join(''):'<span class="hqnone">이 화면에서는 쓸 수 없어요</span>'}</div>`;}
+  R.innerHTML=h;}
+function hqRadClick(e){e.stopPropagation();const b=e.target.closest('button');if(!b){hqRadClose();return;}
+  if(b.dataset.r!=null){if(b.dataset.r==='x'){hqRadClose();return;}const i=+b.dataset.r;HQ.sub=HQ.sub===i?-1:i;hqRadDraw();return;}
+  if(b.dataset.s!=null){const o=hqItems(HQ.sub)[+b.dataset.s];if(!o)return;if(o.keep){o.run();setTimeout(()=>{if(HQ.rad)hqRadDraw();},30);}else{hqRadClose();o.run();}}}
+document.addEventListener('pointerdown',e=>{if(HQ.rad&&!e.target.closest('#hqrad')&&!e.target.closest('#hqmore'))hqRadClose();},true);
+{const S=$('stage');
+  S.addEventListener('contextmenu',e=>{if(!HQ.on)return;if(e.target.closest('input,textarea,select'))return;e.preventDefault();const s=S.getBoundingClientRect();hqRadOpen(e.clientX-s.left,e.clientY-s.top);});
+  S.addEventListener('mousedown',e=>{if(HQ.on&&e.button===1)e.preventDefault();});
+  S.addEventListener('auxclick',e=>{if(!HQ.on||e.button!==1)return;e.preventDefault();const s=S.getBoundingClientRect();hqRadOpen(e.clientX-s.left,e.clientY-s.top);});}
+// 단축키(데스크톱): 스페이스 일시정지, 1/2/3 속도, H 도움말, R 다시 도전, Esc 메뉴 닫기
+document.addEventListener('keydown',e=>{if(!HQ.on||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='Escape'){if(HQ.rad){hqRadClose();e.stopPropagation();}return;}
+  const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,button,[contenteditable]'))return;
+  if(document.body.classList.contains('titleon')||!$('modal').hidden||!playMode)return;if(typeof JR!=='undefined'&&JR&&!JR.hidden)return;
+  const k=e.key.toLowerCase();
+  if(k===' '){e.preventDefault();$('play').click();}
+  else if(k==='1'||k==='2'||k==='3'){const sb=document.querySelectorAll('#hqctl .seg button');if(sb[+k-1])sb[+k-1].click();}
+  else if(k==='h'){const c=$('coachbtn');if(c&&!c.hidden)c.click();}
+  else if(k==='r'){const s=$('skip');if(s&&!s.hidden)s.click();}});
+window.__hq={st:HQ,open:hqRadOpen,close:hqRadClose,items:hqItems};
+try{if(PV2S.on&&!HQ.on)hqMount();}catch(e){}
 // ---------- 새 버전 알림: 공개 주소에서 5분마다 배포본의 빌드 번호를 확인해, 바뀌었으면 새로고침 안내 ----------
 // GitHub Pages는 페이지를 10분까지 캐시하므로, 열어 둔 화면이 옛 버전인 채로 남는 것을 막음
 {const me=(document.querySelector('meta[name="gl-build"]')||{}).content;
