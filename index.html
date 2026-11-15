@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261114222013">
+<meta name="gl-build" content="20261114223002">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -4497,10 +4497,12 @@ async function mvCommit(){const fc=clone(cfg),s=cfgSig(fc);
   const wait=mvChip('<b>계산 중</b><span>이 조작의 효과를 재고 있어요</span>','calc');
   try{const k=fcKey(fc);let ev=FC.cache.get(k);if(!ev){ev=await evalAsync(fc,null);fcPut(k,{score:ev.score,st:ev.st});}
     if(wait)wait.remove();if(modeId()!==mid)return;const ref=MV.ref||fcGet(baseCfg())||(FC.baseId===mid?FC.base:null),dh=mvDeltaHTML(ev,ref);
+    const pk=mode.kind==='level'?curLevel().id:modeId(),prevStars=(prog[pk]||{}).stars||0;
     finishWith(fc,{score:ev.score,st:ev.st},false,true);if(sim&&!timingOnly(fc,sim.cfg)&&state==='run'){startSession();if(typeof buildArms==='function')buildArms();}MV.ref={score:ev.score,st:ev.st};const rec=history[0];
     mvChip(dh.h+(limited()?`<small>남은 조작 ${triesLeft()}번</small>`:''),dh.cls,2600);
     const at=attGet();if(at&&at.paid&&!at.back&&rec&&rec.sameDemand&&!rec.jam&&(at.best0==null||rec.score>at.best0)){at.back=1;attSet(at);tixAdd(1,'내 최고 기록 경신으로 돌려받음');}
-    if(rec&&rec.newStars&&rec.stars>=2&&nextTarget())setTimeout(()=>mvToast(`별 ${rec.stars}개 달성! 다음 스테이지로 갈까요?`,()=>loadMode(nextTarget().m),'다음 스테이지'),900);
+    // 별을 처음 받거나 더 받은 순간: 다음 단계로 갈지 물어봄
+    if(rec&&rec.sameDemand&&!rec.jam&&rec.stars>=1&&rec.stars>prevStars&&mode.kind!=='lab'){const mid2=modeId();setTimeout(()=>{if(modeId()===mid2)mvNext(rec.stars);},1400);}
     if(limited()&&triesLeft()<=0)setTimeout(mvOut,1800);}
   catch(e){if(wait)wait.remove();}finally{MV.busy=false;}}
 function mvTick(){try{if(!cfg||!sim)return;const id=modeId();if(MV.id!==id){MV.id=id;mvSync();return;}    tixRender();const s=cfgSig(cfg);if(s===MV.sig){MV.pend=null;return;}
@@ -4511,6 +4513,13 @@ setInterval(mvTick,150);
 {const rs=restartStage;restartStage=function(){rs();attSet(null);mvSync();};}
 {const lm=loadMode;loadMode=function(m){lm(m);MV.id=null;};}
 function mvBest(){const at=attGet(),t0=at?at.at:0;let b=null;for(const h of history)if((h.at||0)>=t0&&h.sameDemand&&!h.jam&&(!b||h.score>b.score))b=h;return b;}
+// 별 달성: 다음 단계로 갈지 묻기
+function mvNext(n){const nx=nextTarget(),st='★'.repeat(n)+'☆'.repeat(3-n);openModal(`별 ${n}개 달성! ${st}`,[]);
+  $('modalbody').innerHTML=`<p class="note" style="margin-top:0">${n<3?'다음 단계로 넘어가도 되고, 여기서 별을 더 노려도 돼요. 받은 별과 기록은 남아요.':'이 단계의 별을 모두 모았어요.'}</p>
+  <div class="mvopts">${nx?`<button type="button" class="primary" data-k="next">다음 단계로: ${dEsc(nx.name)}</button>`:`<button type="button" class="primary" data-k="modes">모든 단계를 마쳤어요. 게임 모드로</button>`}
+  <button type="button" data-k="stay">${n<3?'여기서 별 더 받기':'여기서 더 해 보기'}</button></div>`;
+  $('modalbody').querySelector('.mvopts').onclick=e=>{const k=(e.target.closest('button')||{}).dataset;if(!k||!k.k)return;closeModal();
+    if(k.k==='next'&&nx){try{anTrack('next_stage',{from:modeId(),stars:n});}catch(_){}loadMode(nx.m);}else if(k.k==='modes')journeyOpen();};}
 // 조작을 모두 썼을 때
 function mvOut(){const b=mvBest(),L=TRIES_MAX();openModal(`조작 ${L}번을 모두 썼어요`,[]);
   $('modalbody').innerHTML=`<p class="note" style="margin-top:0">${b?`이번 도전 최고 <b>${b.score}점</b>, 별 ${b.stars}개. `:''}받은 별과 최고 기록은 그대로 남아요. 처음 설정부터 다시 도전하거나 조작을 더 받아 이어 가세요.</p>
