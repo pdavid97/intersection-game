@@ -112,7 +112,7 @@ function attachConflicts(conns,G){const key=JSON.stringify(G);let list=czCache[k
   for(const c of conns)c.conf=[];
   for(const [a,b,sa,sb] of list){conns[a].conf.push({B:conns[b],sA:sa,sB:sb});conns[b].conf.push({B:conns[a],sA:sb,sB:sa});}}
 // 충돌 지점 양보: 상대가 그 지점을 점유 중이면 반드시 멈추고, 둘 다 다가오는 중이면 먼저 도착할 차가 먼저 간다
-function conflictGap(veh,A,sv){let g=1e9;if(!A.conf)return g;const etaBase=Math.max(veh.v,1);
+function conflictGap(veh,A,sv,sim){let g=1e9;const P=sim&&sim.curIv?sim.curIv.p:null,res=x=>!!(P&&x.pIn&&x.pIn!==P);if(!A.conf)return g;const etaBase=Math.max(veh.v,1);
   for(const c of A.conf){if(sv>c.sA-0.5)continue;const B=c.B;if(!B.vehicles.length)continue;
     const etaV=(c.sA-sv)/etaBase;
     for(const u of B.vehicles){if(u===veh)continue;const uf=u.s,ur=u.s-u.len;
@@ -120,7 +120,9 @@ function conflictGap(veh,A,sv){let g=1e9;if(!A.conf)return g;const etaBase=Math.
       if((veh.bt||0)>5&&u.v<0.2)continue;
       if(ur>c.sB+1.2)continue;
       let y=uf>c.sB-1.6;
-      if(!y){const etaU=(c.sB-uf)/Math.max(u.v,1);if(etaU<4&&(etaU<etaV||(etaU===etaV&&u.id<veh.id)))y=true;}
+      // 지난 현시에 들어와 아직 교차로 안에 남은 차(잔류 차)가 먼저 빠져나감: 새 녹색 차는 잔류 차에게 양보
+      if(!y){const etaU=(c.sB-uf)/Math.max(u.v,1);if(etaU<4){const ru=res(u),rv=sv>=0&&res(veh);
+        if(ru&&!rv)y=true;else if(rv&&!ru)y=false;else if(etaU<etaV||(etaU===etaV&&u.id<veh.id))y=true;}}
       if(y){const gg=c.sA-2.6-sv;if(gg<g)g=gg;}}}
   return g;}
 function aheadIn(ns,off){for(let k=ns.vehicles.length-1;k>=0;k--){const u=ns.vehicles[k];if(u.s-u.len>off-.01)return u;}return null;}
@@ -223,11 +225,11 @@ function accel(sim,veh,seg,k){if(veh.crashed)return -20;let gap=1e9,lv=V_FREE,go
       if(u){gap=dist+u.s-u.len-off;lv=u.v;break;}dist+=ns.length-off;if(dist>150)break;}
     go=veh.si!==0||canGo(sim,veh,seg);
     if(!go){const sg=seg.length-veh.s+1.5;if(sg<gap){gap=sg;lv=0;}}
-    else if(veh.si===0&&!seg.slip){const g2=conflictGap(veh,veh.route[1],veh.s-seg.length);if(g2<gap){gap=g2;lv=0;}}
+    else if(veh.si===0&&!seg.slip){const g2=conflictGap(veh,veh.route[1],veh.s-seg.length,sim);if(g2<gap){gap=g2;lv=0;}}
     // 슬립 차로 합류: 바깥 차로에 가까이 오는 차가 있으면 합류 지점 직전에서 기다림
     const cn=veh.route[1];if(cn.outOffset&&veh.si<=1){const off=cn.outOffset,toEnd=(veh.si===1?cn.length-veh.s:seg.length-veh.s+cn.length)-1;
       if(toEnd>8)for(const u of veh.route[2].vehicles){if(u.s<off-Math.max(15,u.v*3.5)||u.s-u.len>off+veh.len+2)continue;const w=toEnd-8;if(w<gap){gap=Math.max(w,.05);lv=0;}break;}}}
-  if(veh.si===1&&!seg.slip){const g2=conflictGap(veh,seg,veh.s);if(g2<gap){gap=g2;lv=0;}}
+  if(veh.si===1&&!seg.slip){const g2=conflictGap(veh,seg,veh.s,sim);if(g2<gap){gap=g2;lv=0;}}
   // 바깥 차로 차량: 합류를 시작한 슬립 차량에 양보
   if(veh.si===2&&seg.feeders)for(const f of seg.feeders)for(const w of f.vehicles){if(f.length-w.s>8)continue;const pos=f.outOffset-(f.length-w.s);
     if(veh.s<pos){const g2=pos-w.len-veh.s;if(g2<gap){gap=g2;lv=w.v;}}}
@@ -295,7 +297,7 @@ function step(sim){const dt=DT,cfg=sim.cfg,net=sim.net;sim.t+=dt;
     sim.done++;sim.persons+=v.occ;sim.vehP+=v.occ;{const dl=Math.max(0,sim.t-Math.max(v.t0,sim.t0)-v.free);sim.sumDelay+=dl*v.occ;const B=sim.byA||(sim.byA={}),ba=B[v.a]||(B[v.a]={d:0,p:0});ba.d+=dl*v.occ;ba.p+=v.occ;}}
   for(const seg of net.conns)while(seg.vehicles.length&&seg.vehicles[0].s>=seg.length){const v=seg.vehicles.shift();v.s-=seg.length;v.si=2;
     if(seg.outOffset){v.s+=seg.outOffset;const ov=seg.out.vehicles;let k=0;while(k<ov.length&&ov[k].s>=v.s)k++;ov.splice(k,0,v);}else seg.out.vehicles.push(v);}
-  for(const seg of net.ins)while(seg.vehicles.length&&seg.vehicles[0].s>=seg.length){const v=seg.vehicles.shift();v.s-=seg.length;v.si=1;v.route[1].vehicles.push(v);}
+  for(const seg of net.ins)while(seg.vehicles.length&&seg.vehicles[0].s>=seg.length){const v=seg.vehicles.shift();v.s-=seg.length;v.si=1;v.pIn=sim.curIv.p;v.route[1].vehicles.push(v);}
   if(fin)sim.vehicles=sim.vehicles.filter(v=>!v.gone);
   const q=maxQueue(sim);if(q>sim.peakQ)sim.peakQ=q;
   if(((sim.stepN=(sim.stepN||0)+1)%10)===0){const QA=sim.qA||(sim.qA={});for(const a of APPR){let n=0;sim.net.inL[a].forEach((seg,i)=>{n+=sim.pending[a][i].length;for(const v of seg.vehicles)if(v.v<2)n++;});if(n>(QA[a]||0))QA[a]=n;}}}
@@ -508,7 +510,7 @@ const LEVELS=[
  {id:'0-4',stage:0,real:'gangnam',title:'실제 교차로: 서울 강남역 사거리',unlock:['split'],
   story:'1장의 마지막은 실제 교차로입니다. 강남대로와 테헤란로, 서초대로가 만나는 강남역 사거리를 서울시 실측 교통량(평일 오전 8~9시)과 실제 차로, 신호 구조 그대로 옮겼습니다. 네 방향이 차례로 직진과 좌회전을 함께 받는 4현시 신호입니다. 지금은 1장에서 배운 신호 나누기만 할 수 있습니다.',
   goal:'네 현시의 녹색 시간(띠 끝 초)을 조절해 흐름 점수를 올리세요.',
-  hint:'접근로 버튼의 대기 대수와 화면 밖 대기 차량(+N)을 보세요. 계속 쌓이는 방향의 현시에 녹색을 몇 초씩 옮기면 됩니다. 실제 교차로는 교통량이 많아서 별 기준이 빡빡합니다.',stars:[366,401,432]},
+  hint:'접근로 버튼의 대기 대수와 화면 밖 대기 차량(+N)을 보세요. 계속 쌓이는 방향의 현시에 녹색을 몇 초씩 옮기면 됩니다. 실제 교차로는 교통량이 많아서 별 기준이 빡빡합니다.',stars:[410,431,450]},
  {id:'1-1',stage:1,title:'한밤의 교차로',unlock:['split','cycle'],scheme:{NS:'thru',EW:'thru'},plan:{NS_T:56,EW_T:56},
   appr:{N:[220,0,10,'T','TR'],S:[220,0,10,'T','TR'],E:[220,0,10,'T','TR'],W:[220,0,10,'T','TR']},
   story:'자정의 교차로. 차는 거의 없는데 신호 주기가 120초라 빈 도로 앞에서 1분 가까이 기다립니다.',
@@ -527,7 +529,7 @@ const LEVELS=[
  {id:'1-4',stage:1,real:'toronto',title:'실제 교차로: 토론토 레이크쇼어',unlock:['split','cycle'],
   story:'2장의 마지막은 토론토 호숫가 레이크쇼어 대로와 파를러먼트 거리입니다. 2022년 토론토 혼잡 교차로 10위이고, 교통량은 토론토시가 2024년 6월에 실제로 센 출근 시간 값입니다. 동서 좌회전 보호, 동서 직진, 남북 순서의 3현시 신호입니다. 지금은 신호 비중과 주기 길이만 바꿀 수 있습니다.',
   goal:'방향별 녹색 시간을 실제 교통량에 맞게 다듬어 흐름 점수를 올리세요.',
-  hint:'동쪽에서 시간당 1,326대가 들어옵니다. 동서 직진 현시의 비중과 주기 길이를 함께 보세요.',stars:[280,292,302]},
+  hint:'동쪽에서 시간당 1,326대가 들어옵니다. 동서 직진 현시의 비중과 주기 길이를 함께 보세요.',stars:[279,291,301]},
  {id:'2-1',stage:2,title:'직진이 몰린다',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:24,N_A:22,EW_T:20},
   appr:{N:[700,10,10,'L','TR'],S:[750,10,10,'L','TR'],E:[300,0,10,'T','TR'],W:[300,0,10,'T','TR']},
   story:'남북은 방향별로 직진과 좌회전을 함께 내보내는 직좌 동시 신호입니다. 그런데 1차로가 좌회전 전용이라 좌회전 10%를 위해 차로 하나를 비워두고 있습니다.',
@@ -586,7 +588,7 @@ const LEVELS=[
  {id:'4-4',stage:4,real:'tokyo',title:'실제 교차로: 도쿄 오하라',unlock:['split','cycle','lanes','uturn','oneway'],
   story:'5장의 마지막은 도쿄 환상7호선과 고슈가도가 만나는 오하라 교차로입니다. 2021년 일본에서 인신사고가 가장 많았던 교차로(29건)이고, 고슈가도 쪽 우회전 대기열이 직진 차로를 막는 정체로 알려져 있습니다. 일본은 좌측 통행입니다. 지금은 신호 시간, 차로, 유턴, 통행 방향만 바꿀 수 있습니다.',
   goal:'차로와 통행 방향을 바꿔 우회전 대기열이 직진을 막지 않게 하고 흐름 점수를 올리세요.',
-  hint:'좌측 통행에서 우회전은 맞은편을 가로지르는 어려운 회전입니다. 우회전 전용 차로를 어디에 둘지 보세요.',stars:[239,341,428]},
+  hint:'좌측 통행에서 우회전은 맞은편을 가로지르는 어려운 회전입니다. 우회전 전용 차로를 어디에 둘지 보세요.',stars:[226,310,381]},
  {id:'5-1',stage:5,title:'건너지 못하는 사람들',unlock:['split','cycle'],
   phases:[{m:['NT','NR','ST','SR'],g:46},{m:['ET','ER','WT','WR'],g:6}],
   appr:{N:[900,0,10,'T','TR'],S:[950,0,10,'T','TR'],E:[300,0,10,'T','TR'],W:[280,0,10,'T','TR']},ped:{N:700,S:700,E:80,W:80},
@@ -608,7 +610,7 @@ const LEVELS=[
  {id:'5-4',stage:5,real:'gangnam',title:'실제 교차로: 강남역 사거리, 사람과 함께',unlock:['split','cycle','ped'],
   story:'마지막 장의 마지막은 다시 강남역 사거리입니다. 이번에는 횡단보도를 건너는 사람까지 함께 봅니다. 출근 시간 각 횡단보도로 시간당 650~750명이 건넌다고 추정했습니다(서울시 유동인구조사 기반). 지금은 신호 시간, 주기, 보행 신호 방식만 바꿀 수 있습니다.',
   goal:'차량과 보행자 모두 덜 기다리게 해서 흐름 점수를 올리세요.',
-  hint:'주기가 길면 보행자도 오래 기다립니다. 보행 전용 현시가 이득인지, 동시 횡단이 나은지 비교해 보세요.',stars:[355,379,400]}
+  hint:'주기가 길면 보행자도 오래 기다립니다. 보행 전용 현시가 이득인지, 동시 횡단이 나은지 비교해 보세요.',stars:[396,403,410]}
 ];
 function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,pl,pr]=s.appr[a];appr[a]={vph,pl,pr,lanes:['L','TR'],perm:false};}
   return{geo:clone(GEO2),phases:templatePhases('protL','protL',DEFAULT_PLAN),scheme:{NS:'protL',EW:'protL'},yellow:3,rtor:false,appr};}
