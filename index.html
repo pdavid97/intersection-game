@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116135852">
+<meta name="gl-build" content="20261116145355">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1057,7 +1057,7 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.22. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.23. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4530,6 +4530,14 @@ function dxBandGeo(a,lo,hi){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.
   return{C,len,wpx:Math.max(8,(hi-lo+1)*W*sc*.9),skip:0,n:hi-lo+1,sc};}
 // 이 갈래가 녹색을 받는 현시(보행 전용 제외)
 const dxPhasesOf=a=>PH.map((p,i)=>({p,i})).filter(({p})=>!p.x&&p.g>0&&p.m.some(m=>m[0]===a));
+// 갈래의 띠 목록: 현시마다 녹색(또는 비보호)을 받는 차로. 한 차로를 여러 현시가 받으면 차로 폭을 나눠 나란히(병렬) 놓음
+function dxBands(a){const inl=(sim.net.inL[a]||[]).map((sg,k)=>({sg,k})).filter(x=>!x.sg.slip),nL=Math.min(inl.length,cfg.appr[a].lanes.length);
+  const B=dxPhasesOf(a).map(({p,i})=>{let ks=inl.filter(({k})=>k<nL&&[...laneMode(cfg.appr[a],k)].some(mv=>{const r=phaseGives(cfg,p,a,mv);return r==='G'||r==='P';})).map(x=>x.k);if(!ks.length)ks=inl.map(x=>x.k);return{p,i,ks,f0:1e9,f1:-1e9};});
+  const lanes=new Set(B.flatMap(b=>b.ks));for(const k of lanes){const sv=B.filter(b=>b.ks.includes(k)).sort((x,y)=>(x.ks.reduce((t,v)=>t+v,0)/x.ks.length)-(y.ks.reduce((t,v)=>t+v,0)/y.ks.length)||x.i-y.i);
+    sv.forEach((b,j)=>{b.f0=Math.min(b.f0,k+j/sv.length);b.f1=Math.max(b.f1,k+(j+1)/sv.length);});}
+  return B;}
+// 차로 바깥쪽(번호가 커지는 쪽)이 화면에서 dxOff의 +방향인지
+function dxSide(a,C){const L=sim.net.inL[a][0],q=L.pts[L.pts.length-1],r=rightOf(HEAD[a]),W=cfg.geo.LW,P=toScreen(q[0],q[1]),Q=toScreen(q[0]+r[0]*W,q[1]+r[1]*W),N=dxOff(C.slice(0,2),1)[0];return((Q[0]-P[0])*(N[0]-C[0][0])+(Q[1]-P[1])*(N[1]-C[0][1]))>=0?1:-1;}
 // 좌회전 전용 신호: 좌회전(유턴)만 있는 현시에 이 갈래 좌회전이 있음
 const dxLtOnly=p=>!p.x&&p.m.length&&!p.m.some(m=>m[1]==='T');
 const dxLtOn=a=>PH.some(p=>dxLtOnly(p)&&p.m.includes(a+'L'));
@@ -4538,16 +4546,16 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   const s=DX.svg,c=$('cv');s.style.left=c.offsetLeft+'px';s.style.top=c.offsetTop+'px';s.style.width=cw+'px';s.style.height=ch+'px';s.setAttribute('viewBox',`0 0 ${cw} ${ch}`);
   const G=DX.geo=dxArmGeo();
   // 띠 비율(초당 화면 px): 가장 좁은 갈래에도 다 들어가게. 끄는 동안은 고정
-  if(!DX.drag){let k=4.5;for(const a in G){const ps=dxPhasesOf(a),sum=ps.reduce((t,{p})=>t+p.g,0)+ps.length*2;if(sum>0)k=Math.min(k,(G[a].avail-G[a].skip-26)/sum);}DX.K=Math.max(.9,k);}
+  if(!DX.drag){let k=4.5;for(const a in G){const ps=dxPhasesOf(a),sum=ps.reduce((t,{p})=>Math.max(t,p.g),0)+2;if(sum>0)k=Math.min(k,(G[a].avail-G[a].skip-26)/sum);}DX.K=Math.max(.9,k);}
   const K=DX.K,canSplit=unlocked('split')||unlocked('cycle');let h='';h+=dxLaneSVG();{const sb=$('dxsig');if(sb)sb.hidden=!(unlocked('phases')||unlocked('scheme')||dxGlobal().length);}
   if(!DX.paint){
     DX.bandC={};
-    for(const a in G){const G0=G[a],used={},inl=(sim.net.inL[a]||[]).map((sg,k)=>({sg,k})).filter(x=>!x.sg.slip),nL=Math.min(inl.length,cfg.appr[a].lanes.length);
-      for(const {p,i} of dxPhasesOf(a)){
-        // 이 현시가 녹색(또는 비보호)을 주는 차로 위에만 띠를 그림: 좌회전 현시는 좌회전 차로 위, 직진 현시는 직진 차로 위
-        let ks=inl.filter(({k})=>k<nL&&[...laneMode(cfg.appr[a],k)].some(mv=>{const r=phaseGives(cfg,p,a,mv);return r==='G'||r==='P';})).map(x=>x.k),g=G0;
-        if(ks.length&&ks.length<inl.length){const lo=Math.min(...ks),hi=Math.max(...ks);g=dxBandGeo(a,lo,hi)||G0;}else ks=inl.map(x=>x.k);
-        let s0=Math.max(0,...ks.map(k=>used[k]||0));DX.bandC[a+':'+i]=g.C;
+    for(const a in G){const G0=G[a];
+      for(const {p,i,ks,f0,f1} of dxBands(a)){
+        // 이 현시가 녹색(또는 비보호)을 주는 차로 위에만, 정지선에서 시작. 같은 차로를 받는 다른 현시와는 폭을 나눠 나란히
+        const kLo=Math.floor(f0+1e-6),kHi=Math.ceil(f1-1e-6)-1,base=dxBandGeo(a,kLo,kHi)||G0,W=cfg.geo.LW,sc=Math.min(cw,ch)/(2*VIEW),sh=(f0+f1)/2-(kLo+kHi+1)/2;
+        const g={C:Math.abs(sh)>1e-3?dxOff(base.C,dxSide(a,base.C)*sh*W*sc):base.C,wpx:Math.max(7,(f1-f0)*W*sc*.9)};
+        const s0=0;DX.bandC[a+':'+i]=g.C;
         const L=p.g*K,col=dxCol(i),pts=[];for(let s=s0;s<=s0+L;s+=5)pts.push(dxAt(g.C,s));pts.push(dxAt(g.C,s0+L));
         // 띠: 안은 옅게(차가 보이게), 양쪽 테두리는 진하게
         const pl=P=>'M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),dd=pl(pts),hw=g.wpx/2;
@@ -4561,7 +4569,7 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
           for(const sg of [1,-1])h+=`<g class="dxn" data-a="${a}" data-p="${i}" data-d="${sg}" style="cursor:pointer"><circle cx="${e[0]+ux*sg*(R+11)}" cy="${e[1]+uy*sg*(R+11)}" r="12" fill="#000" fill-opacity=".001"/><path d="${tri(sg)}" fill="#fff" stroke="#271d31" stroke-width="1.5"/></g>`;
           h+=`<g class="dxh" data-a="${a}" data-p="${i}" data-s="${s0}" style="cursor:grab"><circle cx="${e[0]}" cy="${e[1]}" r="21" fill="#000" fill-opacity=".001"/><circle cx="${e[0]}" cy="${e[1]}" r="${R}" fill="${col}" stroke="#fff" stroke-width="2.5"/><text x="${e[0]}" y="${e[1]+.5}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#fff" stroke="#271d31" stroke-width="2" paint-order="stroke" pointer-events="none">${p.g}초</text><circle cx="${e[0]-R*.8}" cy="${e[1]-R*.8}" r="7.5" fill="#fff" stroke="${col}" stroke-width="2" pointer-events="none"/><text x="${e[0]-R*.8}" y="${e[1]-R*.8+.5}" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="900" fill="${col}" pointer-events="none">${i+1}</text></g>`;}
         if(only&&L>34){const m=dxAt(g.C,s0+L/2);h+=`<text x="${m[0]}" y="${m[1]}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="800" fill="#fff" stroke="#3a2313" stroke-width="2.5" paint-order="stroke" pointer-events="none">좌</text>`;}
-        for(const k of ks)used[k]=s0+L+3;}}}
+        }}}
   // 신호 순서 막대에서 고른 조: 그 조의 이동을 지도에 표시(초록 = 녹색, 노랑 점선 = 비보호, 빨강 점선 = 이 조에선 빨간불)
   if(DX.selPh!=null&&!DX.paint&&PH[DX.selPh]&&performance.now()-(DX.selAt||0)<7000)h+=dxPhaseOverlay(PH[DX.selPh]);else DX.selPh=null;
   // 신호등(누르면 신호 메뉴) + 대기 대수
