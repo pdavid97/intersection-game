@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116170249">
+<meta name="gl-build" content="20261116171851">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1082,7 +1082,7 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.33. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.34. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3862,12 +3862,13 @@ const PAL={bld:[['#f6c9a8','#e6a987','#d48f70'],['#f3dca2','#e3c27f','#cfa866'],
     const near=sx>0&&sy>0,w=7+trnd()*3,dd=7+trnd()*3,h=near?3.5+trnd()*(i+j>3?9:4):(i+j<2?8:6)+trnd()*(i+j>3?26:16),p=PAL.bld[Math.floor(trnd()*PAL.bld.length)];
     const a=[sx*x0,sx*(x0+w)].sort((u,v)=>u-v),b=[sy*y0,sy*(y0+dd)].sort((u,v)=>u-v);TS.bld.push({x0:a[0],x1:a[1],y0:b[0],y1:b[1],h,p,win:trnd()<.5});}}
   // 길가 가로수
-  for(const s of [-1,1])for(let k=16;k<125;k+=9){TS.trees.push({x:k*s,y:10.4*(k%18<9?1:-1),r:1.5});TS.trees.push({x:10.4*(k%18<9?-1:1),y:k*s,r:1.5});}})();
+  for(const s of [-1,1])for(let k=16;k<125;k+=9){TS.trees.push({x:k*s,y:7.8*(k%18<9?1:-1),r:1.4});TS.trees.push({x:7.8*(k%18<9?-1:1),y:k*s,r:1.4});}})();
 
 // ---- 이스터 에그: 빨간 오픈카 한 대가 하늘에서 날아와 교차로 위를 한 바퀴 돌고 공원 잔디에 내려앉았다가 다시 날아감 ----
 // 처음 6초 뒤, 그 뒤로 30초마다. 로고의 신호등을 눌러도 나옴. 땅에서는 도로를 쓰지 않아(공원 착지) 다른 차, 사람과 겹치지 않음
 const EGG={on:false,u:0,next:6,trail:[],pad:[-31,31]};
 TS.trees=TS.trees.filter(tr=>Math.hypot(tr.x-EGG.pad[0],tr.y-EGG.pad[1])>7);
+TS.trees=TS.trees.filter(tr=>{const r=tr.r+.6;return!TS.bld.some(b=>(tr.x>b.x0-r&&tr.x<b.x1+r&&tr.y>b.y0-r&&tr.y<b.y1+r)||(b.y0>tr.y&&b.y0-tr.y<r*2.2+1&&tr.x>b.x0-1.5&&tr.x<b.x1+1.5)||(b.x0>tr.x&&b.x0-tr.x<r*2.2+1&&tr.y>b.y0-1.5&&tr.y<b.y1+1.5));});
 const eSm=v=>v<0?0:v>1?1:v*v*(3-2*v),eL=(a,b,k)=>a+(b-a)*k;
 function eggPos(u){const R=17,Z=21,C=[20,20];
   // 원 중심을 교차로 앞쪽(화면 아래)에 두어 제목, 챔피언 카드에 가리지 않게 돎
@@ -3908,7 +3909,7 @@ const TMODE=[{k:'basic',name:'2현시 신호',sub:'남북과 동서가 번갈아
   {k:'scr',name:'보행자 전용 신호',sub:'차는 모두 멈추고 사람만 건너요',gx:13,gy:13,P:9,ew:['LT','TR'],ns:['LT','TR']},
   {k:'long',name:'동서 우선 신호',sub:'동서 녹색 28초, 남북 10초',gx:28,gy:10,ew:['L','TR'],ns:['L','TR']},
   {k:'bus',name:'버스 전용 차로',sub:'동서 바깥 차로는 버스만',gx:16,gy:16,ew:['LT','B'],ns:['LT','TR']},
-  {k:'ow',name:'남북 일방통행',sub:'남북 도로는 한 방향으로만',gx:16,gy:20,ew:['LT','TR'],ns:['T','T','T','T']}];
+  {k:'nol',name:'남북 좌회전 금지',sub:'남북 1차로는 직진만',gx:18,gy:14,ew:['LT','TR'],ns:['T','TR']}];
 const TM={i:0,t0:0,per:20,flash:0,shown:null,flipAt:-9};
 function tsMode(){return TMODE[TM.i];}
 function tsModeStep(dt){if(TS.t-TM.t0>=TM.per){TM.i=(TM.i+1)%TMODE.length;TM.t0=TS.t;TM.flash=2.2;}TM.flash=Math.max(0,TM.flash-dt);
@@ -3928,8 +3929,16 @@ function tsStep(dt){eggStep(dt);const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
   tsModeStep(dt);const M=tsMode();
   for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]??trnd()*3)-dt;const dir=M.k==='ow'&&L.ax==='y'?1:L.dir,busL=M.k==='bus'&&L.ax==='x'&&Math.abs(L.off)>4;
     if(TS.spawn[li]<=0){const q=TS.cars.filter(c=>c.li===li),last=q.reduce((m,c)=>Math.min(m,rear(c)),1e9);
-      const wrong=q.some(c=>c.dir!==dir);if(last>-106&&!wrong){const len=busL?7:M.k==='bus'?4.2:trnd()<.12?7:4.2;TS.cars.push({li,ax:L.ax,dir,off:L.off,s:(-120+len/2)*dir,v:8,len,col:busL?(trnd()<.5?'#3f8fd8':'#4fb06b'):PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=busL?5+trnd()*4:1.8+trnd()*3.5;}}
-  for(const c of TS.cars){const sig=c.ax==='x'?sx:sy,f=front(c);let gap=1e9;
+      const wrong=q.some(c=>c.dir!==dir);if(last>-106&&!wrong){const len=busL?7:M.k==='bus'?4.2:trnd()<.12?7:4.2;const mm=(L.ax==='x'?M.ew:M.ns)[Math.abs(L.off)<3?0:1]||'T',r=trnd(),turn=busL?'T':mm.length===1?mm:mm.includes('L')?(r<.28?'L':'T'):mm.includes('R')?(r<.35?'R':'T'):'T';TS.cars.push({li,ax:L.ax,dir,off:L.off,s:(-120+len/2)*dir,v:8,len,turn,col:busL?(trnd()<.5?'#3f8fd8':'#4fb06b'):PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=busL?5+trnd()*4:1.8+trnd()*3.5;}}
+  for(const c of TS.cars){if(c.tr){const T=c.tr;c.v=Math.min(6,c.v+3*dt);T.th=Math.min(Math.PI/2,T.th+c.v*dt/T.rho);const a=T.th,cs=Math.cos(a),sn=Math.sin(a);
+      T.p=[T.C[0]+T.rho*(cs*T.u[0]+sn*T.h0[0]),T.C[1]+T.rho*(cs*T.u[1]+sn*T.h0[1])];T.h=[-sn*T.u[0]+cs*T.h0[0],-sn*T.u[1]+cs*T.h0[1]];
+      if(a>=Math.PI/2-1e-6){const H=T.hEnd,ax=Math.abs(H[0])>.5?'x':'y',dir=ax==='x'?Math.sign(H[0]):Math.sign(H[1]),off=ax==='x'?T.p[1]:T.p[0],li=LANES.findIndex(L=>L.ax===ax&&L.dir===dir&&Math.abs(L.off-off)<.6);
+        c.ax=ax;c.dir=dir;c.off=li>=0?LANES[li].off:off;c.li=li>=0?li:c.li+100;c.s=ax==='x'?T.p[0]:T.p[1];c.done=true;c.tr=null;}continue;}
+    const sig=c.ax==='x'?sx:sy,f=front(c);let gap=1e9;
+    if(c.ent&&!c.done&&(c.turn==='L'||c.turn==='R')){const pc=c.s*c.dir;gap=Math.min(gap,Math.max(0,-7-pc));
+      const opp=c.turn==='L'&&TS.cars.some(o=>o.ax===c.ax&&o.dir!==c.dir&&!o.tr&&!o.done&&((o.s*o.dir>-20&&o.s*o.dir<7&&o.v>.6)||(o.ent&&inBox(o))));
+      if(pc>=-7.05&&!opp){const h=c.ax==='x'?[c.dir,0]:[0,c.dir],l=[-h[1],h[0]],o=Math.abs(c.off),W=(F,S)=>[h[0]*F+l[0]*S,h[1]*F+l[1]*S];
+        const R=c.turn==='R',C=W(-7,R?-7:7),rho=R?7-o:7+o,E=W(-7,-o),u=[(E[0]-C[0])/rho,(E[1]-C[1])/rho];c.tr={C,rho,u,h0:h,th:0,p:E,h,hEnd:R?[-l[0],-l[1]]:l};continue;}}
     // 1) 같은 차로 앞차와 거리(2.2m 이상)
     for(const o of TS.cars)if(o!==c&&o.li===c.li&&rear(o)>f-.01)gap=Math.min(gap,rear(o)-f-2.2);
     // 2) 정지선: 녹색이고 교차하는 방향 차가 교차로 안에 없을 때만 들어감. 황색은 정지선 바로 앞(2.5m 안)이면 그대로 통과
@@ -3988,15 +3997,15 @@ function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTran
       const [hx,hy]=tsP(xm,b.y1+.4,z+.4);c.fillStyle='#ff9f5a';c.beginPath();c.arc(hx,hy,TS.s*.3,0,7);c.fill();}}});}
   for(const tr of TS.trees)if(vis(tr.x,tr.y,6,4))items.push({d:tr.x+tr.y,f:()=>{const [px,py]=tsP(tr.x,tr.y,0),r=tr.r*TS.s;c.fillStyle='rgba(60,40,50,.18)';c.beginPath();c.ellipse(px+r*.5,py+r*.1,r*1.1,r*.5,0,0,7);c.fill();
     c.fillStyle='#8a6248';c.fillRect(px-r*.12,py-r*1.4,r*.24,r*1.4);const [qx,qy]=tsP(tr.x,tr.y,tr.r*1.9);c.fillStyle='#6fb36b';c.beginPath();c.arc(qx,qy,r,0,7);c.fill();c.fillStyle='#8fcf7f';c.beginPath();c.arc(qx-r*.3,qy-r*.3,r*.55,0,7);c.fill();}});
-  for(const car of TS.cars){const L=car.len,Wd=1.9,cx=car.ax==='x'?car.s:car.off,cy=car.ax==='x'?car.off:car.s,hx=car.ax==='x'?L/2:Wd/2,hy=car.ax==='x'?Wd/2:L/2,bus=L>5;
+  for(const car of TS.cars){const T=car.tr,AX=T?(Math.abs(T.h[0])>=Math.abs(T.h[1])?'x':'y'):car.ax,DR=T?(AX==='x'?Math.sign(T.h[0]):Math.sign(T.h[1])):car.dir,L=car.len,Wd=1.9,cx=T?T.p[0]:car.ax==='x'?car.s:car.off,cy=T?T.p[1]:car.ax==='x'?car.off:car.s,hx=AX==='x'?L/2:Wd/2,hy=AX==='x'?Wd/2:L/2,bus=L>5;
     items.push({d:cx+cy+.5,f:()=>{const x0=cx-hx,x1=cx+hx,y0=cy-hy,y1=cy+hy,sh=(u)=>{const m=/^#/.test(u)?u:'#999';return m;};
       tsQuad(x0+.3,y0+.3,x1+.5,y1+.5,.03,'rgba(30,20,40,.28)');
       tsBox(x0,y0,x1,y1,.35,bus?2.6:1.15,car.col,shade(car.col,-.18),shade(car.col,-.3));
-      if(!bus){const k=.22,ix0=car.ax==='x'?x0+L*k:x0+.15,ix1=car.ax==='x'?x1-L*k:x1-.15,iy0=car.ax==='x'?y0+.15:y0+L*k,iy1=car.ax==='x'?y1-.15:y1-L*k;tsBox(ix0,iy0,ix1,iy1,1.15,1.85,shade(car.col,.15),PAL.glass,'#3b5b78');}
-      else{for(let u=0;u<4;u++){const a=car.ax==='x'?[x0+.8+u*1.5,y1+.01]:[x1+.01,y0+.8+u*1.5];if(car.ax==='x')tsPoly([tsP(a[0],a[1],1.5),tsP(a[0]+1,a[1],1.5),tsP(a[0]+1,a[1],2.2),tsP(a[0],a[1],2.2)],PAL.glass);else tsPoly([tsP(a[0],a[1],1.5),tsP(a[0],a[1]+1,1.5),tsP(a[0],a[1]+1,2.2),tsP(a[0],a[1],2.2)],PAL.glass);}}
+      if(!bus){const k=.22,ix0=AX==='x'?x0+L*k:x0+.15,ix1=AX==='x'?x1-L*k:x1-.15,iy0=AX==='x'?y0+.15:y0+L*k,iy1=AX==='x'?y1-.15:y1-L*k;tsBox(ix0,iy0,ix1,iy1,1.15,1.85,shade(car.col,.15),PAL.glass,'#3b5b78');}
+      else{for(let u=0;u<4;u++){const a=AX==='x'?[x0+.8+u*1.5,y1+.01]:[x1+.01,y0+.8+u*1.5];if(AX==='x')tsPoly([tsP(a[0],a[1],1.5),tsP(a[0]+1,a[1],1.5),tsP(a[0]+1,a[1],2.2),tsP(a[0],a[1],2.2)],PAL.glass);else tsPoly([tsP(a[0],a[1],1.5),tsP(a[0],a[1]+1,1.5),tsP(a[0],a[1]+1,2.2),tsP(a[0],a[1],2.2)],PAL.glass);}}
       // 전조등, 미등
-      const fr=car.dir>0,hl=(u,v,col)=>{const [p,q]=tsP(u,v,.75);c.fillStyle=col;c.beginPath();c.arc(p,q,.28*TS.s,0,7);c.fill();};
-      if(car.ax==='x'){const fx=fr?x1:x0,bx=fr?x0:x1;hl(fx,y0+.45,'#fff6c8');hl(fx,y1-.45,'#fff6c8');hl(bx,y1-.45,car.v<1?'#ff5a5a':'#c9474a');}
+      const fr=DR>0,hl=(u,v,col)=>{const [p,q]=tsP(u,v,.75);c.fillStyle=col;c.beginPath();c.arc(p,q,.28*TS.s,0,7);c.fill();};
+      if(AX==='x'){const fx=fr?x1:x0,bx=fr?x0:x1;hl(fx,y0+.45,'#fff6c8');hl(fx,y1-.45,'#fff6c8');hl(bx,y1-.45,car.v<1?'#ff5a5a':'#c9474a');}
       else{const fy=fr?y1:y0,by=fr?y0:y1;hl(x0+.45,fy,'#fff6c8');hl(x1-.45,fy,'#fff6c8');hl(x1-.45,by,car.v<1?'#ff5a5a':'#c9474a');}}});}
   for(const p of TS.peds){if(p.x==null)continue;const x=p.x,y=p.y;
     items.push({d:x+y+.2,f:()=>{const [a,b]=tsP(x,y,0),s=TS.s,bob=Math.abs(Math.sin(TS.t*8+x))*s*.12;c.fillStyle='rgba(30,20,40,.25)';c.beginPath();c.ellipse(a,b,s*.5,s*.22,0,0,7);c.fill();
@@ -4055,11 +4064,11 @@ function tsSigns(items){const c=TS.ctx,SH=TM.shown;if(!SH)return;const fk=Math.m
       if(m.includes('R')){line([[u,1.5],[u+.25,2.05],[u+.55,2.15]]);head(u+.55,2.15,1,0);}});}});
   sign(10.4,-10.4,'y',SH.ew);sign(10.4,10.4,'x',SH.ns);}
 // 노면 화살표: 정지선 뒤 각 차로에 표지판과 같은 방향
-function tsRoadArrows(){const SH=TM.shown;if(!SH)return;const c=TS.ctx,ow=SH.k==='ow';c.save();c.strokeStyle='rgba(255,255,255,.85)';c.fillStyle='rgba(255,255,255,.85)';c.lineWidth=Math.max(1.5,TS.s*.32);c.lineCap='round';c.lineJoin='round';
+function tsRoadArrows(){const SH=TM.shown;if(!SH)return;const c=TS.ctx,ow=SH.k==='ow';c.save();c.strokeStyle='rgba(255,255,255,.85)';c.fillStyle='rgba(255,255,255,.85)';c.lineWidth=Math.max(1.2,TS.s*.2);c.lineCap='round';c.lineJoin='round';
   for(const L of LANES){const dir=ow&&L.ax==='y'?1:L.dir,lanes=L.ax==='x'?SH.ew:SH.ns,idx=Math.abs(L.off)<3?0:1,m=ow&&L.ax==='y'?'T':lanes[idx];if(!m||m==='B')continue;
     const f=L.ax==='x'?[dir,0]:[0,dir],l=[-f[1],f[0]],P=(a,b)=>{const ax=-22*dir;const base=L.ax==='x'?[ax,L.off]:[L.off,ax];return tsP(base[0]+f[0]*a+l[0]*b,base[1]+f[1]*a+l[1]*b,.06);};
-    const line=(pts)=>{c.beginPath();pts.forEach((q,i)=>{const p=P(q[0],q[1]);i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);});c.stroke();},tri=(a,b,da,db)=>{const n=[-db,da];const p=[P(a+da*.9,b+db*.9),P(a+n[0]*.6,b+n[1]*.6),P(a-n[0]*.6,b-n[1]*.6)];c.beginPath();p.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.fill();};
-    line([[0,0],[2,0]]);if(m.includes('T')){line([[2,0],[3.6,0]]);tri(3.6,0,1,0);}if(m.includes('L')){line([[2,0],[2.8,.9]]);tri(2.8,1,0,1);}if(m.includes('R')){line([[2,0],[2.8,-.9]]);tri(2.8,-1,0,-1);}}
+    const line=(pts)=>{c.beginPath();pts.forEach((q,i)=>{const p=P(q[0],q[1]);i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);});c.stroke();},tri=(a,b,da,db)=>{const n=[-db*.6,da*.6];const p=[P(a+da*.7,b+db*.7),P(a+n[0]*.6,b+n[1]*.6),P(a-n[0]*.6,b-n[1]*.6)];c.beginPath();p.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.fill();};
+    line([[0,0],[1.6,0]]);if(m.includes('T')){line([[1.6,0],[2.5,0]]);tri(2.5,0,1,0);}if(m.includes('L')){line([[1.4,0],[2,.55]]);tri(2.05,.6,.6,.6);}if(m.includes('R')){line([[1.4,0],[2,-.55]]);tri(2.05,-.6,.6,-.6);}}
   c.restore();}
 // 하늘: 새 떼, 열기구
 function tsSky(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t;
