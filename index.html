@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116160336">
+<meta name="gl-build" content="20261116160848">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1054,7 +1054,7 @@ body.sk-cute #hqtask #lvchip{font-size:14px}
 body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 /* ---------- 시작 화면 지구본(globe.js) ---------- */
 .title .tglobe{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff8ee;z-index:2}
-.title .tgwrap{position:relative;cursor:grab;touch-action:none;filter:drop-shadow(0 18px 30px rgba(30,10,40,.45))}
+.title .tgwrap{position:relative;cursor:grab;touch-action:none;filter:drop-shadow(0 10px 18px rgba(30,10,40,.25))}
 .title .tgwrap.grab{cursor:grabbing}
 .title .tgcv{position:absolute;inset:0;width:100%;height:100%}
 .title .tglab{position:absolute;inset:0;pointer-events:none}
@@ -1082,7 +1082,7 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.24. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.25. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4015,15 +4015,15 @@ function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,
   // 대기 빛
   const at=g.createRadialGradient(cx,cy,R*.9,cx,cy,R*1.12);at.addColorStop(0,'rgba(140,220,255,.35)');at.addColorStop(1,'rgba(140,220,255,0)');g.fillStyle=at;g.beginPath();g.arc(cx,cy,R*1.12,0,7);g.fill();
   // 바다
-  const sea=g.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R);sea.addColorStop(0,'#3f86b8');sea.addColorStop(.7,'#24557f');sea.addColorStop(1,'#163a5c');g.fillStyle=sea;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+  const sea=g.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R);sea.addColorStop(0,'rgba(63,134,184,.5)');sea.addColorStop(.7,'rgba(36,85,127,.58)');sea.addColorStop(1,'rgba(22,58,92,.75)');g.fillStyle=sea;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();g.strokeStyle='rgba(190,235,255,.55)';g.lineWidth=1.5;g.stroke();
   // 경위선
-  g.strokeStyle='rgba(255,255,255,.07)';g.lineWidth=1;for(let la=-60;la<=60;la+=30){g.beginPath();let on=false;for(let lo=-180;lo<=180;lo+=6){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
+  g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;for(let la=-60;la<=60;la+=30){g.beginPath();let on=false;for(let lo=-180;lo<=180;lo+=6){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
   for(let lo=-180;lo<180;lo+=30){g.beginPath();let on=false;for(let la=-80;la<=80;la+=5){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
   // 육지 점
-  const dr=Math.max(1.1,R/150);for(const [la,lo] of GL_DOTS){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=.35+.65*z;g.fillStyle=z>.25?'#bfe6a8':'#93c58a';g.beginPath();g.arc(x,y,dr*(.6+.4*z),0,7);g.fill();}
+  const dr=Math.max(1.1,R/150);for(const [la,lo] of GL_DOTS){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=.35+.65*z;g.fillStyle=z>.25?'#d6f5c0':'#a8d89a';g.beginPath();g.arc(x,y,dr*(.6+.4*z),0,7);g.fill();}
   g.globalAlpha=1;
   // 빛과 그림자(밤 쪽)
-  const sh=g.createRadialGradient(cx-R*.45,cy-R*.5,R*.2,cx,cy,R*1.05);sh.addColorStop(0,'rgba(255,240,210,.16)');sh.addColorStop(.6,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(10,10,40,.45)');g.fillStyle=sh;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+  const sh=g.createRadialGradient(cx-R*.45,cy-R*.5,R*.2,cx,cy,R*1.05);sh.addColorStop(0,'rgba(255,240,210,.16)');sh.addColorStop(.6,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(10,10,40,.25)');g.fillStyle=sh;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
   // 핀
   const t=performance.now()/1000;
   for(const [id,,,la,lo] of GL_LIVE){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);const k=(t*.8+la)%1;g.strokeStyle='rgba(255,211,90,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(x,y,4+k*14,0,7);g.stroke();
