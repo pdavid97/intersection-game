@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261117132119">
+<meta name="gl-build" content="20261117132948">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1241,12 +1241,15 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
   .hwpanel{left:0;right:0;bottom:0;width:auto;border-radius:24px 24px 0 0;border-bottom:0;box-shadow:0 -4px 0 rgba(74,53,80,.12);min-height:220px;padding:14px 16px max(16px,env(safe-area-inset-bottom))}
   .hwboard{min-width:118px;max-width:150px}.hwwhat{font-size:11.5px}.hwtop b{font-size:14px}
 }
+
+.hwsvg{overflow:hidden!important}.hwwave{animation:hwwave 4s ease-in-out infinite}@keyframes hwwave{0%,100%{opacity:.15;translate:0 0}50%{opacity:.75;translate:6px 0}}
+#hwcars{pointer-events:none}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.39. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.40. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4721,55 +4724,65 @@ function box(x,y,z,w,d,h,c,noS){const t=[P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),
 function flat(x,y,z,w,d,col,op){return`<polygon points="${pt([P(x,y,z),P(x+w,y,z),P(x+w,y+d,z),P(x,y+d,z)])}" fill="${col}"${op?` opacity="${op}"`:''}/>`;}
 function gable(x,y,z,w,d,h,c){const a=P(x,y+d/2,z+h),b=P(x+w,y+d/2,z+h);return`<polygon points="${pt([P(x,y,z),P(x+w,y,z),b,a])}" fill="${c[0]}" ${S}/><polygon points="${pt([P(x,y+d,z),P(x+w,y+d,z),b,a])}" fill="${c[1]}" ${S}/><polygon points="${pt([P(x+w,y,z),P(x+w,y+d,z),b])}" fill="${c[2]}" ${S}/>`;}
 function tree(x,y,s){s=s||1;const b=P(x,y,0);return box(x-.07,y-.07,0,.14,.14,.45*s,C.peach)+`<circle cx="${b[0].toFixed(1)}" cy="${(b[1]-K*.72*s).toFixed(1)}" r="${(K*.38*s).toFixed(1)}" fill="#8fd18a" ${S}/><circle cx="${(b[0]-K*.1).toFixed(1)}" cy="${(b[1]-K*.82*s).toFixed(1)}" r="${(K*.16*s).toFixed(1)}" fill="#b9e8a9"/>`;}
-function signal(x,y,h,lit){const b=P(x,y,h);return box(x-.05,y-.05,0,.1,.1,h,C.dark)+`<g transform="translate(${b[0].toFixed(1)} ${(b[1]-K*.15).toFixed(1)})"><rect x="${-K*.22}" y="${-K*.8}" width="${K*.44}" height="${K*1.02}" rx="${K*.15}" fill="#4a3550"/>`+['#ff6f7f','#ffd35a','#64e3a0'].map((c,i)=>`<circle cx="0" cy="${(-K*.57+i*K*.29).toFixed(1)}" r="${(K*.1).toFixed(1)}" fill="${i===lit?c:'#6a5a7a'}"/>`).join('')+`</g>`;}
+function signal(x,y,h,lit,ax){const b=P(x,y,h);return box(x-.05,y-.05,0,.1,.1,h,C.dark)+`<g transform="translate(${b[0].toFixed(1)} ${(b[1]-K*.15).toFixed(1)})"><rect x="${-K*.22}" y="${-K*.8}" width="${K*.44}" height="${K*1.02}" rx="${K*.15}" fill="#4a3550"/>`+['#ff6f7f','#ffd35a','#64e3a0'].map((c,i)=>`<circle cx="0" cy="${(-K*.57+i*K*.29).toFixed(1)}" r="${(K*.1).toFixed(1)}" fill="${i===lit?c:'#6a5a7a'}" class="hwlamp" data-ax="${ax||''}" data-i="${i}"/>`).join('')+`</g>`;}
 function car(x,y,dir,col){// dir 'x' or 'y'
  const w=dir==='x'?.9:.5,d=dir==='x'?.5:.9;return box(x,y,.05,w,d,.32,col)+box(x+(dir==='x'?.2:.08),y+(dir==='x'?.08:.2),.37,dir==='x'?.45:.34,dir==='x'?.34:.45,.2,C.white);}
 function mascot(cx,cy,s){s=s||1;return`<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) scale(${s})"><ellipse cx="0" cy="32" rx="16" ry="3.5" fill="#4a3550" opacity=".18"/><rect x="-4" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><rect x="1" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><path d="M-17,-2 q-9,-3 -10,-12" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M17,-2 q8,4 9,11" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="-18" y="-43" width="36" height="62" rx="16" fill="#5a4a7a" stroke="#4a3550" stroke-width="3"/><rect x="-5" y="-49" width="10" height="7" rx="2" fill="#4a3550"/><circle cx="0" cy="-27" r="8" fill="#ff7a8a"/><circle cx="0" cy="-3" r="11" fill="#ffd35a"/><circle cx="0" cy="12" r="5.5" fill="#64e3a0"/><ellipse cx="-4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><ellipse cx="4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><circle cx="-7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><circle cx="7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><path d="M-2.5,1 q2.5,2.6 5,0" stroke="#3a2840" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>`;}
 function rival(cx,cy,s){// PvP 상대: 파란 깜빡이(라이벌)
  return mascot(cx,cy,s).replace('#5a4a7a','#3f6fb0').replace('#ffd35a','#9fe0ff').replace('#ff7a8a','#ffd35a');}
-// 떠 있는 섬 받침(층층이 좁아짐)
-function island(x,y,w,d,top){const q=Math.max(1,Math.min(1.7,Math.min(w,d)/4)),T=(f,z,h)=>box(x+w*f,y+d*f,z*q,w*(1-2*f),d*(1-2*f),h*q,C.peach);
- return T(.4,-3.3,.7)+T(.27,-2.6,.9)+T(.12,-1.7,1.1)+box(x,y,-.6,w,d,.6,top);}
-
+// 물 위의 땅 블록(호안 벽 + 윗면)
+function island(x,y,w,d,top){return box(x,y,-1.1,w,d,1.1,[top[0],'#e9d2b8','#d6b896']);}
+// 가로등, 벤치, 작은 가게(차양)
+function lamp(x,y){const b=P(x,y,1.25);return box(x-.04,y-.04,0,.08,.08,1.25,C.dark)+`<circle cx="${b[0].toFixed(1)}" cy="${b[1].toFixed(1)}" r="${(K*.13).toFixed(1)}" fill="#fff4c2" stroke="#4a3550" stroke-width="1.2"/>`;}
+function shop(x,y,w,d,h,c,aw){return box(x,y,0,w,d,h,c)+box(x,y+d,h*.55,w,.28,.08,aw||C.coral)+box(x+.15,y+d-.01,0,w*.35,.02,h*.45,C.sky);}
+function bench(x,y){return box(x,y,.18,.6,.18,.07,C.peach)+box(x+.05,y+.02,0,.06,.06,.18,C.dark)+box(x+.5,y+.02,0,.06,.06,.18,C.dark);}
 const hwG=(m,s)=>`<g class="hwi" data-m="${m}">${s}</g>`;
 function build(){
 const E=2.6;const parts=[];
 function part(dx,dy,isl,body){setO(dx,dy);const L=[];const add=(k,s)=>L.push({k,s});let pre=isl?isl():'';body(add);L.sort((a,b)=>a.k-b.k);const out=pre+L.map(x=>x.s).join('');setO(0,0);return out;}
-const roadStrip=(x,y,w,d)=>box(x,y,-.35,w,d,.35,C.road)+flat(x,y,.01,w,d,'#9a96ad');
+const roadStrip=(x,y,w,d)=>{const ax=w>d?'x':'y',L=ax==='x'?w:d;let o='';
+  for(let t=.6;t<L;t+=1.3)o+=ax==='x'?box(x+t,y+.3,-1.3,.3,d-.6,1,C.stone):box(x+.3,y+t,-1.3,w-.6,.3,1,C.stone);
+  o+=box(x,y,-.3,w,d,.3,C.road)+flat(x,y,.01,w,d,'#9a96ad');
+  o+=ax==='x'?box(x,y-.12,0,w,.12,.32,C.white)+box(x,y+d,0,w,.12,.32,C.white):box(x-.12,y,0,.12,d,.32,C.white)+box(x+w,y,0,.12,d,.32,C.white);return o;};
+// 섬 위로 이어지는 짧은 길(다리와 이어지게)
+const stub=(x,y,w,d)=>flat(x,y,.012,w,d,'#9a96ad')+(w>d?flat(x,y+d/2-.04,.02,w,.08,'#fff',.8):flat(x+w/2-.04,y,.02,.08,d,'#fff',.8));
 // 허브 섬: 가운데 교차로(4..10)
-const hub=part(0,0,()=>island(3,3,8,8,C.grass)+flat(6,3,.012,2,8,'#9a96ad')+flat(3,6,.012,8,2,'#9a96ad')+[0,1,2,3,4].map(i=>{const o=6.15+i*.36;return flat(o,5.2,.02,.2,.7,'#fff')+flat(o,8.1,.02,.2,.7,'#fff')+flat(5.2,o,.02,.7,.2,'#fff')+flat(8.1,o,.02,.7,.2,'#fff');}).join(''),add=>{
-add(11.3,signal(5.7,5.7,1.6,2));add(14.3,signal(8.3,5.7,1.6,0));add(14.4,signal(5.7,8.3,1.6,0));add(16.6,signal(8.3,8.3,1.6,2));
-add(7.5,car(6.2,2.2,'y',C.coral));add(9,car(7.2,10.4,'y',C.sky));add(9.5,car(2.6,7.1,'x',C.gold));add(16.5,car(10.6,6.2,'x',C.mint));add(11,car(6.3,4.4,'y',C.lav));
+const hub=part(0,0,()=>island(3,3,8,8,C.plaza)+flat(3.2,3.2,.008,2.6,2.6,'#c6edb0')+flat(8.2,8.2,.008,2.6,2.6,'#c6edb0')+flat(3,5.75,.009,8,.25,'#fff7ec')+flat(3,8,.009,8,.25,'#fff7ec')+flat(5.75,3,.009,.25,8,'#fff7ec')+flat(8,3,.009,.25,8,'#fff7ec')+flat(6,3,.012,2,8,'#9a96ad')+flat(3,6,.012,8,2,'#9a96ad')+[0,1,2,3,4].map(i=>{const o=6.15+i*.36;return flat(o,5.2,.02,.2,.7,'#fff')+flat(o,8.1,.02,.2,.7,'#fff')+flat(5.2,o,.02,.7,.2,'#fff')+flat(8.1,o,.02,.7,.2,'#fff');}).join(''),add=>{
+add(11.3,signal(5.7,5.7,1.6,2,'ns'));add(14.3,signal(8.3,5.7,1.6,0,'ew'));add(14.4,signal(5.7,8.3,1.6,0,'ew'));add(16.6,signal(8.3,8.3,1.6,2,'ns'));
+add(7,shop(3.3,3.6,1.1,1,1,C.pink,C.gold)+shop(4.6,3.3,.9,.9,.8,C.cream,C.mint));add(8,tree(3.5,5.2,.8)+lamp(5.4,4.6));
+add(12,shop(9.3,3.3,1.4,1.1,1.6,C.sky,C.coral)+lamp(8.6,4.6));add(12.5,tree(10.5,5.2,.85));
+add(12.6,shop(3.3,8.6,1.1,1,1.3,C.mint,C.pink)+bench(4.6,9.9)+lamp(5.4,9.4));
+add(19,tree(9.2,10.2,.9)+bench(8.6,9.2)+lamp(8.6,9.4)+tree(10.4,8.8,.8));
 });
 // 다리(도로): 허브에서 사방으로
-let bridges='';
-bridges+=roadStrip(6,0,2,3)+roadStrip(6,11,2,3)+roadStrip(0,6,3,2)+roadStrip(11,6,3,2);
-for(const t of [.5,1.6])bridges+=flat(6.96,t,.02,.08,.6,'#fff')+flat(6.96,t+11,.02,.08,.6,'#fff')+flat(t,6.96,.02,.6,.08,'#fff')+flat(t+11,6.96,.02,.6,.08,'#fff');
+let bridges='',bridgesF='';
+bridges+=roadStrip(6,0,2,3)+roadStrip(0,6,3,2);bridgesF+=roadStrip(6,11,2,3)+roadStrip(11,6,3,2);
+for(const t of [.5,1.6]){bridges+=flat(6.96,t,.02,.08,.6,'#fff')+flat(t,6.96,.02,.6,.08,'#fff');bridgesF+=flat(6.96,t+11,.02,.08,.6,'#fff')+flat(t+11,6.96,.02,.6,.08,'#fff');}
 // 징검다리(PvP, 실험실로 가는 떠 있는 돌)
-let stones='';for(let i=0;i<3;i++)stones+=box(11.4+i*1.05,2.2-i*.9,-.2-i*.05,.7,.7,.25,C.stone);
-let stones2='';for(let i=1;i>=0;i--)stones2+=box(1.9-i*1.05,1.9-i*1.05,-.2+i*.1,.7,.7,.25,C.stone);
-const tutI=hwG('tut',part(-6,4,()=>island(0,0,6,6,C.sky),add=>{// ----- 1 튜토리얼(북서): 신호 학교 -----
+let stones='';for(let i=0;i<3;i++)stones+=box(11.4+i*1.05,2.2-i*.9,-.9,.7,.7,.95,C.stone);
+let stones2='';for(let i=1;i>=0;i--)stones2+=box(1.9-i*1.05,1.9-i*1.05,-.9,.7,.7,.95,C.stone);
+const tutI=hwG('tut',part(-6,4,()=>island(0,0,6,6,C.sky)+stub(4.3,2,1.7,2),add=>{// ----- 1 튜토리얼(북서): 신호 학교 -----
 add(2,box(1,1,0,3.2,2.2,2,C.cream)+box(1,1,2,3.2,2.2,.3,C.pink)+box(2,1.4,2.3,1.2,1.2,.8,C.cream)+gable(2,1.4,3.1,1.2,1.2,.6,C.pink));
 add(3.5,box(1.4,3.2,.6,.5,.02,.6,C.sky)+box(2.4,3.2,.6,.5,.02,.6,C.sky)+box(3.3,3.2,0,.6,.02,1,C.coral));
-add(4,signal(4.6,4.2,1.8,2)+tree(1,4.6,1)+tree(4.8,1.2,.9));
+add(4,signal(4.6,4.4,1.8,2)+tree(1,4.6,1)+tree(5.4,.8,.9)+lamp(4.2,1.6));add(5.5,shop(4.5,4.6,1.1,.9,1.1,C.peach,C.sky)+bench(1.6,5.2));
 // 운동장 작은 연습 교차로
 add(3,flat(1,4.2,.02,2.6,.5,'#b8b4c8')+flat(2.05,3.6,.02,.5,1.6,'#b8b4c8'));
 }));
-const realI=hwG('real',part(-4,-6,()=>island(8,0,6,6,C.mint),add=>{// ----- 2 실제 교차로(북동): 도시와 지구본 -----
+const realI=hwG('real',part(-4,-6,()=>island(8,0,6,6,C.mint)+stub(10,4.6,2,1.4),add=>{// ----- 2 실제 교차로(북동): 도시와 지구본 -----
 add(9,box(9,1,0,1.6,1.6,4.2,C.sky));add(10.5,box(11.6,.8,0,1.6,1.6,3,C.pink));add(12.5,box(9.2,3.4,0,1.5,1.5,2.2,C.cream));
 add(15,box(12,3.6,0,.8,.8,.6,C.white));
 {const g=P(12.4,4,1.25),k=30;add(15.5,`<g transform="translate(${g[0].toFixed(1)} ${g[1].toFixed(1)})"><circle r="${k*.62}" fill="#a9dcf5" stroke="#4a3550" stroke-width="2.2"/><path d="M${-k*.45},${-k*.12} q${k*.2},${-k*.3} ${k*.42},${-k*.12} q${k*.1},${k*.25} ${-k*.12},${k*.36} z M${k*.08},${k*.1} q${k*.3},${-k*.08} ${k*.38},${k*.18} q${-k*.12},${k*.25} ${-k*.36},${k*.1} z" fill="#9be08f"/></g>`);}
 for(let i=0;i<5;i++)add(9.1,box(9.15,2.62,.5+i*.7,.4,.01,.35,i%2?C.gold:C.white));
 {const e=P(13.2,5.4,1.3);add(18.6,box(13.15,5.35,0,.1,.1,1.3,C.dark)+`<g transform="translate(${e[0].toFixed(1)} ${(e[1]-4).toFixed(1)})"><rect x="-25" y="-14" width="50" height="19" rx="4" fill="#1f8a50" stroke="#fff" stroke-width="2"/><text x="0" y="0" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Jua,sans-serif">EXIT 5</text></g>`);}
-add(14,tree(13.3,1.8,1));
+add(14,tree(13.4,1.8,1)+lamp(9.6,5.3)+lamp(12.4,5.3));add(8.7,shop(8.3,.3,.6,.6,1.4,C.lav,C.gold));
 }));
-const myI=hwG('my',part(4,6,()=>island(0,8,6,6,C.grass),add=>{// ----- 4 나만의 교차로(남서): 우리 동네 집들 -----
+const myI=hwG('my',part(4,6,()=>island(0,8,6,6,C.grass)+stub(2,8,2,1),add=>{// ----- 4 나만의 교차로(남서): 우리 동네 집들 -----
 for(const [x,y,c,r] of [[1,9,C.cream,C.peach],[3.4,9.2,C.pink,C.coral],[1.2,11.6,C.sky,C.peach]]){add(x+y+1,box(x,y,0,1.7,1.5,1,c)+gable(x,y,1,1.7,1.5,.8,r)+box(x+.6,y+1.5,0,.45,.02,.6,C.coral));}
 add(17,tree(4,12.6,1.1)+tree(5.2,10.6,.8));
 for(let i=0;i<6;i++)add(13.8,box(.6+i*.6,13.4,0,.08,.08,.4,C.white));
 {const p=P(4.2,11.6,2.6),k=30;add(16.5,`<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><path d="M0,${k*.9} C${-k*.9},${-k*.1} ${-k*.6},${-k*1.1} 0,${-k*1.1} C${k*.6},${-k*1.1} ${k*.9},${-k*.1} 0,${k*.9}Z" fill="#ff6f6f" stroke="#4a3550" stroke-width="2.2"/><circle cy="${-k*.45}" r="${k*.25}" fill="#fff"/></g>`);}
 }));
-const dailyI=hwG('daily',part(6,-4,()=>island(8,8,6,6,C.lav),add=>{// ----- 3 일일 챌린지(남동): 공연장 -----
+const dailyI=hwG('daily',part(6,-4,()=>island(8,8,6,6,C.lav)+stub(8,10,1,2),add=>{// ----- 3 일일 챌린지(남동): 공연장 -----
 add(19,box(9,9,0,4,1.6,.35,C.night)+box(9,9,.35,.4,1.6,2.2,C.lav)+box(12.6,9,.35,.4,1.6,2.2,C.lav)+box(9,9,2.55,4,1.6,.4,C.pink));
 {const b=P(11,9.8,1.6);add(20,`<g transform="translate(${b[0].toFixed(1)} ${b[1].toFixed(1)})"><rect x="-34" y="-14" width="68" height="26" rx="5" fill="#2a1f36" stroke="#fff" stroke-width="1.8"/><circle cx="-21" cy="-1" r="4" fill="#ff5a6e"/><text x="6" y="4" text-anchor="middle" font-size="12" font-weight="900" fill="#ffd35a" font-family="Jua,sans-serif">LIVE</text></g>`);}
 for(let i=0;i<8;i++){const p=P(9.2+i*.5,11.2+Math.sin(i)*.2,.4);add(22,`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="${['#ffd35a','#ff8fb1','#8fd3ff'][i%3]}" stroke="#4a3550" stroke-width="1"/>`);}
@@ -4788,15 +4801,17 @@ for(const y of [6.4,7.3])add(16+y,box(15.4,y,0,.15,.6,.45,C.coral)+flat(15.4,y,.
 }));
 const labW=hwG('lab',(()=>{setO(3.3,-8.5);let lab=island(-6.2,5.6,2.8,2.8,C.lav)+box(-5.5,6.3,0,1.4,1.4,1.2,C.white)+box(-5.2,6.6,1.2,.8,.8,.5,C.lav);const f=P(-4.8,7,2.3);lab+=`<g transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})"><path d="M-6,-22 h12 M-4,-22 v10 l-10,16 a4,4 0 0 0 3.5,6 h21 a4,4 0 0 0 3.5,-6 l-10,-16 v-10" fill="#e8dcff" stroke="#4a3550" stroke-width="2.2" stroke-linejoin="round"/><circle cx="-2" cy="3" r="2.4" fill="#ff8fb1"/><circle cx="4" cy="0" r="1.8" fill="#8fd3ff"/></g>`;setO(0,0);return lab;})());
 
-return labW+stones2+tutI+realI+pvpI+stones+bridges+`<g class="hwi" data-m="hub">${hub}</g>`+myI+dailyI;}
+let water=`<rect x="${VB[0]}" y="${VB[1]}" width="${VB[2]}" height="${VB[3]}" rx="48" fill="#bfe6f0"/>`;
+for(let i=0;i<26;i++){const x=VB[0]+40+((i*397)%(VB[2]-80)),y=VB[1]+30+((i*211)%(VB[3]-60));water+=`<path class="hwwave" style="animation-delay:${(i%7)*.6}s" d="M${x} ${y} q8 -5 16 0 t16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/>`;}
+return water+labW+stones2+tutI+realI+pvpI+stones+bridges+`<g class="hwi" data-m="hub">${hub}</g>`+bridgesF+'<g id="hwcars"></g>'+myI+dailyI;}
 const VB=[-440,-200,1120,850];
 // 걷기 경로(월드 좌표): 가운데에서 각 섬 앞까지
 const HUBC=[7,7];
-const ROUTE={hub:[[7,7]],tut:[[7,7],[3,7],[0,7],[-2.2,7]],real:[[7,7],[7,3],[7,0],[7,-2.2]],daily:[[7,7],[11,7],[14,7],[16.2,7]],my:[[7,7],[7,11],[7,14],[7,16.2]],
-  pvp:[[7,7],[10.2,3.8],[11.75,2.55],[12.8,1.65],[13.85,.75],[15.4,-.6]],lab:[[7,7],[3.6,3.6],[2.25,2.25],[1.2,1.2],[-.9,-.9]]};
+const ROUTE={hub:[[8.7,8.7]],tut:[[8.7,8.7],[7.9,7.9],[7,7],[3,7],[0,7],[-1.2,7]],real:[[8.7,8.7],[7.9,7.9],[7,7],[7,3],[7,0],[7,-.9]],daily:[[8.7,8.7],[7.9,7.9],[7,7],[11,7],[14,7],[14.7,7]],my:[[8.7,8.7],[7.9,7.9],[7,7],[7,11],[7,14],[7,14.7]],
+  pvp:[[8.7,8.7],[7.9,7.9],[7,7],[10.2,3.8],[11.75,2.55],[12.8,1.65],[13.85,.75],[15.4,-.6]],lab:[[8.7,8.7],[7.9,7.9],[7,7],[3.6,3.6],[2.25,2.25],[1.2,1.2],[-.9,-.9]]};
 // 표지판 자리(월드 좌표, 섬 앞쪽 가장자리)
-const SIGN={tut:[-5.6,9.2,0],real:[4.6,-5.4,0],daily:[19.4,9.6,-3.2],my:[9.6,19.4,-3.2],pvp:[14.8,-5,0],lab:[-2.7,-2.7,0]};
-return{build,VB,ROUTE,SIGN,P:(x,y,z)=>{const o=[OX,OY];OX=0;OY=0;const p=P(x,y,z||0);OX=o[0];OY=o[1];return p;},mascot,rival};})();
+const SIGN={tut:[-5.6,9.2,0],real:[4.6,-5.4,0],daily:[19.4,9.6,-1.1],my:[9.6,19.4,-1.1],pvp:[14.8,-5,0],lab:[-2.7,-2.7,0]};
+return{build,VB,ROUTE,SIGN,car,C,P:(x,y,z)=>{const o=[OX,OY];OX=0;OY=0;const p=P(x,y,z||0);OX=o[0];OY=o[1];return p;},mascot,rival};})();
 // ---------- 모드 월드 화면: 표지판 + 깜빡이 걷기 + 정보 패널 ----------
 // 섬이나 표지판을 누르면 깜빡이가 길(다리, 징검다리)을 따라 그 섬까지 걸어가고, 도착하면 아래 패널에 그 모드 설명과 시작 버튼이 나옴
 const HWS={svg:null,at:'hub',sel:null,walk:null,s:1,ox:0,oy:0,raf:0};
@@ -4874,6 +4889,32 @@ $('vmodes').addEventListener('click',e=>{const g=e.target.closest('[data-go]');i
   const i=e.target.closest('.hwi');if(i){hwGo(i.dataset.m);}});
 HUB.act.pvpnotify=()=>{store.set('pvp-notify-v1',Date.now());try{anTrack('pvp_interest',{});}catch(e){}hwPanel('pvp');hwSay('경기장이 열리면 꼭 알려 드릴게요!');};
 addEventListener('resize',()=>{if(!JR.hidden&&JS.view==='modes')hwLayout();});
+// ---------- 움직이는 차와 신호: 가운데 교차로 신호가 남북, 동서로 번갈아 바뀌고 차가 섬 사이를 오감 ----------
+const HWC={cars:[],raf:0,last:0,lampSt:'',spawn:[0,0,0,0]};
+const HW_LANES=[{ax:'ew',dir:'x',s0:-1.6,s1:14.9,sg:1,c:7.5,stop:5},{ax:'ew',dir:'x',s0:14.9,s1:-1.6,sg:-1,c:6.5,stop:9},
+  {ax:'ns',dir:'y',s0:-1.2,s1:14.9,sg:1,c:6.5,stop:5},{ax:'ns',dir:'y',s0:14.9,s1:-1.2,sg:-1,c:7.5,stop:9}];
+const HW_CC=['coral','sky','gold','mint','lav','pink','teal','cream'];
+function hwSig(ax,t){const u=t%16,ns=u<6.5?'G':u<8?'Y':'R',ew=u<8?'R':u<14.5?'G':'Y';return ax==='ns'?ns:ew;}
+function hwCarsTick(now){const dt=Math.min(.1,(now-(HWC.last||now))/1000);HWC.last=now;const t=now/1000;
+  HW_LANES.forEach((L,li)=>{const end=(L.s1-L.s0)*L.sg,stopP=(L.stop-L.s0)*L.sg,cs=HWC.cars.filter(c=>c.l===li).sort((a,b)=>b.p-a.p),st=hwSig(L.ax,t);
+    cs.forEach((c,i)=>{let np=c.p+c.v*dt;const lead=cs[i-1];if(lead)np=Math.min(np,lead.p-1.35);
+      if(c.p<=stopP+.01&&st!=='G'&&!(st==='Y'&&c.p>stopP-.5))np=Math.min(np,stopP);c.p=Math.max(c.p,np);});
+    if(now>HWC.spawn[li]){const back=cs[cs.length-1];if(!back||back.p>1.6){HWC.cars.push({l:li,p:0,v:2.2+Math.random()*.8,col:HW_CC[(Math.random()*HW_CC.length)|0]});}HWC.spawn[li]=now+1800+Math.random()*3200;}
+    for(const c of cs)if(c.p>end)c.dead=1;});
+  HWC.cars=HWC.cars.filter(c=>!c.dead);
+  const g=document.getElementById('hwcars');if(g){const items=HWC.cars.map(c=>{const L=HW_LANES[c.l],s=L.s0+c.p*L.sg,end=(L.s1-L.s0)*L.sg,
+      x=L.dir==='x'?s-.45:L.c-.25,y=L.dir==='x'?L.c-.25:s-.45,op=Math.max(0,Math.min(1,c.p/.7,(end-c.p)/.7));return{k:x+y,h:`<g opacity="${op.toFixed(2)}">${HW.car(x,y,L.dir,HW.C[c.col])}</g>`};});
+    items.sort((a,b)=>a.k-b.k);g.innerHTML=items.map(i=>i.h).join('');}
+  // 신호등 불
+  const key=hwSig('ns',t)+hwSig('ew',t);if(key!==HWC.lampSt){HWC.lampSt=key;const col=['#ff6f7f','#ffd35a','#64e3a0'],idx={R:0,Y:1,G:2};
+    for(const e of document.querySelectorAll('#hwworld .hwlamp')){const ax=e.dataset.ax;if(!ax)continue;const on=idx[hwSig(ax,t)];e.setAttribute('fill',+e.dataset.i===on?col[on]:'#6a5a7a');}}}
+function hwCarsLoop(now){if(JR.hidden||JS.view!=='modes'||!document.getElementById('hwcars')){HWC.raf=0;return;}
+  if(now-(HWC.frame||0)>=33){HWC.frame=now;try{hwCarsTick(now);}catch(e){}}else HWC.last=HWC.last||now;HWC.raf=requestAnimationFrame(hwCarsLoop);}
+function hwCarsStart(){HWC.cars=[];HWC.last=0;HWC.lampSt='';const n=performance.now();
+  // 처음부터 길에 차가 몇 대 있게
+  HW_LANES.forEach((L,li)=>{const end=(L.s1-L.s0)*L.sg;for(const f of [.15,.55])HWC.cars.push({l:li,p:end*f+Math.random(),v:2.2+Math.random()*.8,col:HW_CC[(li*3+f*10)%HW_CC.length|0]});HWC.spawn[li]=n+1000*li;});
+  if(!HWC.raf)HWC.raf=requestAnimationFrame(hwCarsLoop);}
+{const _hm=hubModes;hubModes=function(){_hm();hwCarsStart();};}
 window.__hw={go:hwGo,state:HWS,layout:hwLayout};
 // ---------- 오늘의 도전(일일 퀘스트): 하루 한정 교통 상황 + 그날만의 랭킹 ----------
 // 시나리오는 Supabase Edge Function 'daily'가 하루 1번 만듦(Claude가 쓴 사건 이야기와 교통량 배율, 실패하면 규칙 생성기). 날짜는 한국 시간 기준
