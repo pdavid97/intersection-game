@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116145355">
+<meta name="gl-build" content="20261116160336">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1052,12 +1052,37 @@ body.sk-retro .hqsub button{background:#d4d0c8;color:#111;border:0;border-radius
 body.sk-retro #hqflow .hqh b{display:none}body.sk-retro #hqflow.min .hqh b{display:inline}
 body.sk-cute #hqtask #lvchip{font-size:14px}
 body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
+/* ---------- 시작 화면 지구본(globe.js) ---------- */
+.title .tglobe{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff8ee;z-index:2}
+.title .tgwrap{position:relative;cursor:grab;touch-action:none;filter:drop-shadow(0 18px 30px rgba(30,10,40,.45))}
+.title .tgwrap.grab{cursor:grabbing}
+.title .tgcv{position:absolute;inset:0;width:100%;height:100%}
+.title .tglab{position:absolute;inset:0;pointer-events:none}
+.title .tgli{position:absolute;left:0;top:0;transition:opacity .25s;will-change:transform}
+.title .tgl{font:inherit;display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap;cursor:pointer;border-radius:12px;padding:4px 9px;line-height:1.25;box-shadow:0 4px 12px rgba(20,10,30,.35)}
+.title .tgl.live{background:rgba(40,22,48,.82);border:1.5px solid #ffd35a;color:#fff8ee}
+.title .tgl.live b{font-size:12.5px}.title .tgl.live b em{font-style:normal;font-weight:500;opacity:.85}
+.title .tgl.live span{font-size:11px;color:#ffd35a}.title .tgl.live span i{font-style:normal;font-family:var(--f-mono);font-weight:600}
+.title .tgl.live:hover{background:rgba(60,34,70,.92)}
+.title .tgl.cand{flex-direction:row;gap:6px;background:rgba(255,248,238,.88);border:1.5px solid rgba(255,255,255,.95);color:#3a2840;padding:3px 8px;border-radius:99px;font-size:11.5px}
+.title .tgl.cand b{font-weight:700}.title .tgl.cand .hv{color:#e2556d;font-family:var(--f-mono);font-weight:600}
+.title .tgl.cand.me{background:#ffe1e8;border-color:#ff8fab}.title .tgl.cand:hover{background:#fff}
+.title .tgl:focus-visible{outline:2px solid #ffd35a;outline-offset:2px}
+.title .tgfoot{width:max-content;max-width:min(92vw,640px);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;max-width:100%}
+.title .tgleg{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:11.5px;text-shadow:0 1px 4px rgba(30,10,40,.7)}
+.title .tgleg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.title .tgleg i.gdl{background:#ffd35a;box-shadow:0 0 0 2px rgba(255,211,90,.35)}.title .tgleg i.gdc{background:#fff;border:1.5px solid #ff8fab}
+.title .tgrank{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 10px;font-size:12px;padding:5px 12px;border-radius:12px;background:rgba(40,22,48,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.title .tgrank b{color:#ffd35a}.title .tgrank span{font-family:var(--f-body)}.title .tgrank small{flex-basis:100%;font-size:11px;opacity:.85}
+.title .tgtoast{position:absolute;left:50%;top:40%;transform:translateX(-50%);background:rgba(40,22,48,.94);border:1px solid #ffd35a;color:#fff8ee;padding:7px 14px;border-radius:12px;font-size:13px;white-space:nowrap;pointer-events:none;z-index:5}
+.title .tglobe[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.title .tgli{transition:none}}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.23. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.24. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3809,8 +3834,9 @@ const TTL=(()=>{const d=document.createElement('div');d.id='title';d.className='
 // 표기: 도시 + 교차로 이름(같은 수준으로)
 const CHAMP=[['gangnam','서울','강남역',['real-gangnam','L5-4','L0-4']],['toronto','토론토','레이크쇼어',['real-toronto','L1-4']],['london','런던','노스서큘러',['real-london','L2-4']],['edirnekapi','이스탄불','에디르네카프',['real-edirnekapi','L3-4']],['tokyo','도쿄','오하라',['real-tokyo','L4-4']]];
 function champLabel(sid){if(sid.startsWith('real-'))return'모든 도구';const lv=LEVELS.find(l=>'L'+l.id===sid);return lv?lvLabel(lv)+' 스테이지':'';}
-function champRender(rows){const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  $('tcity').innerHTML=CHAMP.map(([id,city,ix,sids])=>{let best=null;for(const sid of sids){const r=(rows||[]).filter(x=>x.stage_id===sid).sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at))[0];if(r){best=r;break;}}
+const CHAMPB={};let CHAMP_LOADED=false;
+function champRender(rows){CHAMP_LOADED=!!rows;const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  $('tcity').innerHTML=CHAMP.map(([id,city,ix,sids])=>{let best=null;for(const sid of sids){const r=(rows||[]).filter(x=>x.stage_id===sid).sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at))[0];if(r){best=r;break;}}CHAMPB[id]=best;
     return`<div class="tc ${best?'':'empty'}"><b><span class="tcy">${city}</span> ${ix}</b>${best?`<span class="tn">${esc(best.nickname||'익명')}</span><span class="ts">${best.score.toLocaleString()}점<small>통과 ${Number(best.persons||0).toLocaleString()}명, ${champLabel(best.stage_id)}</small></span>`:`<span class="tn">${rows?'아직 없음':'불러오는 중'}</span>`}</div>`;}).join('');}
 async function champLoad(){champRender(null);try{const ids=CHAMP.flatMap(c=>c[3]).join(',');
   const r=await fetch(`https://qjguvtmkrkbtpvdnyelp.supabase.co/rest/v1/scores?select=stage_id,nickname,score,persons,created_at&status=eq.verified&weather=eq.clear&stage_id=in.(${ids})&order=score.desc&limit=200`,{headers:{apikey:'sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp'}});
@@ -3968,6 +3994,92 @@ TTL.querySelector('.tgo').addEventListener('click',e=>{e.stopPropagation();title
 {const lamp=TTL.querySelector('.tlamp');if(lamp){lamp.style.cursor='pointer';lamp.title='?';lamp.addEventListener('click',e=>{e.stopPropagation();eggStart();});}}
 if(/notitle/.test(location.hash)){TS.on=false;TTL.hidden=true;if(INTRO_PEND)introBox.hidden=false;}
 else{document.body.classList.add('titleon');tsResize();requestAnimationFrame(tsFrame);setTimeout(()=>{try{TTL.querySelector('.tgo').focus({preventScroll:true});}catch(e){}},300);champLoad();}
+// ---------- 시작 화면 지구본(2026-11-16): 천천히 도는 지구 위에 실제 교차로(플레이 가능, 챔피언 기록)와 후보 도시(투표) ----------
+// 육지는 점으로(Natural Earth 110m 육지에서 2.4도 간격으로 뽑은 1,878점, world-atlas 패키지). 끌어서 돌리고, 손을 떼면 다시 천천히 돎
+// 실제 교차로를 누르면 그 교차로로 바로 시작. 후보 도시의 하트를 누르면 투표(익명 로그인 1명당 도시마다 1표, 다시 누르면 취소). 표가 많은 도시부터 추가 예정
+const GL_DOTS=(()=>{const a='-es -kk -es -jg -e4 -k0 -dg -ki -dg -ji -dg -ii -cs -ko -cs -jq -cs -ir -cs 1an -c4 -k7 -c4 -ja -c4 -id -c4 1bp -bg -kd -bg -jh -bg -il -bg 14p -bg 1bs -bg 1co -as -jo -as -it -as -hy -as -h3 -as 1cq -a4 -ju -a4 -j0 -a4 -i7 -a4 -hd -a4 -gj -a4 12u -a4 13o -a4 14i -a4 15c -9g -jr -9g -iy -9g -i5 -9g -hc -9g -gj -9g -fq -9g -ex -9g 59 -9g 62 -9g wo -9g 12b -9g 134 -9g 13x -9g 14q -9g 15j -8s -j5 -8s -id -8s -hl -8s -gt -8s -g1 -8s -f8 -8s -eg -8s 53 -8s 5v -8s 6n -8s 7f -8s 87 -8s wf -8s x7 -8s xz -8s ys -8s zk -8s 114 -8s 11w -8s 12o -8s 13g -8s 148 -8s 151 -8s 15t -84 -jv -84 -j3 -84 -ic -84 -hk -84 -gt -84 -g1 -84 -fa -84 -ei -84 5c -84 64 -84 6v -84 7n -84 8e -84 w2 -84 wu -84 xl -84 yd -84 z4 -84 zw -84 10n -84 11f -84 126 -84 12y -84 13p -84 14g -84 158 -84 15z -7g -j1 -7g -ia -7g -hj -7g -gs -7g -g2 -7g -fb -7g -ek -7g -dt -7g 4v -7g 5l -7g 6c -7g 73 -7g 7u -7g 8l -7g vq -7g wh -7g x8 -7g xy -7g yp -7g zg -7g 107 -7g 10y -7g 11p -7g 12g -7g 136 -7g 13x -7g 14o -7g 15f -7g 166 -6s -iz -6s -i9 -6s -hj -6s -gs -6s -g2 -6s -fc -6s -em -6s -dv -6s -d5 -6s 4e -6s 54 -6s 5u -6s 6k -6s 7b -6s 81 -6s 8r -6s 9i -6s cf -6s d5 -6s w4 -6s wu -6s xl -6s yb -6s z1 -6s zs -6s 10i -6s 118 -6s 11y -6s 12p -6s 13f -6s 145 -6s 14w -6s 15m -64 -jf -64 -ip -64 -hz -64 -ha -64 -gk -64 -fu -64 -f4 -64 -ee -64 -do -64 -cy -64 -c8 -64 -bi -64 4b -64 51 -64 5r -64 6h -64 77 -64 7x -64 8n -64 9d -64 c8 -64 cy -64 wd -64 x3 -64 xt -64 yj -64 z9 -64 zz -64 10p -64 11f -64 125 -64 12v -64 13k -64 14a -64 150 -5g -j5 -5g -ig -5g -hq -5g -h1 -5g -gb -5g -fm -5g -ew -5g -e7 -5g -dh -5g -cs -5g -c2 -5g -bd -5g 49 -5g 4z -5g 5o -5g 6e -5g 73 -5g 7t -5g 8i -5g 98 -5g cs -5g dh -5g y2 -5g yr -5g zh -5g 106 -5g 10w -5g 11l -5g 12b -5g 130 -5g 13q -5g 14f -4s -jl -4s -iw -4s -i7 -4s -hh -4s -gs -4s -g3 -4s -fe -4s -ep -4s -dz -4s -da -4s -cl -4s -bw -4s -b7 -4s 3i -4s 47 -4s 4w -4s 5l -4s 6b -4s 70 -4s 7p -4s 8e -4s 93 -4s 9s -4s ai -4s cl -4s da -4s ya -4s yz -4s zo -4s 10d -4s 112 -4s 11r -4s 12h -4s 136 -4s 13v -44 -kp -44 -k0 -44 -jb -44 -im -44 -hy -44 -h9 -44 -gk -44 -fv -44 -f6 -44 -eh -44 -dt -44 -d4 -44 -cf -44 -bq -44 -b1 -44 3g -44 45 -44 4u -44 5j -44 67 -44 6w -44 7l -44 8a -44 8z -44 9o -44 ac -44 b1 -44 dt -44 z6 -44 10k -44 119 -44 140 -3g -l3 -3g -kf -3g -jq -3g -j2 -3g -id -3g -hp -3g -h0 -3g -gc -3g -fn -3g -ez -3g -ea -3g -dm -3g -cx -3g -c9 -3g -bk -3g -aw -3g 43 -3g 4r -3g 5g -3g 64 -3g 6t -3g 7h -3g 86 -3g 8u -3g 9j -3g a7 -3g aw -3g dm -3g 10q -3g 11f -3g 13g -2s -la -2s -km -2s -jy -2s -j9 -2s -il -2s -hx -2s -h8 -2s -gk -2s -fw -2s -f7 -2s -ej -2s -dv -2s -d6 -2s -ci -2s -bu -2s -b5 -2s -ah -2s 3q -2s 4e -2s 52 -2s 5r -2s 6f -2s 73 -2s 7s -2s 8g -2s 94 -2s 9t -2s ah -2s xg -2s 15k -24 -lh -24 -kt -24 -k5 -24 -jh -24 -it -24 -i4 -24 -hg -24 -gs -24 -g4 -24 -fg -24 -es -24 -e3 -24 -df -24 -cr -24 -c3 -24 -bf -24 -ar -24 -a2 -24 41 -24 4p -24 5d -24 61 -24 6q -24 7e -24 82 -24 8q -24 9e -24 a2 -24 ar -24 u7 -24 uv -24 12x -24 13m -24 14a -24 14y -1g -m5 -1g -lh -1g -kt -1g -k5 -1g -jh -1g -it -1g -i4 -1g -hg -1g -gs -1g -g4 -1g -fg -1g -es -1g -e3 -1g -df -1g -cr -1g -c3 -1g -bf -1g -ar -1g -a2 -1g 3d -1g 41 -1g 4p -1g 5d -1g 61 -1g 6q -1g 7e -1g 82 -1g 8q -1g 9e -1g a2 -1g ar -1g 129 -1g 12x -1g 13m -1g 14a -1g 16y -s -lo -s -l0 -s -kc -s -jo -s -j0 -s -ic -s -ho -s -h0 -s -gc -s -fo -s -f0 -s -ec -s -do -s -d0 -s -cc -s -bo -s 30 -s 3o -s 4c -s 50 -s 5o -s 6c -s 70 -s 7o -s 8c -s 90 -s 9o -s ac -s b0 -s sc -s t0 -s v0 -s vo -s wc -s x0 -s xo -s 110 -s 12c -s 130 -4 -mc -4 -lo -4 -l0 -4 -kc -4 -jo -4 -j0 -4 -ic -4 -ho -4 -h0 -4 -gc -4 -fo -4 -f0 -4 -ec -4 -do -4 30 -4 3o -4 4c -4 50 -4 5o -4 6c -4 70 -4 7o -4 8c -4 90 -4 9o -4 ac -4 b0 -4 bo -4 sc -4 uc -4 v0 -4 vo -4 wc k -lo k -l0 k -kc k -jo k -j0 k -ic k -ho k -h0 k -gc k -fo k -f0 k -ec k 30 k 3o k 4c k 50 k 5o k 6c k 70 k 7o k 8c k 90 k 9o k ac k b0 k bo k cc k ro k v0 k vo k wc 18 -l0 18 -kc 18 -jo 18 -j0 18 -ic 18 -ho 18 -h0 18 -gc 18 -fo 18 -f0 18 1o 18 30 18 3o 18 4c 18 50 18 5o 18 6c 18 70 18 7o 18 8c 18 90 18 9o 18 ac 18 b0 18 bo 18 cc 18 d0 18 r0 18 sc 18 wc 1w -lh 1w -kt 1w -k5 1w -jh 1w -it 1w -i4 1w -hg 1w -gs 1w -2p 1w -20 1w -1c 1w -o 1w 0 1w o 1w 1c 1w 20 1w 2p 1w 3d 1w 41 1w 4p 1w 5d 1w 61 1w 6q 1w 7e 1w 82 1w 8q 1w 9e 1w a2 1w ar 1w bf 1w c3 1w cr 1w df 2k -lz 2k -km 2k -j9 2k -il 2k -hx 2k -h8 2k -3q 2k -31 2k -2d 2k -1p 2k -10 2k -c 2k c 2k 10 2k 1p 2k 2d 2k 31 2k 3q 2k 4e 2k 52 2k 5r 2k 6f 2k 73 2k 7s 2k 8g 2k 94 2k 9t 2k ah 2k b5 2k bu 2k ci 2k d6 2k dv 2k la 2k lz 2k rd 2k te 2k ws 38 -nt 38 -43 38 -3e 38 -2q 38 -21 38 -1d 38 -o 38 0 38 o 38 1d 38 21 38 2q 38 3e 38 43 38 4r 38 5g 38 64 38 6t 38 7h 38 86 38 8u 38 9j 38 a7 38 aw 38 bk 38 l3 38 ls 38 t9 38 ty 38 y0 38 yp 3w -p0 3w -ob 3w -nn 3w -4g 3w -3s 3w -33 3w -2e 3w -1q 3w -11 3w -c 3w c 3w 11 3w 1q 3w 2e 3w 33 3w 3s 3w 4g 3w 55 3w 5u 3w 6i 3w 77 3w 7w 3w 8k 3w 99 3w 9y 3w am 3w bb 3w c0 3w co 3w dd 3w kw 3w ll 3w m9 3w rr 3w sf 3w t4 3w tt 3w xx 4k -qq 4k -q1 4k -pc 4k -on 4k -4i 4k -3t 4k -34 4k -2f 4k -1q 4k -11 4k -c 4k d 4k 12 4k 1r 4k 2g 4k 35 4k 3u 4k 4j 4k 58 4k 5x 4k 6m 4k 7b 4k 80 4k 8p 4k 9e 4k a3 4k as 4k c6 4k cv 4k dk 4k e9 4k ki 4k l7 4k lw 4k ml 4k qr 4k rg 4k s5 4k su 4k tj 4k xp 58 -sj 58 -rt 58 -r4 58 -p0 58 -k3 58 -jd 58 -3v 58 -36 58 -2h 58 -1r 58 -12 58 -d 58 d 58 12 58 1r 58 2h 58 36 58 3v 58 4l 58 5a 58 5z 58 6p 58 7e 58 84 58 8t 58 9i 58 a8 58 bm 58 cc 58 d1 58 dq 58 eg 58 f5 58 ks 58 lh 58 m7 58 mw 58 qf 58 r4 58 rt 58 sj 58 t8 58 un 5w -sx 5w -s8 5w -ri 5w -on 5w -ls 5w -4n 5w -3x 5w -38 5w -2i 5w -1s 5w -13 5w -d 5w d 5w 13 5w 1s 5w 2i 5w 38 5w 3x 5w 4n 5w 5d 5w 63 5w 6s 5w 7i 5w 88 5w 8x 5w 9n 5w b3 5w bs 5w ci 5w d8 5w dx 5w en 5w fd 5w g3 5w jn 5w kd 5w l3 5w ls 5w mi 5w n8 5w nx 5w q3 5w qs 5w ri 5w s8 5w sx 5w tn 6k -uo 6k -t7 6k -sh 6k -rr 6k -4e 6k -3n 6k -2x 6k -27 6k -1h 6k -q 6k 0 6k q 6k 1h 6k 27 6k 2x 6k 3n 6k 4e 6k 54 6k 5u 6k 6k 6k 7b 6k 81 6k 8r 6k 9i 6k ay 6k bo 6k cf 6k d5 6k dv 6k em 6k fc 6k g2 6k iz 6k jp 6k kg 6k l6 6k lw 6k mn 6k nd 6k o3 6k ot 6k pk 6k qa 6k r0 6k rr 6k sh 6k t7 6k tx 6k uo 6k ve 6k w4 6k xl 78 -v4 78 -ud 78 -tn 78 -sw 78 -s5 78 -rf 78 -lh 78 -3p 78 -2z 78 -28 78 -1h 78 -r 78 0 78 r 78 1h 78 28 78 2z 78 3p 78 4g 78 57 78 5x 78 6o 78 7f 78 85 78 8w 78 ad 78 b4 78 bv 78 cl 78 dc 78 gb 78 h1 78 hs 78 ij 78 j9 78 k0 78 kr 78 lh 78 m8 78 mz 78 np 78 og 78 p7 78 px 78 qo 78 rf 78 s5 78 sw 78 tn 78 ud 78 v4 78 vv 78 wl 7w -vg 7w -up 7w -tx 7w -t6 7w -sf 7w -rn 7w -qw 7w -2n 7w -1w 7w -15 7w -e 7w e 7w 15 7w 1w 7w 2n 7w 3f 7w 46 7w 4x 7w 5p 7w 6g 7w 77 7w 7y 7w 8q 7w 9h 7w a8 7w az 7w br 7w ci 7w d9 7w es 7w fj 7w ga 7w h2 7w ht 7w ik 7w jb 7w k3 7w ku 7w ll 7w md 7w n4 7w nv 7w om 7w pe 7w q5 7w qw 7w rn 7w sf 7w t6 7w tx 7w up 7w vg 7w w7 7w wy 7w xq 8k -v0 8k -u8 8k -tg 8k -sp 8k -rx 8k -r5 8k -qd 8k -pl 8k -ot 8k -o1 8k -n9 8k -2c 8k -1k 8k -s 8k 0 8k s 8k 1k 8k 2c 8k 34 8k 3w 8k 4n 8k 67 8k 6z 8k 7r 8k 8j 8k 9b 8k a3 8k av 8k bn 8k cf 8k d6 8k dy 8k eq 8k fi 8k ga 8k h2 8k hu 8k im 8k je 8k k6 8k kx 8k lp 8k mh 8k n9 8k o1 8k ot 8k pl 8k qd 8k r5 8k rx 8k sp 8k tg 8k u8 8k v0 8k vs 8k wk 8k xc 98 -w5 98 -vd 98 -uk 98 -tr 98 -sz 98 -s6 98 -re 98 -ql 98 -pt 98 -p0 98 -o7 98 -nf 98 -mm 98 -1z 98 -17 98 -e 98 e 98 17 98 1z 98 2s 98 9x 98 aq 98 bi 98 cb 98 d3 98 dw 98 ep 98 fh 98 ga 98 h2 98 hv 98 in 98 jg 98 k9 98 l1 98 lu 98 mm 98 nf 98 o7 98 p0 98 pt 98 ql 98 re 98 s6 98 sz 98 tr 98 uk 98 vd 98 w5 98 wy 98 104 98 10x 9w -x7 9w -we 9w -vk 9w -ur 9w -tx 9w -t4 9w -sa 9w -rh 9w -qn 9w -pu 9w -p0 9w -o6 9w -nd 9w -mj 9w -lq 9w f 9w 18 9w 22 9w 2v 9w a9 9w b2 9w bw 9w cp 9w dj 9w ec 9w f6 9w fz 9w gt 9w hm 9w ig 9w j9 9w k3 9w kw 9w lq 9w mj 9w nd 9w o6 9w p0 9w pu 9w qn 9w rh 9w sa 9w t4 9w tx 9w ur 9w vk 9w we 9w x7 9w zo 9w 11b 9w 124 9w 12y ak -xh ak -wn ak -vs ak -uy ak -u3 ak -t9 ak -se ak -rk ak -qp ak -pv ak -p0 ak -o5 ak -nb ak -mg ak -lm ak -24 ak -1a ak -f ak 3t ak 6d ak 82 ak 8w ak 9r ak al ak bg ak ca ak d5 ak fo ak gj ak hd ak i8 ak j2 ak jx ak kr ak lm ak mg ak nb ak o5 ak p0 ak pv ak qp ak rk ak se ak t9 ak u3 ak uy ak vs ak wn ak z6 b8 -xs b8 -ww b8 -w1 b8 -v5 b8 -u9 b8 -te b8 -si b8 -rn b8 -qr b8 -pw b8 -p0 b8 -o4 b8 -n9 b8 -md b8 -li b8 -km b8 -27 b8 -1b b8 -g b8 4u b8 5p b8 6l b8 8c b8 98 b8 a3 b8 az b8 bu b8 cq b8 dl b8 fd b8 g8 b8 h4 b8 hz b8 iv b8 jr b8 km b8 li b8 md b8 n9 b8 o4 b8 p0 b8 pw b8 qr b8 rn b8 si b8 te b8 u9 b8 v5 b8 w1 b8 ww b8 yn b8 zj b8 131 bw -y3 bw -x7 bw -wa bw -vd bw -ug bw -tk bw -sn bw -rq bw -qt bw -px bw -p0 bw -o3 bw -n7 bw -ma bw -ld bw -kg bw -2a bw -1d bw -g bw g bw 37 bw 50 bw 5x bw 6t bw ca bw d7 bw f0 bw fx bw gt bw hq bw in bw jk bw kg bw ld bw ma bw n7 bw o3 bw p0 bw px bw qt bw rq bw sn bw tk bw ug bw vd bw wa bw x7 bw y3 bw z0 bw zx bw 13k ck -xi ck -wk ck -vm ck -uo ck -tq ck -ss ck -ru ck -qw ck -py ck -p0 ck -o2 ck -n4 ck -m6 ck -l8 ck -ka ck -jc ck -hg ck h ck 1f ck 2d ck 3b ck 49 ck 57 ck 65 ck 73 ck 81 ck 9x ck av ck bt ck cq ck em ck fk ck gi ck hg ck ie ck jc ck ka ck l8 ck m6 ck n4 ck o2 ck p0 ck py ck qw ck ru ck ss ck tq ck uo ck vm ck wk ck xi ck yg ck ze ck 10c ck 11a d8 -xo d8 -wo d8 -vp d8 -up d8 -tp d8 -sq d8 -rq d8 -qq d8 -pr d8 -or d8 -nr d8 -ms d8 -ls d8 -kt d8 -jt d8 -it d8 -fu d8 -ev d8 0 d8 10 d8 1z d8 2z d8 3z d8 4y d8 5y d8 6y d8 7x d8 8x d8 9w d8 aw d8 bw d8 cv d8 dv d8 ev d8 fu d8 gu d8 hu d8 it d8 jt d8 kt d8 ls d8 ms d8 nr d8 or d8 pr d8 qq d8 rq d8 sq d8 tp d8 up d8 vp d8 wo d8 xo d8 yo d8 zn d8 10n d8 11m d8 12m d8 13m dw -yw dw -xv dw -wt dw -vs dw -uq dw -tp dw -sn dw -rm dw -qk dw -pj dw -oh dw -ng dw -me dw -ld dw -kb dw -ja dw j dw 1k dw 2m dw 3n dw 4p dw 5q dw 6s dw 7t dw 8v dw 9w dw ay dw bz dw d1 dw e2 dw f4 dw g5 dw h7 dw i8 dw ja dw kb dw ld dw me dw ng dw oh dw pj dw qk dw rm dw sn dw tp dw uq dw vs dw wt dw xv dw yw dw zy dw 10z dw 121 ek -zc ek -y9 ek -x5 ek -w2 ek -uz ek -tw ek -st ek -rq ek -qn ek -pk ek -og ek -nd ek -l7 ek -k4 ek -j1 ek -hy ek -gv ek -fr ek -k ek 1n ek 2q ek 3t ek 4w ek 5z ek 72 ek 85 ek 99 ek ac ek bf ek ci ek dl ek eo ek fr ek gv ek hy ek j1 ek k4 ek l7 ek ma ek nd ek og ek pk ek qn ek rq ek st ek tw ek uz ek w2 ek x5 ek y9 ek zc ek 10f ek 11i ek 12l ek 13o f8 -zh f8 -yb f8 -x5 f8 -vz f8 -ut f8 -tn f8 -si f8 -rc f8 -q6 f8 -p0 f8 -nu f8 -li f8 -kd f8 -j7 f8 -i1 f8 -gv f8 -1r f8 -l f8 6e f8 7k f8 8q f8 9w f8 b2 f8 c8 f8 dd f8 ej f8 fp f8 gv f8 i1 f8 j7 f8 kd f8 li f8 mo f8 nu f8 p0 f8 q6 f8 rc f8 si f8 tn f8 ut f8 vz f8 x5 f8 yb f8 zh f8 10n f8 17m f8 18s fw -111 fw -zt fw -yk fw -xc fw -w4 fw -uv fw -tn fw -se fw -r6 fw -px fw -l0 fw -jr fw -ij fw -ha fw -18 fw 3p fw 66 fw 7f fw 8n fw 9w fw b4 fw cc fw dl fw et fw g2 fw ha fw ij fw jr fw l0 fw m8 fw ng fw op fw px fw r6 fw se fw tn fw uv fw w4 fw xc fw yk fw zt fw 111 fw 12a fw 18g gk -183 gk -16r gk -12t gk -11i gk -107 gk -yv gk -xk gk -w9 gk -ux gk -tm gk -sa gk -qz gk -ke gk -hr gk 1z gk 3a gk 4m gk 8k gk 9v gk b7 gk ci gk dt gk f5 gk gg gk hr gk j3 gk ke gk lq gk n1 gk oc gk po gk qz gk sa gk tm gk ux gk w9 gk xk gk yv gk 107 gk 11i gk 12t gk 145 gk 15g gk 16r h8 -190 h8 -17l h8 -165 h8 -14q h8 -13a h8 -11v h8 -10f h8 -z0 h8 -xl h8 -w5 h8 -uq h8 -ta h8 -rv h8 -qf h8 -m5 h8 -kq h8 -dl h8 -c5 h8 25 h8 3l h8 6f h8 7v h8 9a h8 aq h8 c5 h8 dl h8 f0 h8 gf h8 hv h8 ja h8 kq h8 m5 h8 nl h8 p0 h8 qf h8 rv h8 ta h8 uq h8 w5 h8 xl h8 z0 h8 10f h8 11v h8 13a h8 14q h8 165 h8 17l h8 190 h8 1af h8 1bv hw -18m hw -173 hw -15j hw -140 hw -12h hw -10x hw -ze hw -xu hw -wb hw -us hw -t8 hw -rp hw -q6 hw -om hw -n3 hw -lj hw -k0 hw -ih hw -du hw -cb hw -4m hw 33 hw 4m hw 7p hw 98 hw as hw cb hw du hw fe hw gx hw ih hw k0 hw lj hw n3 hw om hw q6 hw rp hw t8 hw us hw wb hw xu hw ze hw 10x hw 12h hw 140 hw 15j hw 173 hw 18m hw 1a6 hw 1bp hw 1d8 ik -1d5 ik -182 ik -16d ik -14o ik -12z ik -11a ik -zl ik -xw ik -w7 ik -ui ik -st ik -r4 ik -pf ik -nq ik -kc ik -in ik -dk ik -bv ik -a6 ik 53 ik 6s ik 8h ik a6 ik dk ik f9 ik gy ik in ik m1 ik nq ik pf ik r4 ik st ik ui ik w7 ik xw ik zl ik 11a ik 12z ik 14o ik 16d ik 182 ik 19r ik 1bg ik 1d5 j8 -19a j8 -17e j8 -15i j8 -13m j8 -11q j8 -zv j8 -xz j8 -u7 j8 -mn j8 -kr j8 -iv j8 -d7 j8 -bc j8 -9g j8 -7k j8 5o j8 7k j8 9g j8 gz j8 kr j8 mn j8 oj j8 qf j8 sb j8 u7 j8 w3 j8 xz j8 zv j8 11q j8 13m j8 15i j8 17e j8 19a j8 1d2 jw -y2 jw -vx jw -ts jw -ro jw -nf jw -la jw -ew jw -cs jw -an jw -8i jw -6e jw ew jw j5 jw la jw nf jw pj jw ro jw ts jw vx jw y2 jw 14f kk -y5 kk -en kk -c7 kk -9r kk -7b kk oe kk qu kk ta l8 -pq l8 -mv l8 -h5 l8 -ea l8 -bf l8 -8l l8 sl'.split(' ').map(x=>parseInt(x,36)/10),o=[];for(let i=0;i<a.length;i+=2)o.push([a[i],a[i+1]]);return o;})();
+const GL_LIVE=[['gangnam','서울','강남역',37.498,127.028],['toronto','토론토','레이크쇼어',43.64,-79.39],['london','런던','노스서큘러',51.6,-0.12],['edirnekapi','이스탄불','에디르네카프',41.03,28.94],['tokyo','도쿄','오하라',35.67,139.67]];
+const GL_CAND=[['nyc','뉴욕',40.76,-73.99],['la','로스앤젤레스',34.05,-118.24],['mexico','멕시코시티',19.43,-99.13],['saopaulo','상파울루',-23.55,-46.63],['lagos','라고스',6.52,3.38],['cairo','카이로',30.04,31.24],['paris','파리',48.87,2.29],['mumbai','뭄바이',19.07,72.88],['bengaluru','벵갈루루',12.97,77.59],['bangkok','방콕',13.75,100.5],['jakarta','자카르타',-6.2,106.82],['manila','마닐라',14.6,120.98]];
+const GL={lon:-127,lat:22,spin:4,drag:null,hover:false,R:0,cx:0,cy:0,votes:{},mine:new Set(),busy:false,last:0};
+try{for(const c of JSON.parse(localStorage.getItem('cityvote-v1')||'[]'))GL.mine.add(c);}catch(e){}
+const GLB=(()=>{const d=document.createElement('div');d.className='tglobe';d.innerHTML='<div class="tgwrap"><canvas class="tgcv" aria-hidden="true"></canvas><div class="tglab"></div></div><div class="tgfoot"><div class="tgleg"><span><i class="gdl"></i>플레이할 수 있는 교차로(누르면 시작)</span><span><i class="gdc"></i>후보 도시(하트로 투표)</span></div><div class="tgrank" aria-live="polite"></div></div>';TTL.insertBefore(d,TTL.querySelector('.tgo'));return d;})();
+{const c=TTL.querySelector('.tchamp');if(c)c.hidden=true;}
+const GLC=GLB.querySelector('.tgcv'),GLX=GLC.getContext('2d'),GLL=GLB.querySelector('.tglab'),GLW=GLB.querySelector('.tgwrap');
+// 정사영: 경도 lon0, 위도 lat0을 가운데로
+function glProj(lat,lon){const r=Math.PI/180,p=lat*r,l=(lon-GL.lon)*r,p0=GL.lat*r,cp=Math.cos(p);
+  const x=cp*Math.sin(l),y=Math.cos(p0)*Math.sin(p)-Math.sin(p0)*cp*Math.cos(l),z=Math.sin(p0)*Math.sin(p)+Math.cos(p0)*cp*Math.cos(l);return[GL.cx+x*GL.R,GL.cy-y*GL.R,z];}
+function glLayout(){const tb=TTL.querySelector('.tbox').getBoundingClientRect(),go=TTL.querySelector('.tgo').getBoundingClientRect(),vw=innerWidth;
+  const top=tb.bottom+4,foot=(GLB.querySelector('.tgfoot').offsetHeight||70)+6,avail=go.top-top-foot-12,S=Math.max(150,Math.min(avail,520,vw*.92));GLB.style.top=top+'px';GLW.style.width=GLW.style.height=S+'px';GLB.style.width=Math.max(S,Math.min(vw-24,640))+'px';
+  const d=Math.min(2,devicePixelRatio||1);GLC.width=Math.round(S*d);GLC.height=Math.round(S*d);GLX.setTransform(d,0,0,d,0,0);GL.S=S;GL.R=S/2-14;GL.cx=S/2;GL.cy=S/2;GLB.hidden=S<170;}
+function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,S);
+  // 대기 빛
+  const at=g.createRadialGradient(cx,cy,R*.9,cx,cy,R*1.12);at.addColorStop(0,'rgba(140,220,255,.35)');at.addColorStop(1,'rgba(140,220,255,0)');g.fillStyle=at;g.beginPath();g.arc(cx,cy,R*1.12,0,7);g.fill();
+  // 바다
+  const sea=g.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R);sea.addColorStop(0,'#3f86b8');sea.addColorStop(.7,'#24557f');sea.addColorStop(1,'#163a5c');g.fillStyle=sea;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+  // 경위선
+  g.strokeStyle='rgba(255,255,255,.07)';g.lineWidth=1;for(let la=-60;la<=60;la+=30){g.beginPath();let on=false;for(let lo=-180;lo<=180;lo+=6){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
+  for(let lo=-180;lo<180;lo+=30){g.beginPath();let on=false;for(let la=-80;la<=80;la+=5){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
+  // 육지 점
+  const dr=Math.max(1.1,R/150);for(const [la,lo] of GL_DOTS){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=.35+.65*z;g.fillStyle=z>.25?'#bfe6a8':'#93c58a';g.beginPath();g.arc(x,y,dr*(.6+.4*z),0,7);g.fill();}
+  g.globalAlpha=1;
+  // 빛과 그림자(밤 쪽)
+  const sh=g.createRadialGradient(cx-R*.45,cy-R*.5,R*.2,cx,cy,R*1.05);sh.addColorStop(0,'rgba(255,240,210,.16)');sh.addColorStop(.6,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(10,10,40,.45)');g.fillStyle=sh;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+  // 핀
+  const t=performance.now()/1000;
+  for(const [id,,,la,lo] of GL_LIVE){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);const k=(t*.8+la)%1;g.strokeStyle='rgba(255,211,90,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(x,y,4+k*14,0,7);g.stroke();
+    g.fillStyle='#ffd35a';g.strokeStyle='#3a2313';g.lineWidth=1.5;g.beginPath();g.arc(x,y,5.5,0,7);g.fill();g.stroke();}
+  for(const [id,,la,lo] of GL_CAND){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);g.fillStyle=GL.mine.has(id)?'#ff8fab':'rgba(255,255,255,.9)';g.strokeStyle='#2a2238';g.lineWidth=1.3;g.beginPath();g.arc(x,y,4,0,7);g.fill();g.stroke();}
+  g.globalAlpha=1;}
+const glEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// 이름표: 앞쪽(z 큰) 것부터 놓고, 겹치면 아래로 한 번 비켜 보고, 그래도 겹치면 숨김
+function glLabels(){const items=[];
+  for(const [id,city,ix,la,lo] of GL_LIVE){const [x,y,z]=glProj(la,lo);if(z<.12)continue;const b=CHAMPB[id];
+    items.push({k:'L'+id,z,x,y,live:1,h:`<button type="button" class="tgl live" data-live="${id}"><b>${city} <em>${ix}</em></b><span>${b?`챔피언 ${glEsc(b.nickname||'익명')} <i>${b.score.toLocaleString()}점</i>`:CHAMP_LOADED?'챔피언 없음, 첫 기록에 도전':'기록 불러오는 중'}</span></button>`});}
+  for(const [id,city,la,lo] of GL_CAND){const [x,y,z]=glProj(la,lo);if(z<.12)continue;const n=GL.votes[id]||0,me=GL.mine.has(id);
+    items.push({k:'C'+id,z,x,y,h:`<button type="button" class="tgl cand${me?' me':''}" data-vote="${id}" aria-pressed="${me}" aria-label="${city} 추가 투표${me?' 취소':''}, 지금 ${n}표"><b>${city}</b><span class="hv">${me?'♥':'♡'} ${n}</span></button>`});}
+  items.sort((a,b)=>b.z-a.z);
+  // 기존 요소를 재사용해 깜빡임 없이 위치만 바꿈
+  const seen=new Set(),placed=[];
+  for(const it of items){let el=GLL.querySelector(`[data-k="${it.k}"]`);if(!el){el=document.createElement('div');el.className='tgli';el.dataset.k=it.k;GLL.appendChild(el);}
+    if(el.dataset.h!==it.h){el.innerHTML=it.h;el.dataset.h=it.h;}seen.add(it.k);
+    const w=el.offsetWidth||90,h=el.offsetHeight||30;let X=it.x-w/2,Y=it.y-h-9,ok=false;
+    for(const dy of [0,h+18]){const r=[X,Y+dy,X+w,Y+dy+h];if(!placed.some(p=>r[0]<p[2]+2&&r[2]>p[0]-2&&r[1]<p[3]+2&&r[3]>p[1]-2)){Y+=dy;placed.push(r);ok=true;break;}}
+    el.style.transform=`translate(${X.toFixed(1)}px,${Y.toFixed(1)}px)`;el.style.opacity=ok?Math.min(1,(it.z-.12)*4).toFixed(2):'0';el.style.pointerEvents=ok&&it.z>.3?'auto':'none';el.style.zIndex=Math.round(it.z*100);}
+  for(const el of [...GLL.children])if(!seen.has(el.dataset.k))el.remove();}
+function glRank(){const list=GL_CAND.map(([id,city])=>[id,city,GL.votes[id]||0]).sort((a,b)=>b[2]-a[2]||a[1].localeCompare(b[1],'ko'));const tot=list.reduce((t,x)=>t+x[2],0);
+  const h=tot?`<b>다음 도시 투표</b> ${list.slice(0,3).map((x,i)=>`<span>${i+1}위 ${x[1]} ${x[2]}표</span>`).join('')}<small>표가 많은 도시부터 다음 업데이트에 추가할 예정이에요</small>`:'<b>다음 도시 투표</b><span>지구본의 후보 도시 하트를 눌러 다음에 추가될 교차로를 골라 주세요</span>';
+  const R=GLB.querySelector('.tgrank');if(R.dataset.h!==h){R.dataset.h=h;R.innerHTML=h;if(TS.on)glLayout();}}
+const GLSB='https://qjguvtmkrkbtpvdnyelp.supabase.co',GLK='sb_publishable_8SQHH4kdMREtk4eJ1Skrgg_-stLi6bp';
+async function glLoadVotes(){try{const r=await fetch(GLSB+'/rest/v1/rpc/city_vote_totals',{method:'POST',headers:{apikey:GLK,'Content-Type':'application/json'},body:'{}'});if(!r.ok)return;const v={};for(const x of await r.json())v[x.city]=+x.votes;GL.votes=v;glRank();}catch(e){}}
+async function glVote(id){if(GL.busy)return;GL.busy=true;const had=GL.mine.has(id);
+  // 화면은 바로 바꾸고(낙관적), 실패하면 되돌림
+  if(had){GL.mine.delete(id);GL.votes[id]=Math.max(0,(GL.votes[id]||1)-1);}else{GL.mine.add(id);GL.votes[id]=(GL.votes[id]||0)+1;}glSave();glRank();
+  try{const a=await window.__lb.token(),H={apikey:GLK,Authorization:'Bearer '+a.access,'Content-Type':'application/json',Prefer:'return=minimal'};
+    const r=had?await fetch(GLSB+'/rest/v1/city_votes?city=eq.'+id+'&user_id=eq.'+a.uid,{method:'DELETE',headers:H}):await fetch(GLSB+'/rest/v1/city_votes',{method:'POST',headers:{...H,Prefer:'return=minimal,resolution=ignore-duplicates'},body:JSON.stringify({city:id})});
+    if(!r.ok&&r.status!==409)throw new Error(r.status);try{anTrack('city_vote',{city:id,on:!had});}catch(e){}}
+  catch(e){if(had){GL.mine.add(id);GL.votes[id]=(GL.votes[id]||0)+1;}else{GL.mine.delete(id);GL.votes[id]=Math.max(0,(GL.votes[id]||1)-1);}glSave();glToast('투표를 저장하지 못했어요. 잠시 뒤 다시 눌러 주세요');}
+  GL.busy=false;glRank();setTimeout(glLoadVotes,600);}
+function glSave(){try{localStorage.setItem('cityvote-v1',JSON.stringify([...GL.mine]));}catch(e){}}
+function glToast(t){let e=GLB.querySelector('.tgtoast');if(!e){e=document.createElement('div');e.className='tgtoast';GLB.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>{e.hidden=true;},2600);}
+// 누르기: 실제 교차로는 바로 시작, 후보는 투표
+GLL.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
+  if(b.dataset.vote){glVote(b.dataset.vote);const c=GL_CAND.find(x=>x[0]===b.dataset.vote);if(c&&!GL.mine.has(c[0]))glToast(`${c[1]} 투표를 취소했어요`);else if(c)glToast(`${c[1]}에 투표했어요. 다른 도시에도 투표할 수 있어요`);return;}
+  if(b.dataset.live){const id=b.dataset.live;titleClose();setTimeout(()=>{try{loadMode({kind:'real',id});}catch(err){}},80);}});
+// 끌어서 돌리기
+GLW.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;GL.drag={x:e.clientX,y:e.clientY,lon:GL.lon,lat:GL.lat};GLW.setPointerCapture(e.pointerId);GLW.classList.add('grab');});
+GLW.addEventListener('pointermove',e=>{if(!GL.drag)return;const k=180/(Math.PI*GL.R);GL.lon=GL.drag.lon-(e.clientX-GL.drag.x)*k;GL.lat=Math.max(-60,Math.min(70,GL.drag.lat+(e.clientY-GL.drag.y)*k));});
+for(const ev of ['pointerup','pointercancel'])GLW.addEventListener(ev,()=>{GL.drag=null;GLW.classList.remove('grab');});
+GLB.addEventListener('pointerenter',()=>{GL.hover=true;});GLB.addEventListener('pointerleave',()=>{GL.hover=false;});
+const GL_RM=matchMedia('(prefers-reduced-motion: reduce)');
+function glFrame(now){if(!TS.on){GL.run=false;return;}const dt=Math.min(.05,(now-(GL.last||now))/1000);GL.last=now;
+  // 마우스를 올리면 아주 느리게(이름표를 누르기 쉽게), 끄는 중엔 멈춤
+  if(!GL.drag&&!GL_RM.matches)GL.lon+=dt*(GL.hover?.6:GL.spin);
+  glDraw();glLabels();requestAnimationFrame(glFrame);}
+function glStart(){glRank();glLayout();setTimeout(glLayout,700);glLoadVotes();if(!GL.run){GL.run=true;GL.last=0;requestAnimationFrame(glFrame);}}
+addEventListener('resize',()=>{if(TS.on)glLayout();});
+{const _o=titleOpen;titleOpen=function(){_o();glStart();};}
+if(TS.on)setTimeout(glStart,50);
+window.__globe={st:GL,vote:glVote,layout:glLayout};
 // ---------- 게임 모드 화면(옛 '나의 교통 여정'): 게임 시작 뒤 모드 4개 선택 + 모드별 화면(교차로, 도로 표지 테마) ----------
 // 모드: 1 튜토리얼(레벨 24단계 지도) 2 실제 교차로 최적화(5곳 + 추가 예정 자리) 3 일일 챌린지(daily.js) 4 나만의 교차로(custom.js, 한 사람당 1곳)
 // 큰 길 하나 = 6장 24스테이지(차례로 가는 본선). 스테이지마다 횡단보도가 있는 교차로와 신호등:
