@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261117124823">
+<meta name="gl-build" content="20261117130144">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1113,12 +1113,79 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 .mvopts>b small{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:4px}
 body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 @media (max-width:520px){.mongrid button{padding:6px 9px}.monpass ul{grid-template-columns:1fr}}
+/* ----- 게임 모드 화면 v2: 떠 있는 섬 + 깜빡이 ----- */
+.journey[data-view="modes"]{color:#4a3550;background:linear-gradient(180deg,#ffe3d3 0%,#fbd3e2 38%,#dcd6ff 78%,#c9e4ff 100%);font-family:"Jua","IBM Plex Sans KR",sans-serif}
+.journey[data-view="modes"] .jhead{background:rgba(255,250,240,.55);border-bottom:3px solid rgba(74,53,80,.15);color:#4a3550}
+.journey[data-view="modes"] .jsum{color:#7a6283}
+.journey[data-view="modes"] .jx{background:#fffaf0!important;color:#4a3550!important;border:2.5px solid #4a3550!important;box-shadow:0 3px 0 #4a3550;border-radius:99px;font-family:inherit}
+#vmodes{position:relative;padding-bottom:24px}
+.hmbg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.hmcl{position:absolute;width:140px;height:44px;border-radius:44px;background:#fff;opacity:.75;filter:blur(.3px);animation:hmdrift 70s linear infinite}
+.hmcl::before,.hmcl::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.hmcl::before{width:60px;height:60px;left:22px;top:-28px}.hmcl::after{width:44px;height:44px;left:70px;top:-18px}
+.hmcl.c1{top:16%;left:-160px}.hmcl.c2{top:46%;left:-160px;animation-duration:95s;animation-delay:-40s;transform:scale(.7)}.hmcl.c3{top:74%;left:-160px;animation-duration:85s;animation-delay:-62s;opacity:.6}
+@keyframes hmdrift{to{translate:calc(100vw + 320px) 0}}
+.hmrock{position:absolute;width:34px;height:20px;background:linear-gradient(180deg,#ffe0c7 0 45%,#f6bb92 45%);clip-path:polygon(0 0,100% 0,70% 100%,30% 100%);animation:hmbob 6s ease-in-out infinite}
+.hmrock.r1{left:6%;top:30%}.hmrock.r2{right:7%;top:22%;animation-delay:-2s;transform:scale(1.4)}.hmrock.r3{right:12%;top:70%;animation-delay:-4s}
+.hmbird{position:absolute;width:14px;height:6px;border-top:2.5px solid #7a6283;border-radius:50% 50% 0 0;animation:hmfly 40s linear infinite}
+.hmbird::after{content:"";position:absolute;left:12px;top:-2.5px;width:14px;height:6px;border-top:2.5px solid #7a6283;border-radius:50% 50% 0 0}
+.hmbird.b1{top:12%;left:-40px}.hmbird.b2{top:20%;left:-40px;animation-delay:-18s;scale:.8}
+@keyframes hmfly{to{translate:calc(100vw + 80px) -30px}}
+@keyframes hmbob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+.hmhero{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:8px auto 4px;max-width:640px}
+.hmguide{flex:none;animation:hmbob 3.2s ease-in-out infinite}
+.hmbubble{position:relative;background:#fffaf0;border:3px solid #4a3550;border-radius:20px;box-shadow:0 4px 0 #4a3550;padding:10px 16px 9px;font-size:16px;line-height:1.4;cursor:pointer;margin-bottom:34px;max-width:440px}
+.hmbubble b{color:#e0557f}.hmbubble small{display:block;font-size:12px;color:#9a84a3;margin-top:2px}
+.hmbubble::before{content:"";position:absolute;left:-13px;bottom:16px;width:18px;height:18px;background:#fffaf0;border-left:3px solid #4a3550;border-bottom:3px solid #4a3550;transform:rotate(45deg)}
+.hmbubble:hover{transform:translateY(-2px)}
+.hmgrid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+@media (max-width:720px){.hmgrid{grid-template-columns:1fr}}
+.hmc{display:flex;flex-direction:column;background:#fffaf0;border:3px solid #4a3550;border-radius:24px;box-shadow:0 6px 0 #4a3550;overflow:hidden;cursor:pointer;transition:transform .18s}
+.hmc:hover,.hmc:focus-visible{transform:translateY(-4px);outline:none}
+.hmc.here{box-shadow:0 6px 0 #4a3550,0 0 0 5px rgba(255,211,90,.7)}
+.hmart{position:relative;height:212px;border-bottom:3px solid #4a3550;overflow:hidden}
+.hm-tut .hmart{background:linear-gradient(180deg,#bfe3ff,#e8f4ff)}.hm-real .hmart{background:linear-gradient(180deg,#c8f3e0,#f0fff6)}
+.hm-daily .hmart{background:linear-gradient(180deg,#3d3270,#7b5fa8)}.hm-my .hmart{background:linear-gradient(180deg,#ffd9c2,#fff1e4)}
+.hmsvg{position:absolute;left:50%;top:2px;height:210px;width:auto;translate:-50% 0;overflow:visible}
+.hmsvg .hmb polygon{stroke:#4a3550;stroke-width:1.2;stroke-linejoin:round}
+.hmfloat{animation:hmbob 5s ease-in-out infinite}.hm-real .hmfloat{animation-delay:-1.2s}.hm-daily .hmfloat{animation-delay:-2.4s}.hm-my .hmfloat{animation-delay:-3.6s}
+.hmsh{animation:hmsh 5s ease-in-out infinite;transform-origin:0 140px;transform-box:view-box}@keyframes hmsh{50%{transform:scale(.88)}}
+.hmtree{animation:hmsway 4s ease-in-out infinite}@keyframes hmsway{50%{rotate:3deg}}
+.hml{fill:#5a4a6a}.hml-r{animation:hmlr 6s infinite}.hml-y{animation:hmly 6s infinite}.hml-g{animation:hmlg 6s infinite}
+@keyframes hmlg{0%,45%{fill:#64e3a0}46%,100%{fill:#5a4a6a}}@keyframes hmly{0%,45%{fill:#5a4a6a}46%,58%{fill:#ffd35a}59%,100%{fill:#5a4a6a}}@keyframes hmlr{0%,58%{fill:#5a4a6a}59%,100%{fill:#ff6f7f}}
+.hmglobe{animation:hmspin 9s linear infinite}@keyframes hmspin{50%{transform-box:fill-box}}
+.hmlive{animation:hmblink 1.2s steps(2) infinite}@keyframes hmblink{50%{opacity:.2}}
+.hmbulb{animation:hmblink 1.6s steps(2) infinite}
+.hmfan{animation:hmhop .9s ease-in-out infinite}@keyframes hmhop{50%{translate:0 -4px}}
+.hmpin{animation:hmpin 1.8s ease-in-out infinite}@keyframes hmpin{0%,100%{translate:0 0}50%{translate:0 -7px}}
+.hmno{position:absolute;left:12px;top:10px;width:30px;height:30px;border-radius:50%;background:#fffaf0;border:3px solid #4a3550;display:grid;place-items:center;font-size:16px;color:#4a3550}
+.hmlivebadge{position:absolute;right:12px;top:12px;display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;background:#ff5a6e;color:#fff;font-size:13px;border:2.5px solid #4a3550}
+.hmlivebadge i{width:7px;height:7px;border-radius:50%;background:#fff;animation:hmblink 1.2s steps(2) infinite}
+.hmmas.mini{animation:hmhop 1.1s ease-in-out infinite}
+.hmtx{display:flex;flex-direction:column;gap:5px;padding:12px 16px 14px}
+.hmt{font-size:21px;font-weight:400}.hms{font-size:14.5px;color:#6a5470;line-height:1.35}
+.hmmeta{font-size:13px;color:#9a84a3}
+.hmprog{position:relative;height:16px;border-radius:99px;background:#efe3f2;border:2px solid #4a3550;overflow:hidden}
+.hmprog i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#64e3a0,#9be08f);border-right:2px solid #4a3550}
+.hmprog span{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;color:#4a3550}
+.hmstars{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:15px;color:#f6b93b}.hmstars s{color:#e3d6e8;text-decoration:none}
+.hmact{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.hmact button,.hmlab{font-family:inherit;font-size:15px;padding:7px 16px;border-radius:99px;border:2.5px solid #4a3550!important;background:#fffaf0!important;color:#4a3550!important;box-shadow:0 3px 0 #4a3550;cursor:pointer}
+.hmact button.primary{background:#ffd35a!important}
+.hm-real .hmact button.primary{background:#7fe0a8!important}.hm-daily .hmact button.primary{background:#c6b2f2!important}.hm-my .hmact button.primary{background:#ffb48a!important}
+.hmact button:active,.hmlab:active{translate:0 2px;box-shadow:0 1px 0 #4a3550}
+.hmlab{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%;margin-top:18px;padding:10px 18px;border-radius:20px;text-align:left;background:rgba(255,250,240,.85)!important;border-style:dashed!important}
+.hmlab svg{width:34px;height:34px;flex:none}.hmlab span{display:flex;flex-direction:column}.hmlab b{font-weight:400;font-size:17px}.hmlab small{font-size:13px;color:#7a6283}
+.hmeye.blink{transform:scaleY(.1);transform-box:fill-box;transform-origin:center}
+.hmarm{animation:hmwave 2.4s ease-in-out infinite;transform-origin:-17px -2px}@keyframes hmwave{0%,60%,100%{rotate:0deg}70%{rotate:-18deg}80%{rotate:6deg}90%{rotate:-14deg}}
+@media (max-width:720px){.hmart{height:180px}.hmsvg{height:178px}.hmbubble{font-size:14.5px}.hmhero{padding:0 8px}}
+@media (prefers-reduced-motion:reduce){.hmc *,.hmbg *,.hmguide{animation:none!important}}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.37. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.38. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4459,8 +4526,8 @@ $('jback').addEventListener('click',()=>hubShow('modes'));
 // 모드 카드: 카드를 누르면 그 모드 화면, 안의 버튼은 바로 플레이
 $('vmodes').addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     if(k.startsWith('v:'))hubShow(k.slice(2),k==='v:tut');else if(k==='tut')journeyPick(JS.rec.m,JS.rec.key);else if(k==='lab')journeyPick({kind:'lab'},'LAB');else if(HUB.act&&HUB.act[k])HUB.act[k]();return;}
-  const c=e.target.closest('.mcard');if(c)hubShow(c.dataset.v,c.dataset.v==='tut');});
-$('vmodes').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('mcard')){e.preventDefault();hubShow(e.target.dataset.v,e.target.dataset.v==='tut');}});
+  const c=e.target.closest('.mcard,.hmc');if(c)hubShow(c.dataset.v,c.dataset.v==='tut');});
+$('vmodes').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&(e.target.classList.contains('mcard')||e.target.classList.contains('hmc'))){e.preventDefault();hubShow(e.target.dataset.v,e.target.dataset.v==='tut');}});
 HUB.act={};
 $('jhome').addEventListener('click',()=>{JR.hidden=true;document.body.classList.remove('jopen');titleOpen();});
 $('jexits').addEventListener('click',e=>{const b=e.target.closest('.jexit');if(!b||b.classList.contains('soon'))return;const k=b.dataset.key;journeyPick(k==='LAB'?{kind:'lab'}:{kind:'real',id:k.slice(1)},k);});
@@ -4489,6 +4556,92 @@ const JM=(()=>{const b=document.createElement('button');b.type='button';b.id='jb
 {const c=document.createElement('button');c.type='button';c.className='primary jlvbtn';c.textContent='게임 모드 화면으로';c.addEventListener('click',()=>{closeModal();journeyOpen(false);});
   const _om=openModal;openModal=function(t,els){const r=_om(t,els);if(t==='레벨과 목표')$('modalbody').insertBefore(c,$('modalbody').firstChild);return r;};}
 window.__J={open:journeyOpen,show:hubShow,close:journeyClose,rec:()=>jRecommend()};
+// ---------- 게임 모드 화면 v2: 아기자기한 떠 있는 섬(모뉴먼트 밸리 느낌) + 신호등 친구 '깜빡이' ----------
+// 모드마다 아이소메트릭 섬 하나: 1 튜토리얼 = 신호 학교, 2 실제 교차로 = 지구본과 도시, 3 일일 챌린지 = 밤 공연장, 4 나만의 교차로 = 우리 집과 위치 핀
+// 깜빡이: 노란 등에 얼굴이 있는 작은 신호등 캐릭터. 추천 모드 섬 위에 서서 말풍선으로 다음 할 일을 알려 줌
+// 색은 첫 화면(아기자기 마을 스킨)과 같은 파스텔 + 굵은 보라 외곽선
+const hmEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HMI={k:20,cx:0,cy:0};
+function hmP(x,y,z,s){s=s||HMI.k;return[(x-y)*.866*s,(x+y)*.5*s-z*s];}
+const hmPt=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+// 상자: 바닥 (x,y,z), 크기 (w,d,h), 윗면, 왼쪽, 오른쪽 색
+function hmBox(x,y,z,w,d,h,c,extra){const P=(a,b,cc)=>hmP(a,b,cc),t=[P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)],
+  l=[P(x,y+d,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x,y+d,z+h)],r=[P(x+w,y,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x+w,y,z+h)];
+  return`<g class="hmb" ${extra||''}><polygon points="${hmPt(l)}" fill="${c[1]}"/><polygon points="${hmPt(r)}" fill="${c[2]}"/><polygon points="${hmPt(t)}" fill="${c[0]}"/></g>`;}
+// 지붕(박공): 바닥 상자 위 삼각 지붕
+function hmGable(x,y,z,w,d,h,c){const P=hmP,a=P(x,y+d/2,z+h),b=P(x+w,y+d/2,z+h);
+  return`<polygon points="${hmPt([P(x,y,z),P(x+w,y,z),b,a])}" fill="${c[0]}"/><polygon points="${hmPt([P(x,y+d,z),P(x+w,y+d,z),b,a])}" fill="${c[1]}"/><polygon points="${hmPt([P(x+w,y,z),P(x+w,y+d,z),b])}" fill="${c[2]}"/>`;}
+const HMC={// [윗면, 왼쪽, 오른쪽]
+  cream:['#fff6e4','#f3d9b5','#e2bf93'],pink:['#ffd3e0','#f4a9c0','#de88a6'],mint:['#cff3df','#9fdcbc','#7cc39f'],sky:['#d6e6ff','#a9c4f2','#8aa6dc'],
+  lav:['#e8dcff','#c6b2f2','#a790dc'],peach:['#ffe0c7','#f6bb92','#e09a6d'],road:['#8d8aa0','#6f6b85','#5d5872'],grass:['#bfe9a8','#93cf7c','#78b562'],
+  night:['#5b4f8a','#43386e','#352b5b'],gold:['#ffe7a3','#f6c95a','#e0ab33'],white:['#ffffff','#e8e1f0','#d6cde3'],dark:['#4a3550','#3a2840','#2c1e31']};
+// 떠 있는 섬 받침: 위 잔디, 아래로 좁아지는 흙 기둥
+function hmIsland(top){return hmBox(-.2,-.2,-1.6,4.4,4.4,.7,HMC.peach)+hmBox(.4,.4,-2.6,3.2,3.2,1,HMC.peach)+hmBox(1.1,1.1,-3.3,1.8,1.8,.7,HMC.peach)+hmBox(-.2,-.2,-.9,4.4,4.4,.9,top||HMC.grass);}
+function hmTree(x,y,z,s){s=s||1;const b=hmP(x,y,z);return`<g class="hmtree" style="transform-origin:${b[0].toFixed(1)}px ${b[1].toFixed(1)}px">${hmBox(x-.08,y-.08,z,.16,.16,.5*s,HMC.peach)}<circle cx="${b[0]}" cy="${(b[1]-HMI.k*(.75*s)).toFixed(1)}" r="${(HMI.k*.42*s).toFixed(1)}" fill="#8fd18a"/><circle cx="${(b[0]-HMI.k*.12).toFixed(1)}" cy="${(b[1]-HMI.k*(.85*s)).toFixed(1)}" r="${(HMI.k*.2*s).toFixed(1)}" fill="#b5e6a5"/></g>`;}
+// 신호등 기둥(점등 순환)
+function hmSignal(x,y,z,h){const b=hmP(x,y,z+h),k=HMI.k;return hmBox(x-.06,y-.06,z,.12,.12,h,HMC.dark)+
+  `<g transform="translate(${b[0].toFixed(1)} ${(b[1]-k*.2).toFixed(1)})"><rect x="${-k*.27}" y="${-k*.95}" width="${k*.54}" height="${k*1.25}" rx="${k*.18}" fill="#4a3550"/>`+
+  ['r','y','g'].map((c,i)=>`<circle class="hml hml-${c}" cx="0" cy="${(-k*.68+i*k*.36).toFixed(1)}" r="${(k*.13).toFixed(1)}"/>`).join('')+`</g>`;}
+// 모드별 섬 그림(viewBox 고정)
+function hmScene(kind,here){const vb='-92 -72 184 220';let s=`<svg class="hmsvg" viewBox="${vb}" aria-hidden="true"><ellipse cx="0" cy="140" rx="40" ry="6" fill="#4a3550" opacity=".13" class="hmsh"/><g class="hmfloat">`+hmIsland(kind==='daily'?HMC.lav:kind==='real'?HMC.mint:kind==='my'?HMC.grass:HMC.sky);
+  if(kind==='tut'){// 신호 학교: 교차로 바닥 + 2층 학교 + 계단 + 신호등
+    s+=hmBox(.2,1.6,0,3.6,.8,.04,HMC.road)+hmBox(1.6,.2,0,.8,3.6,.04,HMC.road);
+    for(let i=0;i<4;i++)s+=hmBox(1.62+i*.2,1.65,0.04,.1,.7,.01,HMC.white);
+    s+=hmBox(.2,.2,0,1.3,1.3,1.5,HMC.cream)+hmBox(.2,.2,1.5,1.3,1.3,.25,HMC.pink)+hmBox(.55,.2,1.75,.6,.6,.55,HMC.cream)+hmGable(.55,.2,2.3,.6,.6,.35,HMC.pink);
+    for(const [a,b] of [[.45,1.5],[1.05,1.5]])s+=hmBox(a,b,.6,.25,.01,.35,HMC.sky);
+    s+=hmSignal(2.6,2.6,.04,1.6)+hmTree(3.4,.6,0,1)+hmTree(.6,3.4,0,.85);}
+  if(kind==='real'){// 도시: 빌딩 셋 + 지구본 + EXIT 표지
+    s+=hmBox(2.3,.2,0,1.4,1.4,2.6,HMC.sky)+hmBox(.3,.3,0,1.1,1.1,1.7,HMC.pink)+hmBox(.4,2.4,0,1.2,1.2,1.1,HMC.cream);
+    for(let i=0;i<4;i++)s+=hmBox(2.45,1.6,.4+i*.55,.3,.01,.25,HMC.gold)+hmBox(3.05,1.6,.4+i*.55,.3,.01,.25,HMC.white);
+    const g=hmP(2.7,2.7,1.1),k=HMI.k;s+=hmBox(2.45,2.45,0,.5,.5,.5,HMC.white)+`<g class="hmglobe" transform="translate(${g[0].toFixed(1)} ${g[1].toFixed(1)})"><circle r="${k*.62}" fill="#a9dcf5" stroke="#4a3550" stroke-width="2"/><path d="M${-k*.45},${-k*.12} q${k*.2},${-k*.3} ${k*.42},${-k*.12} q${k*.1},${k*.25} ${-k*.12},${k*.36} z M${k*.08},${k*.1} q${k*.3},${-k*.08} ${k*.38},${k*.18} q${-k*.12},${k*.25} ${-k*.36},${k*.1} z" fill="#9be08f"/></g>`;
+    const e=hmP(.4,3.8,1.2);s+=hmBox(.36,3.76,0,.08,.08,1.2,HMC.dark)+`<g transform="translate(${e[0].toFixed(1)} ${(e[1]-6).toFixed(1)})"><rect x="-22" y="-13" width="44" height="17" rx="4" fill="#1f8a50" stroke="#fff" stroke-width="2"/><text x="0" y="-1" text-anchor="middle" font-size="10" font-weight="900" fill="#fff" font-family="Jua,sans-serif">EXIT</text></g>`;}
+  if(kind==='daily'){// 밤 공연장: 무대 아치 + 전광판 + 줄 조명 + 달
+    s+=hmBox(.4,.4,0,3.2,1.2,.35,HMC.night)+hmBox(.4,.4,.35,.35,1.2,1.9,HMC.lav)+hmBox(3.25,.4,.35,.35,1.2,1.9,HMC.lav)+hmBox(.4,.4,2.25,3.2,1.2,.35,HMC.pink);
+    const b=hmP(2,1,1.35),k=HMI.k;s+=`<g transform="translate(${b[0].toFixed(1)} ${b[1].toFixed(1)})"><rect x="${-k*1.1}" y="${-k*.45}" width="${k*2.2}" height="${k*.8}" rx="4" fill="#2a1f36" stroke="#fff" stroke-width="1.5"/><circle class="hmlive" cx="${-k*.7}" cy="${-k*.05}" r="3.2" fill="#ff5a6e"/><text x="${k*.15}" y="${k*.12}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#ffd35a" font-family="Jua,sans-serif">LIVE</text></g>`;
+    for(let i=0;i<7;i++){const p=hmP(.6+i*.45,2.2+Math.sin(i)*.15,.25);s+=`<circle class="hmbulb" style="animation-delay:${i*.2}s" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="${['#ffd35a','#ff8fb1','#8fd3ff'][i%3]}"/>`;}
+    for(const [x,y] of [[1,3.2],[2.2,3.4],[3.1,2.8]]){const p=hmP(x,y,0);s+=`<g class="hmfan" style="animation-delay:${x*.3}s"><circle cx="${p[0].toFixed(1)}" cy="${(p[1]-9).toFixed(1)}" r="4" fill="#ffd8b5"/><rect x="${(p[0]-4).toFixed(1)}" y="${(p[1]-5).toFixed(1)}" width="8" height="8" rx="3" fill="${x>2?'#8fd3ff':'#ff8fb1'}"/></g>`;}
+    s+=`<g class="hmmoon"><circle cx="66" cy="-50" r="10" fill="#fff4c2"/><circle cx="71" cy="-54" r="8.5" fill="#43386e"/></g>`;}
+  if(kind==='my'){// 우리 집 + 위치 핀 + 울타리 + 우체통
+    s+=hmBox(.5,.5,0,1.8,1.6,1.1,HMC.cream)+hmGable(.5,.5,1.1,1.8,1.6,.9,HMC.peach)+hmBox(1.1,2.1,0,.5,.01,.65,HMC.pink)+hmBox(.7,2.1,.55,.3,.01,.3,HMC.sky)+hmBox(1.8,2.1,.55,.3,.01,.3,HMC.sky);
+    s+=hmBox(1.7,.7,1.6,.25,.25,.6,HMC.pink);
+    for(let i=0;i<6;i++)s+=hmBox(.2+i*.55,3.85,0,.08,.08,.45,HMC.white);s+=hmBox(.2,3.87,.3,3,.04,.08,HMC.white);
+    s+=hmBox(3.3,2.5,0,.08,.08,.6,HMC.dark)+hmBox(3.15,2.4,.6,.38,.28,.3,HMC.pink)+hmTree(3.4,.7,0,1.1);
+    const p=hmP(2.9,1.6,2.2),k=HMI.k;s+=`<g class="hmpin" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><path d="M0,${k*.9} C${-k*.9},${-k*.1} ${-k*.6},${-k*1.1} 0,${-k*1.1} C${k*.6},${-k*1.1} ${k*.9},${-k*.1} 0,${k*.9}Z" fill="#ff6f6f" stroke="#4a3550" stroke-width="2"/><circle cy="${-k*.45}" r="${k*.25}" fill="#fff"/></g>`;}
+  if(here){const at={tut:[3.2,3.1],real:[2.1,3.3],daily:[2,1.9],my:[2.6,3.1]}[kind],p=hmP(at[0],at[1],kind==='daily'?.35:0);s+=`<g transform="translate(${(p[0]-14).toFixed(1)} ${(p[1]-46).toFixed(1)})">${hmMascot(28,'mini')}</g>`;}
+  return s+`</g></svg>`;}
+// 깜빡이: 노란 등에 얼굴. size(px)
+function hmMascot(sz,cls){return`<svg class="hmmas ${cls||''}" width="${sz}" height="${sz*1.35}" viewBox="-30 -46 60 81" aria-hidden="true">
+  <ellipse cx="0" cy="32" rx="16" ry="3.5" fill="#4a3550" opacity=".15"/>
+  <g class="hmbody"><rect x="-4" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><rect x="1" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/>
+  <path class="hmarm" d="M-17,-2 q-9,-3 -10,-12" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M17,-2 q8,4 9,11" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <rect x="-18" y="-43" width="36" height="62" rx="16" fill="#5a4a7a" stroke="#4a3550" stroke-width="3"/><rect x="-5" y="-49" width="10" height="7" rx="2" fill="#4a3550"/>
+  <circle class="hmk-r" cx="0" cy="-27" r="8" fill="#ff7a8a"/><circle cx="0" cy="-3" r="11" fill="#ffd35a"/><circle class="hmk-g" cx="0" cy="12" r="5.5" fill="#64e3a0"/>
+  <g class="hmeye"><ellipse cx="-4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><ellipse cx="4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/></g>
+  <circle cx="-7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><circle cx="7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><path d="M-2.5,1 q2.5,2.6 5,0" stroke="#3a2840" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>`;}
+// 배경: 구름, 작은 떠 있는 바위, 새
+function hmBack(){return`<div class="hmbg" aria-hidden="true"><i class="hmcl c1"></i><i class="hmcl c2"></i><i class="hmcl c3"></i><i class="hmrock r1"></i><i class="hmrock r2"></i><i class="hmrock r3"></i><i class="hmbird b1"></i><i class="hmbird b2"></i></div>`;}
+// 모드 화면 다시 그리기
+hubModes=function(){const r=JS.rec,n=LEVELS.filter(l=>jStars(l.id)>=1).length,O=OFFICIAL(),rs=O.reduce((a,x)=>a+jStars('real-'+x.id),0),first=r.first;
+  const d=HUB.sum.daily?HUB.sum.daily():null,m=HUB.sum.my?HUB.sum.my():null,here=r.done?'real':'tut';
+  const say=first?`안녕하세요! 신호등 친구 <b>깜빡이</b>예요. 1-1 첫 신호부터 같이 가 볼까요?`:r.done?`튜토리얼을 모두 마쳤어요! 이제 <b>세계의 상습 정체 교차로</b>를 풀어 볼까요?`:`다음은 <b>${hmEsc(r.name)}</b> 차례예요. 이어서 가요!`;
+  const card=(k,no,title,desc,meta,acts,badge)=>`<div class="hmc hm-${k}${k===here?' here':''}" data-v="${k}" role="button" tabindex="0">
+    <div class="hmart">${hmScene(k,k===here)}${badge||''}<span class="hmno">${no}</span></div>
+    <div class="hmtx"><b class="hmt">${title}</b><span class="hms">${desc}</span>${meta}<div class="hmact">${acts}</div></div></div>`;
+  $('vmodes').innerHTML=hmBack()+`<div class="hmhero"><div class="hmguide">${hmMascot(64)}</div><div class="hmbubble" data-act="${r.done?'v:real':'tut'}" role="button" tabindex="0">${say}<small>${r.done?'눌러서 교차로 고르기':first?'눌러서 출발':'눌러서 이어 하기'}</small></div></div>
+  <div class="hmgrid">`+
+    card('tut','1','튜토리얼',`신호 나누기부터 보행 신호까지 6장 24단계`,
+      `<div class="hmprog"><i style="width:${Math.round(n/LEVELS.length*100)}%"></i><span>${n} / ${LEVELS.length}</span></div>`,
+      (r.done?'':`<button type="button" class="primary" data-act="tut">${first?'1-1부터 시작':'이어서 하기'}</button>`)+`<button type="button" data-act="v:tut">단계 지도</button>`)+
+    card('real','2','실제 교차로',`${O.map(x=>(J_CITY[x.id]||[x.city])[0]).join(', ')}의 상습 정체 교차로`,
+      `<div class="hmstars">${O.map(x=>{const s=jStars('real-'+x.id);return`<span title="${hmEsc((J_CITY[x.id]||[x.city])[0])}">${'★'.repeat(s)}<s>${'★'.repeat(3-s)}</s></span>`;}).join('')}</div>`,
+      `<button type="button" class="primary" data-act="v:real">교차로 고르기</button>`)+
+    card('daily','3','일일 챌린지',d&&d.title?`오늘: ${hmEsc(d.title)}`:'매일 바뀌는 하루 한정 교통 상황',`<small class="hmmeta">${d?d.sub:'불러오는 중'}</small>`,
+      (d&&d.ready?'<button type="button" class="primary" data-act="daily">도전하기</button>':'')+'<button type="button" data-act="v:daily">자세히</button>',`<span class="hmlivebadge"><i></i>LIVE</span>`)+
+    card('my','4','나만의 교차로',m&&m.has?`내 교차로: ${hmEsc(m.name)}`:'우리 동네 주소로 만드는 나만의 스테이지',`<small class="hmmeta">${m?m.sub:'한 사람당 1곳'}</small>`,
+      (m&&m.has?'<button type="button" class="primary" data-act="my">플레이</button>':'<button type="button" class="primary" data-act="mynew">만들기</button>')+'<button type="button" data-act="v:my">자세히</button>')+
+  `</div><button type="button" class="hmlab" data-act="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" fill="#e8dcff" stroke="#4a3550" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 15h9" stroke="#4a3550" stroke-width="2"/><circle cx="10" cy="18" r="1" fill="#ff8fb1"/><circle cx="13.5" cy="17" r="1.2" fill="#8fd3ff"/></svg><span><b>실험실</b><small>레벨 제약 없이 모든 도구로 자유롭게 실험 (별과 랭킹 없음)</small></span></button>`;};
+// 깜빡이 눈 깜빡임과 등 순환
+setInterval(()=>{if(JR.hidden||JS.view!=='modes')return;for(const e of JR.querySelectorAll('.hmeye')){e.classList.add('blink');setTimeout(()=>e.classList.remove('blink'),160);}},3800);
 // ---------- 오늘의 도전(일일 퀘스트): 하루 한정 교통 상황 + 그날만의 랭킹 ----------
 // 시나리오는 Supabase Edge Function 'daily'가 하루 1번 만듦(Claude가 쓴 사건 이야기와 교통량 배율, 실패하면 규칙 생성기). 날짜는 한국 시간 기준
 // 게임에서는 실제 교차로 모드에 daily:YYYYMMDD를 붙여 플레이(mode={kind:'real',id,daily}). 기록 키 'daily-YYYYMMDD'(별, 도전 5번, 랭킹 모두 그날 따로)
