@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116163311">
+<meta name="gl-build" content="20261116163926">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1082,7 +1082,7 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.30. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.31. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3903,16 +3903,31 @@ function tsQuad(x0,y0,x1,y1,z,fill){tsPoly([tsP(x0,y0,z),tsP(x1,y0,z),tsP(x1,y1,
 function tsBox(x0,y0,x1,y1,z0,z1,top,fx,fy){tsPoly([tsP(x0,y1,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x0,y1,z1)],fy);tsPoly([tsP(x1,y0,z0),tsP(x1,y1,z0),tsP(x1,y1,z1),tsP(x1,y0,z1)],fx);tsQuad(x0,y0,x1,y1,z1,top);}
 // 신호: 주기 40초. 동서(x) 녹색 16초, 황색 2.5초, 전적색 1.5초 후 남북(y) 같은 순서. 전적색 동안 교차로 안 차가 빠져나감
 const SG={G:16,Y:2.5,AR:1.5};SG.C=2*(SG.G+SG.Y+SG.AR);
-function tsSig(t){const c=t%SG.C,h=SG.G+SG.Y+SG.AR,ph=c<h?0:1,u=c-ph*h,st=u<SG.G?'G':u<SG.G+SG.Y?'Y':'R';const s=ph===0?[st,'R']:['R',st];s.left=st==='G'?SG.G-u:0;s.ph=ph;return s;}
+// 시작 화면 데모: 20초마다 교차로 설정과 신호 체계가 바뀜(게임에서 하는 일을 보여 줌). 표지판과 전광판도 함께 바뀜
+const TMODE=[{k:'basic',name:'2현시 신호',sub:'남북과 동서가 번갈아 녹색',gx:16,gy:16},
+  {k:'scr',name:'보행자 전용 신호',sub:'차는 모두 멈추고 사람만 건너요',gx:13,gy:13,P:9},
+  {k:'long',name:'동서 우선 신호',sub:'동서 녹색 28초, 남북 10초',gx:28,gy:10},
+  {k:'bus',name:'버스 전용 차로',sub:'동서 바깥 차로는 버스만',gx:16,gy:16},
+  {k:'ow',name:'남북 일방통행',sub:'남북 도로는 한 방향으로만',gx:16,gy:20}];
+const TM={i:0,t0:0,per:20,flash:0};
+function tsMode(){return TMODE[TM.i];}
+function tsModeStep(dt){if(TS.t-TM.t0>=TM.per){TM.i=(TM.i+1)%TMODE.length;TM.t0=TS.t;TM.flash=2.2;}TM.flash=Math.max(0,TM.flash-dt);}
+function tsSig(t){const M=tsMode(),Y=SG.Y,AR=SG.AR,u0=t-TM.t0;
+  // 바뀐 직후 2초는 모두 빨간불(신호를 다시 짜는 중)
+  if(u0<2){const s=['R','R'];s.left=0;s.ph=-1;return s;}
+  const hx=M.gx+Y+AR,hy=M.gy+Y+AR,P=M.P||0,C=hx+hy+(P?P+AR:0),c=(u0-2)%C;let ph,u,G;
+  if(c<hx){ph=0;u=c;G=M.gx;}else if(c<hx+hy){ph=1;u=c-hx;G=M.gy;}else{const s=['R','R'];const k=c-hx-hy;s.ped=k<P;s.left=s.ped?P-k:0;s.ph=2;return s;}
+  const st=u<G?'G':u<G+Y?'Y':'R';const s=ph===0?[st,'R']:['R',st];s.left=st==='G'?G-u:0;s.ph=ph;return s;}
 const LANES=[];for(const [ax,dir] of [['x',1],['x',-1],['y',1],['y',-1]])for(const o of [1.75,5.25])LANES.push({ax,dir,off:(ax==='x'?-dir:dir)*o});
 // 차는 직진만. 차 좌표 s는 자기 축 위치, 앞범퍼 = s*dir + 길이/2. 정지선은 횡단보도(|축|=8.9~12.3) 앞 -13
 const STOP=-13,BOX=12.3,CWX=10.6,CWH=1.7,PV=1.45;
 const front=c=>c.s*c.dir+c.len/2,rear=c=>c.s*c.dir-c.len/2;
 const inBox=c=>front(c)>STOP&&rear(c)<BOX+.5;
 function tsStep(dt){eggStep(dt);const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
-  for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]??trnd()*3)-dt;
+  tsModeStep(dt);const M=tsMode();
+  for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]??trnd()*3)-dt;const dir=M.k==='ow'&&L.ax==='y'?1:L.dir,busL=M.k==='bus'&&L.ax==='x'&&Math.abs(L.off)>4;
     if(TS.spawn[li]<=0){const q=TS.cars.filter(c=>c.li===li),last=q.reduce((m,c)=>Math.min(m,rear(c)),1e9);
-      if(last>-106){const len=trnd()<.12?7:4.2;TS.cars.push({li,ax:L.ax,dir:L.dir,off:L.off,s:(-120+len/2)*L.dir,v:8,len,col:PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=1.8+trnd()*3.5;}}
+      const wrong=q.some(c=>c.dir!==dir);if(last>-106&&!wrong){const len=busL?7:M.k==='bus'?4.2:trnd()<.12?7:4.2;TS.cars.push({li,ax:L.ax,dir,off:L.off,s:(-120+len/2)*dir,v:8,len,col:busL?(trnd()<.5?'#3f8fd8':'#4fb06b'):PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=busL?5+trnd()*4:1.8+trnd()*3.5;}}
   for(const c of TS.cars){const sig=c.ax==='x'?sx:sy,f=front(c);let gap=1e9;
     // 1) 같은 차로 앞차와 거리(2.2m 이상)
     for(const o of TS.cars)if(o!==c&&o.li===c.li&&rear(o)>f-.01)gap=Math.min(gap,rear(o)-f-2.2);
@@ -3926,15 +3941,15 @@ function tsStep(dt){eggStep(dt);const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
   TS.cars=TS.cars.filter(c=>Math.abs(c.s)<125);
   // 보행자 1) 횡단: 연석 바로 뒤(|u|=7.6)에서 기다렸다가, 건너는 도로의 차가 멈춘 쪽 녹색이 충분히 남았을 때 출발. 방향마다 다른 줄(서로 엇갈리지 않게)
   const SL=[9.35,10.15,11.05,11.85];
-  if(trnd()<dt*1.4){const cw=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,side=trnd()<.5?1:-1,dirn=-side,slot=dirn>0?trnd()<.5?0:1:trnd()<.5?2:3;
+  if(trnd()<dt*(sg.ped?5:1.4)){const cw=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,side=trnd()<.5?1:-1,dirn=-side,slot=dirn>0?trnd()<.5?0:1:trnd()<.5?2:3;
     if(!TS.peds.some(p=>p.cw===cw&&p.k===k&&p.slot===slot&&(p.wait||Math.abs(p.u-side*7.6)<1.2)))TS.peds.push({cw,k,slot,u:side*7.6,dirn,wait:true,v:PV*(.9+trnd()*.2),col:PAL.car[Math.floor(trnd()*8)]});}
   // 2) 보도 걷기: 보도 가운데 줄(8.6) 기준 진행 방향마다 옆으로 0.45m 비켜 걸음(오른쪽 통행). 앞사람이 1m 안이면 속도를 맞춤
-  if(TS.peds.filter(p=>!p.cw).length<22&&trnd()<dt*2.2){const side=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,end=trnd()<.5?1:-1,out=trnd()<.5,dirn=out?end:-end,u=out?end*13.6:end*60;
+  if(TS.peds.filter(p=>!p.cw).length<44&&trnd()<dt*4){const side=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,end=trnd()<.5?1:-1,out=trnd()<.5,dirn=out?end:-end,u=out?end*13.6:end*118;
     if(!TS.peds.some(p=>!p.cw&&p.side===side&&p.k===k&&p.dirn===dirn&&Math.abs(p.u-u)<1.6))TS.peds.push({side,k,u,dirn,v:1.05+trnd()*.35,col:PAL.car[Math.floor(trnd()*8)]});}
   for(const p of TS.peds){
-    if(p.cw){const ok=(p.cw==='x'?sy:sx)==='G'&&sg.left>15.2/p.v+.5&&!TS.cars.some(c=>c.ax===p.cw&&c.ent&&rear(c)<BOX+CWH);if(p.wait&&ok)p.wait=false;if(!p.wait){let v=p.v;for(const o of TS.peds)if(o!==p&&o.cw===p.cw&&o.k===p.k&&o.slot===p.slot){const d=(o.u-p.u)*p.dirn;if(d>0&&d<1.1)v=o.wait?0:Math.min(v,o.v*(d<.8?.5:1));}p.u+=p.dirn*v*dt;}if(!p.wait&&p.u*p.dirn>7.6)p.gone=true;}
+    if(p.cw){const ok=((p.cw==='x'?sy:sx)==='G'||sg.ped)&&sg.left>15.2/p.v+.5&&!TS.cars.some(c=>c.ax===p.cw&&c.ent&&rear(c)<BOX+CWH);if(p.wait&&ok)p.wait=false;if(!p.wait){let v=p.v;for(const o of TS.peds)if(o!==p&&o.cw===p.cw&&o.k===p.k&&o.slot===p.slot){const d=(o.u-p.u)*p.dirn;if(d>0&&d<1.1)v=o.wait?0:Math.min(v,o.v*(d<.8?.5:1));}p.u+=p.dirn*v*dt;}if(!p.wait&&p.u*p.dirn>7.6)p.gone=true;}
     else{let v=p.v;for(const o of TS.peds)if(o!==p&&!o.cw&&o.side===p.side&&o.k===p.k&&o.dirn===p.dirn){const d=(o.u-p.u)*p.dirn;if(d>0&&d<1.1)v=Math.min(v,o.v*(d<.8?.5:1));}
-      p.u+=p.dirn*v*dt;if(Math.abs(p.u)>61||Math.abs(p.u)<13.4)p.gone=true;}
+      p.u+=p.dirn*v*dt;if(Math.abs(p.u)>120||Math.abs(p.u)<13.4)p.gone=true;}
     // 화면 위치
     if(p.cw){const lat=p.k*SL[p.slot];[p.x,p.y]=p.cw==='x'?[lat,p.u]:[p.u,lat];}else{const lat=p.k*(8.6+p.dirn*p.k*.45);[p.x,p.y]=p.side==='x'?[p.u,lat]:[lat,p.u];}}
   TS.peds=TS.peds.filter(p=>!p.gone);}
@@ -3949,15 +3964,27 @@ function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTran
   for(let s=-138;s<138;s+=6){if(Math.abs(s)<12)continue;for(const o of [-3.5,3.5]){tsQuad(s,o-.12,s+3,o+.12,.04,'rgba(255,255,255,.75)');tsQuad(o-.12,s,o+.12,s+3,.04,'rgba(255,255,255,.75)');}}
   for(const o of [-.25,.25]){tsQuad(-140,o-.1,-12,o+.1,.04,'#f3c74b');tsQuad(12,o-.1,140,o+.1,.04,'#f3c74b');tsQuad(o-.1,-140,o+.1,-12,.04,'#f3c74b');tsQuad(o-.1,12,o+.1,140,.04,'#f3c74b');}
   for(let k=-6.3;k<6.5;k+=1.4){tsQuad(-12.3,k,-8.9,k+.75,.05,'#f4f1ea');tsQuad(8.9,k,12.3,k+.75,.05,'#f4f1ea');tsQuad(k,-12.3,k+.75,-8.9,.05,'#f4f1ea');tsQuad(k,8.9,k+.75,12.3,.05,'#f4f1ea');}
+  tsMarks();
   // 깊이 순서로 그릴 것들(그림자 먼저)
-  const items=[];
+  const items=[];if(!TS.tall||!TS.bld.includes(TS.tall)){const vis0=TS.bld.filter(b=>{const p=tsP(b.x1,b.y1,0);return p[0]>TS.w*.62&&p[0]<TS.w*.95&&p[1]>TS.h*.3&&p[1]<TS.h;});TS.tall=vis0.sort((a,b)=>b.h-a.h)[0]||null;}
+  tsSigns(items);
   const vis=(x,y,h,m)=>{const p=tsP(x,y,0),S=TS.s;return p[0]>-m*S&&p[0]<W+m*S&&p[1]>-2*S&&p[1]-(h+m)*S<H;};
   for(const b of TS.bld){if(!vis((b.x0+b.x1)/2,(b.y0+b.y1)/2,b.h,8))continue;items.push({d:b.x1+b.y1,f:()=>{tsPoly([tsP(b.x1,b.y0,0),tsP(b.x1+b.h*.35,b.y0+b.h*.1,0),tsP(b.x1+b.h*.35,b.y1+b.h*.1,0),tsP(b.x1,b.y1,0)],'rgba(70,40,60,.18)');
     tsBox(b.x0,b.y0,b.x1,b.y1,0,b.h,b.p[0],b.p[1],b.p[2]);
     // 창문: 보이는 두 면에 줄지어(노을빛으로 몇 개는 켜짐)
-    for(let z=2.2;z<b.h-1;z+=2.6){for(let u=b.x0+1;u<b.x1-1;u+=2.2){const on=((u*7+z*3)|0)%5===0;tsPoly([tsP(u,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z+1.3),tsP(u,b.y1+.01,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.55)');}
-      for(let u=b.y0+1;u<b.y1-1;u+=2.2){const on=((u*5+z*7)|0)%6===0;tsPoly([tsP(b.x1+.01,u,z),tsP(b.x1+.01,u+1.1,z),tsP(b.x1+.01,u+1.1,z+1.3),tsP(b.x1+.01,u,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.45)');}}
-    tsQuad(b.x0+.6,b.y0+.6,b.x1-.6,b.y1-.6,b.h+.01,'rgba(0,0,0,.06)');}});}
+    if(b.per==null){b.per=5+Math.random()*12;b.ph=Math.random()*30;b.party=b.h>14&&Math.random()<.12;b.ant=b.h>24&&Math.random()<.55;}const tk=Math.floor((TS.t+b.ph)/b.per)*3;
+    for(let z=2.2;z<b.h-1;z+=2.6){for(let u=b.x0+1;u<b.x1-1;u+=2.2){const on=((u*7+z*3+tk)|0)%5===0;tsPoly([tsP(u,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z),tsP(u+1.1,b.y1+.01,z+1.3),tsP(u,b.y1+.01,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.55)');}
+      for(let u=b.y0+1;u<b.y1-1;u+=2.2){const on=((u*5+z*7+tk)|0)%6===0;tsPoly([tsP(b.x1+.01,u,z),tsP(b.x1+.01,u+1.1,z),tsP(b.x1+.01,u+1.1,z+1.3),tsP(b.x1+.01,u,z+1.3)],on?'#ffe7a3':'rgba(46,74,99,.45)');}}
+    tsQuad(b.x0+.6,b.y0+.6,b.x1-.6,b.y1-.6,b.h+.01,'rgba(0,0,0,.06)');
+    // 옥상: 안테나(빨간 경고등 깜빡임), 줄 조명(파티)
+    if(b.ant){const mx=(b.x0+b.x1)/2,my=(b.y0+b.y1)/2,[a1,b1]=tsP(mx,my,b.h),[a2,b2]=tsP(mx,my,b.h+5);c.strokeStyle='#5a5560';c.lineWidth=Math.max(1,TS.s*.15);c.beginPath();c.moveTo(a1,b1);c.lineTo(a2,b2);c.stroke();
+      const on=(TS.t+b.ph)%1.8<.35;c.fillStyle=on?'#ff4d4d':'#7a2b2b';c.beginPath();c.arc(a2,b2,TS.s*.32,0,7);c.fill();if(on){c.fillStyle='rgba(255,80,80,.3)';c.beginPath();c.arc(a2,b2,TS.s*.9,0,7);c.fill();}}
+    if(b.party){const cols=['#ff6f91','#ffd35a','#6ff0a0','#7ec8ff','#c3a6ff'];let k=0;for(const [u0,v0,u1,v1] of [[b.x0,b.y1,b.x1,b.y1],[b.x1,b.y0,b.x1,b.y1]])for(let q=.08;q<1;q+=.12){const x=u0+(u1-u0)*q,y=v0+(v1-v0)*q,[a,bb]=tsP(x,y,b.h+.6+Math.sin(q*Math.PI)*-.4);k++;
+      const on=Math.floor(TS.t*3+k)%3!==0;c.fillStyle=on?cols[k%5]:'rgba(255,255,255,.35)';c.beginPath();c.arc(a,bb,TS.s*.22,0,7);c.fill();}}
+    // 유리창 청소 곤돌라(가장 높은 건물 하나)
+    if(b===TS.tall){const z=3+(b.h-6)*(.5+.5*Math.sin(TS.t*.25)),xm=(b.x0+b.x1)/2;const [p0,q0]=tsP(xm-1.4,b.y1+.05,z),[p1,q1]=tsP(xm+1.4,b.y1+.05,z),[t0,u0]=tsP(xm-1.4,b.y1+.05,b.h),[t1,u1]=tsP(xm+1.4,b.y1+.05,b.h);
+      c.strokeStyle='rgba(60,60,70,.7)';c.lineWidth=1;c.beginPath();c.moveTo(p0,q0);c.lineTo(t0,u0);c.moveTo(p1,q1);c.lineTo(t1,u1);c.stroke();tsBox(xm-1.4,b.y1+.05,xm+1.4,b.y1+.7,z-.9,z,'#ffd35a','#e0a930','#c98f22');
+      const [hx,hy]=tsP(xm,b.y1+.4,z+.4);c.fillStyle='#ff9f5a';c.beginPath();c.arc(hx,hy,TS.s*.3,0,7);c.fill();}}});}
   for(const tr of TS.trees)if(vis(tr.x,tr.y,6,4))items.push({d:tr.x+tr.y,f:()=>{const [px,py]=tsP(tr.x,tr.y,0),r=tr.r*TS.s;c.fillStyle='rgba(60,40,50,.18)';c.beginPath();c.ellipse(px+r*.5,py+r*.1,r*1.1,r*.5,0,0,7);c.fill();
     c.fillStyle='#8a6248';c.fillRect(px-r*.12,py-r*1.4,r*.24,r*1.4);const [qx,qy]=tsP(tr.x,tr.y,tr.r*1.9);c.fillStyle='#6fb36b';c.beginPath();c.arc(qx,qy,r,0,7);c.fill();c.fillStyle='#8fcf7f';c.beginPath();c.arc(qx-r*.3,qy-r*.3,r*.55,0,7);c.fill();}});
   for(const car of TS.cars){const L=car.len,Wd=1.9,cx=car.ax==='x'?car.s:car.off,cy=car.ax==='x'?car.off:car.s,hx=car.ax==='x'?L/2:Wd/2,hy=car.ax==='x'?Wd/2:L/2,bus=L>5;
@@ -3980,8 +4007,41 @@ function tsDraw(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t,[sx,sy]=tsSig(t);c.setTran
   let egg=null;if(EGG.on){egg=eggCar();if(egg.z<1.2){items.push(egg);egg=null;}}
   items.sort((p,q)=>p.d-q.d).forEach(i=>i.f());
   if(EGG.on){eggTrail();if(egg)egg.f();}
+  tsSky();
   // 노을빛과 가장자리 어둡게
   const v=c.createRadialGradient(W/2,H*.55,Math.min(W,H)*.25,W/2,H*.55,Math.max(W,H)*.75);v.addColorStop(0,'rgba(255,190,140,0)');v.addColorStop(1,'rgba(60,30,60,.45)');c.fillStyle=v;c.fillRect(0,0,W,H);}
+// 모드별 도로 표시
+function tsMarks(){const M=tsMode(),c=TS.ctx;
+  if(M.k==='bus')for(const sgn of [-1,1]){tsQuad(-140,sgn>0?3.6:-6.9,-12.3,sgn>0?6.9:-3.6,.045,'rgba(220,70,70,.42)');tsQuad(12.3,sgn>0?3.6:-6.9,140,sgn>0?6.9:-3.6,.045,'rgba(220,70,70,.42)');}
+  if(M.k==='ow')for(let k=-130;k<130;k+=14){if(Math.abs(k)<16)continue;for(const o of [-5.25,-1.75,1.75,5.25])tsPoly([tsP(o-.7,k,.05),tsP(o+.7,k,.05),tsP(o+.7,k+2,.05),tsP(o+1.3,k+2,.05),tsP(o,k+3.6,.05),tsP(o-1.3,k+2,.05),tsP(o-.7,k+2,.05)],'rgba(255,255,255,.85)');}
+  if(M.k==='scr'){for(const [a,b] of [[[-9,-9],[9,9]],[[-9,9],[9,-9]]]){const L=Math.hypot(b[0]-a[0],b[1]-a[1]),ux=(b[0]-a[0])/L,uy=(b[1]-a[1])/L,nx=-uy*1.1,ny=ux*1.1,n=16;
+    for(let i=1;i<n-1;i+=2){const k0=i/n,k1=(i+.6)/n,p0=[a[0]+(b[0]-a[0])*k0,a[1]+(b[1]-a[1])*k0],p1=[a[0]+(b[0]-a[0])*k1,a[1]+(b[1]-a[1])*k1];
+      tsPoly([tsP(p0[0]-nx,p0[1]-ny,.06),tsP(p1[0]-nx,p1[1]-ny,.06),tsP(p1[0]+nx,p1[1]+ny,.06),tsP(p0[0]+nx,p0[1]+ny,.06)],'rgba(244,241,234,.75)');}}}}
+// 표지판(모드별) + 전광판(지금 실험 중인 신호 체계)
+function tsSigns(items){const M=tsMode(),c=TS.ctx,s=TS.s;
+  const post=(x,y,h,draw)=>items.push({d:x+y+.4,f:()=>{const [a,b]=tsP(x,y,0),[a2,b2]=tsP(x,y,h);c.strokeStyle='#6b6f78';c.lineWidth=Math.max(1.5,s*.22);c.beginPath();c.moveTo(a,b);c.lineTo(a2,b2);c.stroke();draw(a2,b2);}});
+  const font=(px,w)=>`${w||700} ${Math.round(px)}px "Do Hyeon","IBM Plex Sans KR",sans-serif`;
+  // 전광판(왼쪽 위 모퉁이 뒤): 검은 판, 주황 LED 글씨. 바뀔 때 깜빡
+  post(14,22,7,(x,y)=>{const w=s*17,h=s*5.6,fl=TM.flash>0&&Math.floor(TM.flash*6)%2===0;c.fillStyle='#22252b';c.beginPath();c.roundRect?c.roundRect(x-w/2,y-h,w,h,s*.6):c.rect(x-w/2,y-h,w,h);c.fill();c.strokeStyle='#4a4f58';c.lineWidth=2;c.stroke();
+    c.textAlign='center';c.textBaseline='middle';const left=Math.max(0,Math.ceil(TM.per-(TS.t-TM.t0)));
+    if(fl){c.fillStyle='#ffb300';c.font=font(h*.36);c.fillText('신호 체계 변경 중',x,y-h*.5);return;}
+    c.fillStyle='#ffb300';c.font=font(h*.34);c.fillText(M.name,x,y-h*.66);c.fillStyle='#ffd98a';c.font=font(h*.22,500);c.fillText(M.sub,x,y-h*.3);
+    c.fillStyle='#7d828c';c.font=font(h*.16,500);c.fillText(`다음 바꿈까지 ${left}초`,x,y-h*.1);});
+  // 모드별 표지판(오른쪽 아래 모퉁이)
+  const sx=14.5,sy=14.5;
+  if(M.k==='scr')post(10.4,-10.4,5,(x,y)=>{const r=s*1.7;c.fillStyle='#ffd200';c.strokeStyle='#222';c.lineWidth=2;c.beginPath();c.moveTo(x,y-2*r);c.lineTo(x+r,y-r);c.lineTo(x,y);c.lineTo(x-r,y-r);c.closePath();c.fill();c.stroke();
+    c.strokeStyle='#222';c.lineWidth=Math.max(1.5,s*.2);c.beginPath();c.arc(x,y-r*1.45,r*.13,0,7);c.moveTo(x,y-r*1.3);c.lineTo(x,y-r*.9);c.lineTo(x-r*.25,y-r*.55);c.moveTo(x,y-r*.9);c.lineTo(x+r*.22,y-r*.6);c.moveTo(x-r*.25,y-r*1.15);c.lineTo(x+r*.25,y-r*1.05);c.stroke();});
+  if(M.k==='bus')post(10.4,-10.4,5,(x,y)=>{const w=s*3.2;c.fillStyle='#2f6fe0';c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.rect(x-w/2,y-w,w,w);c.fill();c.stroke();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.font=font(w*.3);c.fillText('버스',x,y-w*.66);c.font=font(w*.26);c.fillText('전용',x,y-w*.3);});
+  if(M.k==='ow')post(10.4,-10.4,5,(x,y)=>{const w=s*4,h=s*1.6;c.fillStyle='#2f6fe0';c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.rect(x-w/2,y-h,w,h);c.fill();c.stroke();c.fillStyle='#fff';c.beginPath();c.moveTo(x-w*.38,y-h*.62);c.lineTo(x+w*.15,y-h*.62);c.lineTo(x+w*.15,y-h*.85);c.lineTo(x+w*.42,y-h*.5);c.lineTo(x+w*.15,y-h*.15);c.lineTo(x+w*.15,y-h*.38);c.lineTo(x-w*.38,y-h*.38);c.closePath();c.fill();});
+  if(M.k==='long')post(10.4,-10.4,5,(x,y)=>{const w=s*4.2,h=s*2.4;c.fillStyle='#fff8ee';c.strokeStyle='#222';c.lineWidth=2;c.beginPath();c.rect(x-w/2,y-h,w,h);c.fill();c.stroke();c.fillStyle='#222';c.textAlign='center';c.textBaseline='middle';c.font=font(h*.3);c.fillText('동서 28초',x,y-h*.68);c.fillText('남북 10초',x,y-h*.3);});
+  if(M.k==='basic')post(10.4,-10.4,5,(x,y)=>{const r=s*1.5;c.fillStyle='#fff';c.strokeStyle='#d33';c.lineWidth=Math.max(2,s*.3);c.beginPath();c.arc(x,y-r,r,0,7);c.fill();c.stroke();c.fillStyle='#222';c.textAlign='center';c.textBaseline='middle';c.font=font(r*.8);c.fillText('50',x,y-r);});}
+// 하늘: 새 떼, 열기구
+function tsSky(){const c=TS.ctx,W=TS.w,H=TS.h,t=TS.t;
+  {const per=26,k=(t%per)/per,x=-80+k*(W+160),y=H*.18+Math.sin(t*.3)*20;c.strokeStyle='rgba(60,40,60,.6)';c.lineWidth=1.6;c.lineCap='round';
+    for(let i=0;i<6;i++){const bx=x-Math.abs(i-2.5)*16,by=y+(i-2.5)*9,f=Math.sin(t*9+i)*4;c.beginPath();c.moveTo(bx-7,by-2+f);c.quadraticCurveTo(bx-3,by-4,bx,by);c.quadraticCurveTo(bx+3,by-4,bx+7,by-2+f);c.stroke();}}
+  {const per=70,k=(t%per)/per,x=W*1.05-k*W*1.2,y=H*.32+Math.sin(t*.4)*10,r=Math.max(14,TS.s*2.4);if(k>.02&&k<.98){c.fillStyle='rgba(60,30,60,.12)';c.beginPath();c.ellipse(x+r*2,y+r*9,r*.9,r*.3,0,0,7);c.fill();
+    const cols=['#ff6f91','#ffd35a','#7ec8ff','#6ff0a0'];for(let i=0;i<4;i++){c.fillStyle=cols[i];c.beginPath();c.ellipse(x+(i-1.5)*r*.42,y,r*.24,r*.98,0,0,7);c.fill();}
+    c.strokeStyle='rgba(80,50,70,.6)';c.lineWidth=1.2;c.beginPath();c.arc(x,y,r,0,7);c.stroke();c.beginPath();c.moveTo(x-r*.55,y+r*.8);c.lineTo(x-r*.25,y+r*1.5);c.moveTo(x+r*.55,y+r*.8);c.lineTo(x+r*.25,y+r*1.5);c.stroke();c.fillStyle='#a8744f';c.fillRect(x-r*.3,y+r*1.5,r*.6,r*.42);}}}
 function shade(hex,k){const n=parseInt(hex.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(k<0?v*(1+k):v+(255-v)*k)));return'#'+[n>>16,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,'0')).join('');}
 function tsResize(){const r=TTL.getBoundingClientRect();TS.w=r.width;TS.h=r.height;TS.dpr=Math.min(2,devicePixelRatio||1);TS.cv.width=Math.round(TS.w*TS.dpr);TS.cv.height=Math.round(TS.h*TS.dpr);
   TS.s=Math.max(TS.w/150,TS.h/100);
@@ -4101,7 +4161,25 @@ const GL_DOODLE=[
  [-50,-70,(g,u,t)=>{const w=Math.sin(t*5)*.12;gO(g);gE(g,0,0,.33,.5,'#3a2840',w);gE(g,.05,.08,.2,.36,'#fff8ee',w);gC(g,0,-.48,.2,'#3a2840');gP(g,[[.18,-.5],[.38,-.44],[.18,-.4]],'#ffb800');}],
  // 순록(북유럽)
  [66,24,(g)=>{gO(g);gE(g,0,0,.5,.3,'#c9a98a');gC(g,.55,-.15,.2,'#c9a98a');g.beginPath();g.moveTo(.5,-.3);g.lineTo(.4,-.75);g.moveTo(.42,-.55);g.lineTo(.22,-.65);g.moveTo(.65,-.3);g.lineTo(.8,-.75);g.moveTo(.75,-.55);g.lineTo(.95,-.6);g.moveTo(-.3,.28);g.lineTo(-.3,.62);g.moveTo(.25,.28);g.lineTo(.25,.62);g.stroke();gC(g,.75,-.12,.06,'#ff5a6e');}]];
-function glDoodles(){const g=GLX,t=performance.now()/1000,k=GL.R*.105;
+// 스티커(이모지 그림 + 흰 테두리 + 그림자): 아이들 그림 지도처럼. 기기에 컬러 이모지 글꼴이 없으면 위 손그림으로 대신
+const GL_STK=[[44,-68,'🗽'],[47,4,'🥐'],[25,16,'🐫'],[27.5,31.5,'🛕'],[-3,35,'🦒'],[-16,21,'🐘'],[-8,25,'🦁'],[32,104,'🐼'],[23,79,'🐯'],[62,95,'🐻'],
+  [-24,133,'🦘'],[-31,148,'🐨'],[-34,151.5,'🎶'],[56,-112,'🍁'],[70,-95,'🐻‍❄️'],[29,-109,'🌵'],[-17,-68,'🦙'],[-4,-63,'🦜'],[-50,-70,'🐧'],
+  [5,-140,'🐋'],[-27,-109,'🗿'],[24,-40,'🐬'],[-22,72,'🐢'],[66,22,'🦌'],[20,-157,'🌺'],[37,-120,'🌉']];
+const GLS={ok:null,cache:{}};
+function glEmojiOk(){if(GLS.ok!=null)return GLS.ok;try{const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d');x.font='20px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';x.textBaseline='middle';x.textAlign='center';x.fillText('🌵',12,13);
+  const d=x.getImageData(0,0,24,24).data;let col=0;for(let i=0;i<d.length;i+=4)if(d[i+3]>100&&(Math.abs(d[i]-d[i+1])>30||Math.abs(d[i+1]-d[i+2])>30))col++;GLS.ok=col>8;}catch(e){GLS.ok=false;}return GLS.ok;}
+function glSticker(e){if(GLS.cache[e])return GLS.cache[e];const N=96,P=10,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');
+  const g=document.createElement('canvas');g.width=g.height=N;const y=g.getContext('2d');y.font=`${N-2*P-14}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;y.textAlign='center';y.textBaseline='middle';y.fillText(e,N/2,N/2+4);
+  // 흰 테두리: 그림을 둘레로 여러 번 찍은 뒤 흰색으로 채움
+  for(let a=0;a<16;a++){const r=6;x.drawImage(g,Math.cos(a/16*Math.PI*2)*r,Math.sin(a/16*Math.PI*2)*r);}x.globalCompositeOperation='source-in';x.fillStyle='#fffaf0';x.fillRect(0,0,N,N);
+  // 테두리 바깥 얇은 자두색 선
+  const o=document.createElement('canvas');o.width=o.height=N;const z=o.getContext('2d');for(let a=0;a<16;a++){z.drawImage(c,Math.cos(a/16*Math.PI*2)*1.6,Math.sin(a/16*Math.PI*2)*1.6);}z.globalCompositeOperation='source-in';z.fillStyle='rgba(107,74,110,.55)';z.fillRect(0,0,N,N);
+  z.globalCompositeOperation='source-over';z.drawImage(c,0,0);z.drawImage(g,0,0);GLS.cache[e]=o;return o;}
+function glStickers(){const g=GLX,t=performance.now()/1000,k=GL.R*.19;
+  GL_STK.forEach(([la,lo,e],i)=>{const [x,y,z]=glProj(la,lo);if(z<.18)return;const s=k*(.6+.4*z),bob=Math.sin(t*2.2+i*1.7)*s*.06,im=glSticker(e);
+    g.save();g.globalAlpha=Math.min(1,(z-.18)*3);g.fillStyle='rgba(70,40,70,.2)';g.beginPath();g.ellipse(x+s*.08,y+s*.05,s*.36,s*.1,0,0,7);g.fill();
+    g.translate(x,y-s*.42+bob);g.rotate(Math.sin(t*1.3+i)*.06);g.drawImage(im,-s/2,-s/2,s,s);g.restore();});}
+function glDoodles(){if(glEmojiOk()){glStickers();return;}const g=GLX,t=performance.now()/1000,k=GL.R*.105;
   for(const [la,lo,f] of GL_DOODLE){const [x,y,z]=glProj(la,lo);if(z<.15)continue;const s=k*(.55+.45*z);g.save();g.globalAlpha=Math.min(1,(z-.15)*3);g.translate(x,y);g.scale(s,s);
     // 그림자
     g.fillStyle='rgba(70,40,70,.18)';g.beginPath();g.ellipse(.15,.85,.7,.18,0,0,7);g.fill();
