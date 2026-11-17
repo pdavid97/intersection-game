@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261117123842">
+<meta name="gl-build" content="20261117124823">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1118,7 +1118,7 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.36. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.37. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4709,7 +4709,7 @@ function cxBuild(osm,q){
   const arm={};for(const k of KEYS)arm[k]=as[k]?`${nm(k)} (${KO[k]}쪽)`:'(길 없음)';
   const lanesSrc=A.some(a=>a.br.some(b=>b.lin+b.lout>0))?'OpenStreetMap lanes 태그, 없으면 도로 등급 기본값':'도로 등급 기본값';
   const mainName=(as.N&&as.N.name)||(as.S&&as.S.name)||'큰 도로';
-  const def={custom:true,title:q.name||[...new Set(KEYS.map(nm).filter(Boolean))].slice(0,2).join(' x ')||'나만의 교차로',city:q.city||'',rot:-geoRot,lht:lht||undefined,
+  const def={custom:true,title:q.name||[...new Set(KEYS.map(nm).filter(Boolean))].slice(0,2).join(' x ')||'나만의 교차로',city:q.city||'',rot:-geoRot,lht:lht||undefined,cc:(q.cc||'').toLowerCase()||undefined,
     geoRef:{lat:+(lat0+C[1]/ky).toFixed(6),lon:+(lon0+C[0]/kx).toFixed(6),rot:geoRot,ox:0,oy:0},bend,
     desc:`${q.addr||'입력한 주소'} 근처 교차로로 만든 나만의 교차로입니다.`,
     srcNote:'도로와 차로는 OpenStreetMap에서 자동으로 읽었고, 교통량과 신호는 도로 등급으로 추정한 값입니다. 실제와 다를 수 있습니다.',
@@ -4959,22 +4959,66 @@ function dxRender(){if(!DX.svg)return;const on=dxActive();DX.svg.style.display=o
   if(DX.selPh!=null&&!DX.paint&&PH[DX.selPh]&&performance.now()-(DX.selAt||0)<7000)h+=dxPhaseOverlay(PH[DX.selPh]);else DX.selPh=null;
   // 신호등(누르면 신호 메뉴) + 대기 대수
   for(const a in G){const g=G[a],p=g.A[0],q=g.B[0],dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy)||1,u=[dx/l,dy/l];
-    const x=q[0]+u[0]*(g.wpx/g.n*.55+14),y=q[1]+u[1]*(g.wpx/g.n*.55+14),st=sigState(sim,a,cfg.appr[a].lanes.some(m=>m.includes('T'))?'T':'L');
-    const col={G:'#4fe08a',P:'#4fe08a',Y:'#ffc94a',R:'#ff5a5a'}[st]||'#ff5a5a',vert=Math.abs(u[0])>Math.abs(u[1]),w=vert?13:42,hh=vert?42:13,sel=DX.menu&&DX.menu.k==='s'&&DX.menu.a===a;
+    const hs=dxHeadStyle(),hd=dxHead(hs,a,Math.abs(u[0])>Math.abs(u[1])),off=g.wpx/g.n*.55+14+hd.ext,x=q[0]+u[0]*off,y=q[1]+u[1]*off,vert=hd.vert,sel=DX.menu&&DX.menu.k==='s'&&DX.menu.a===a;
     let qn=0;sim.net.inL[a].forEach((sg,i)=>{qn+=sim.pending[a][i].length;for(const v of sg.vehicles)if(v.v<2)qn++;});
-    // 4구 신호등(적, 황, 좌회전 화살표, 녹): 좌회전 화살표는 보호 좌회전이면 초록, 비보호면 초록 테두리
-    const sl=sigState(sim,a,'L'),hasL=cfg.appr[a].lanes.some(m=>/[LU]/.test(m));
-    const lamps=['R','Y','L','G'].map((k,j)=>{const o=(j-1.5)*9.5,cx=x+(vert?0:o),cy=y+(vert?o:0);
-      if(k==='L'){if(!hasL)return`<circle cx="${cx}" cy="${cy}" r="3.4" fill="#45404c"/>`;const on=sl==='G',pm=sl==='P';return`<circle cx="${cx}" cy="${cy}" r="3.6" fill="${on?'#4fe08a':'#45404c'}" stroke="${pm?'#4fe08a':'none'}" stroke-width="1.2"/><text x="${cx}" y="${cy+.4}" text-anchor="middle" dominant-baseline="middle" font-size="6" font-weight="900" fill="${on?'#123':'#cfc6d8'}">${MX<0?'→':'←'}</text>`;}
-      const on=(k==='G'&&(st==='G'||st==='P'))||st===k;return`<circle cx="${cx}" cy="${cy}" r="3.4" fill="${on?col:'#45404c'}"/>`;}).join('');
-    h+=`<g class="dxs" data-a="${a}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="22" fill="#000" fill-opacity=".001"/>${sel?`<circle cx="${x}" cy="${y}" r="20" fill="none" stroke="#ffd35a" stroke-width="3"/>`:''}<rect x="${x-w/2}" y="${y-hh/2}" width="${w}" height="${hh}" rx="5" fill="#232027" stroke="#fff" stroke-width="1.5"/>${lamps}${!cfg.appr[a].perm||!dxLtOn(a)?'':''}</g>`;
-    if(qn>0)h+=`<text x="${x}" y="${y+(vert?26:-14)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" stroke="#271d31" stroke-width="3" paint-order="stroke" pointer-events="none">대기 ${qn}</text>`;}
+    h+=`<g class="dxs" data-a="${a}" data-hs="${hs}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="22" fill="#000" fill-opacity=".001"/>${sel?`<circle cx="${x}" cy="${y}" r="20" fill="none" stroke="#ffd35a" stroke-width="3"/>`:''}<g transform="translate(${x} ${y})">${hd.svg}</g></g>`;
+    if(qn>0)h+=`<text x="${x}" y="${y+(vert?hd.h/2+15:-hd.h/2-6)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" stroke="#271d31" stroke-width="3" paint-order="stroke" pointer-events="none">대기 ${qn}</text>`;}
   // 차로 바꾸는 자리(정지선 뒤 점선 네모)를 처음엔 반짝 알려 줌
   if(unlocked('lanes')&&!DX.paint&&(DX.tick++%20)<10&&!store.get('dx-lane-seen'))for(const a in G){const g=G[a];for(const P of [g.A,g.B]){const m=dxAt(P,g.sc*8);h+=`<circle class="dxlane" cx="${m[0]}" cy="${m[1]}" r="${Math.max(8,g.sc*4)}" fill="none" stroke="#ffd35a" stroke-width="2" stroke-dasharray="3 3" pointer-events="none"/>`;}}
   // 교차로 가운데: 현시 그리기 들어가는 곳
 
   if(DX.paint)h+=dxPaintSVG();
   s.innerHTML=h;}
+// ----- 나라별 신호등 모양(실제와 비슷하게) -----
+// kr 한국: 가로 4구(적, 황, 녹색 좌회전 화살표, 녹). 비보호면 화살표 등은 꺼져 있고 녹색 원에서 회전
+// jp 일본: 가로 3구(왼쪽부터 청(청록), 황, 적) + 아래 화살표 등(우회전 등은 적색 등 아래). 녹색 화살표가 켜지면 적색이어도 그 방향으로 진행
+// uk 영국: 세로 3구(적, 황, 녹) + 흰 테두리 배면판. 녹색 직전 적색과 황색이 함께 켜짐. 우회전 보호 현시는 녹색 옆 녹색 보조 화살표(filter arrow)
+// ca 캐나다(토론토): 세로 3구 + 아래 좌회전 화살표 등(보호 좌회전은 녹색 화살표, 끝나면 황색 화살표). 그 뒤 녹색 원이면 틈을 보고 좌회전
+// tr 튀르키예: 세로 3구, 녹색 직전 적색과 황색이 함께 켜짐 + 녹색 옆 녹색 보조 화살표
+const HS_CC={kr:'kr',jp:'jp',gb:'uk',ie:'uk',ca:'ca',us:'ca',tr:'tr'};
+function dxHeadStyle(){const r=typeof curReal==='function'&&curReal();if(!r)return'kr';
+  const by={gangnam:'kr',tokyo:'jp',london:'uk',toronto:'ca',edirnekapi:'tr'}[r.id];if(by)return by;
+  if(r.cc&&HS_CC[r.cc])return HS_CC[r.cc];return r.lht?'uk':'kr';}
+// 다음 녹색: 지금이 전적색(현시 사이)이고 다음 현시가 이 접근로에 녹색을 주면 true(영국, 튀르키예의 적색+황색)
+function dxPreGreen(a){const cur=sim.curIv,c=sim.cfg;if(!cur||cur.type!=='R')return false;const P=c.phases;for(let k=1;k<=P.length;k++){const ph=P[(cur.i+k)%P.length];if(!ph||ph.g<=0)continue;
+  return!!(phaseGives(c,ph,a,'T')||phaseGives(c,ph,a,'L'));}return false;}
+// 이 접근로에 회전 보호 현시가 있는지(화살표 등을 달지)
+function dxHasProt(a){return cfg.phases.some(ph=>ph.g>0&&ph.m.includes(a+'L'));}
+function dxHead(hs,a,lateralX){const OFF='#3c3842',C={R:'#ff4b4b',Y:'#ffb627',G:'#3ee07f',JG:'#19d3b5'};
+  const mainMv=cfg.appr[a].lanes.some(m=>m.includes('T'))?'T':'L',st=sigState(sim,a,mainMv),sl=sigState(sim,a,'L'),cur=sim.curIv;
+  const protNow=cur&&cur.type!=='R'&&phaseGives(sim.cfg,cur.p,a,'L')==='G';   // 지금 회전이 보호(화살표)로 나가는지
+  const hasL=cfg.appr[a].lanes.some(m=>/[LU]/.test(m)),prot=dxHasProt(a),pre=dxPreGreen(a);
+  const dirX=MX<0?1:-1;   // 대향 차로를 가로지르는 회전 방향(화면 기준): 우측 통행이면 왼쪽, 좌측 통행이면 오른쪽
+  const arrow=(cx,cy,r,col,ang)=>{const k=r*.62,ca=Math.cos(ang),sa=Math.sin(ang),P=(x,y)=>`${(cx+x*ca-y*sa).toFixed(2)} ${(cy+x*sa+y*ca).toFixed(2)}`;
+    return`<path d="M${P(-k,0)}L${P(k*.55,0)}M${P(k*.05,-k*.55)}L${P(k*.6,0)}L${P(k*.05,k*.55)}" fill="none" stroke="${col}" stroke-width="${(r*.36).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;};
+  const lamp=(cx,cy,r,on,col)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${on?col:OFF}"${on?` style="filter:drop-shadow(0 0 2px ${col})"`:''}/>`;
+  const arrowLamp=(cx,cy,r,state)=>{const on=state==='G'||state==='Y',col=state==='Y'?C.Y:C.G;return`<circle cx="${cx}" cy="${cy}" r="${r}" fill="#1b191f"/>`+arrow(cx,cy,r,on?col:'#4a4552',dirX>0?0:Math.PI)+(on?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-opacity=".35"/>`:'');};
+  const ball=(k)=>k==='R'?st==='R'||pre&&false:k==='Y'?st==='Y':(st==='G'||st==='P');
+  const turnSt=protNow?(cur.type==='Y'?'Y':'G'):null;   // 화살표 등: 보호 회전 중 녹색, 끝날 때 황색
+  let svg='',w,hgt,vert;
+  if(hs==='kr'){vert=lateralX;const s=9.5;w=vert?13:42;hgt=vert?42:13;const lit=(k)=>k==='L'?null:ball(k);
+    svg+=`<rect x="${-w/2}" y="${-hgt/2}" width="${w}" height="${hgt}" rx="4" fill="#232027" stroke="#fff" stroke-width="1.4"/>`;
+    ['R','Y','L','G'].forEach((k,j)=>{const o=(j-1.5)*s,cx=vert?0:o,cy=vert?o:0;
+      if(k==='L'){if(!hasL){svg+=lamp(cx,cy,3.4,false);return;}svg+=arrowLamp(cx,cy,3.6,sl==='G'&&protNow?(cur.type==='Y'?'Y':'G'):null);return;}
+      svg+=lamp(cx,cy,3.4,lit(k),C[k]);});
+    return{svg,vert,h:hgt,ext:0};}
+  if(hs==='jp'){// 늘 가로(일본 신호기는 대부분 가로형). 도로가 세로면 길가로 조금 더 띄움
+    w=34;const rows=prot&&hasL?2:1;hgt=rows===2?24:13;vert=false;const s=10.5;
+    svg+=`<rect x="${-w/2}" y="${-hgt/2}" width="${w}" height="${hgt}" rx="3" fill="#4a4f57" stroke="#fff" stroke-width="1.3"/>`;
+    const y0=rows===2?-5.5:0,order=MX<0?['G','Y','R']:['R','Y','G'];   // 일본: 왼쪽 청, 가운데 황, 오른쪽 적(적색이 도로 중앙 쪽)
+    order.forEach((k,j)=>{const cx=(j-1)*s;svg+=`<rect x="${cx-4.6}" y="${y0-4.6}" width="9.2" height="9.2" rx="2" fill="#2b2a2f"/>`+lamp(cx,y0,3.6,ball(k),k==='G'?C.JG:C[k]);});
+    if(rows===2){const cx=(order.indexOf('R')-1)*s;svg+=`<rect x="${-w/2+2}" y="${y0+6}" width="${w-4}" height="10" rx="2" fill="#2b2a2f"/>`+arrowLamp(cx,y0+11,3.6,turnSt==='G'?'G':null);}
+    return{svg,vert,h:hgt,ext:Math.max(0,(lateralX?w:hgt)/2-6.5)};}
+  // 세로형(uk, ca, tr)
+  vert=true;const s=9.5,side=(hs==='uk'||hs==='tr')&&prot&&hasL,below=hs==='ca'&&prot&&hasL;
+  w=13;hgt=below?42:32;const bw=side?w+11:w;
+  if(hs==='uk')svg+=`<rect x="${-w/2-3}" y="${-hgt/2-3}" width="${w+6}" height="${hgt+6}" rx="2" fill="#111" stroke="#fff" stroke-width="1.6"/>`;
+  svg+=`<rect x="${-w/2}" y="${-hgt/2}" width="${w}" height="${hgt}" rx="${hs==='ca'?3:4}" fill="${hs==='ca'?'#2a2a2a':'#232027'}" stroke="${hs==='uk'?'#232027':'#fff'}" stroke-width="1.3"/>`;
+  const y0=-hgt/2+6.5;
+  [['R',st==='R'],['Y',st==='Y'||(pre&&(hs==='uk'||hs==='tr'))],['G',st==='G'||st==='P']].forEach(([k,on],j)=>{svg+=lamp(0,y0+j*s,3.6,on,C[k]);});
+  if(below)svg+=arrowLamp(0,y0+3*s,3.6,turnSt);
+  if(side){const sx=dirX*(w/2+5.5),sy=y0+2*s;svg+=`<rect x="${sx-5}" y="${sy-5}" width="10" height="10" rx="2" fill="#111" stroke="${hs==='uk'?'#fff':'#232027'}" stroke-width="1"/>`+arrowLamp(sx,sy,3.5,turnSt==='G'?'G':null);}
+  return{svg,vert,h:hgt,ext:Math.max(0,(lateralX?bw:hgt)/2-6.5)};}
 // ----- 띠 손잡이 끌기 -----
 function dxDown(e){const t=e.target.closest('[class]');if(!t)return;const cl=t.getAttribute('class');
   if(cl==='dxh'){e.preventDefault();e.stopPropagation();dxClose();DX.drag={a:t.dataset.a,p:+t.dataset.p,s0:+t.dataset.s,C:(DX.bandC||{})[t.dataset.a+':'+t.dataset.p]};DX.svg.setPointerCapture&&DX.svg.setPointerCapture(e.pointerId);return;}
