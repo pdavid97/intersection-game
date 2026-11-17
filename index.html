@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261117130144">
+<meta name="gl-build" content="20261117132119">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1180,12 +1180,73 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 .hmarm{animation:hmwave 2.4s ease-in-out infinite;transform-origin:-17px -2px}@keyframes hmwave{0%,60%,100%{rotate:0deg}70%{rotate:-18deg}80%{rotate:6deg}90%{rotate:-14deg}}
 @media (max-width:720px){.hmart{height:180px}.hmsvg{height:178px}.hmbubble{font-size:14.5px}.hmhero{padding:0 8px}}
 @media (prefers-reduced-motion:reduce){.hmc *,.hmbg *,.hmguide{animation:none!important}}
+/* ----- 모드 월드(시안 B): 섬, 표지판, 깜빡이 걷기 ----- */
+.journey[data-view="modes"] .jscroll{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.journey[data-view="modes"] #vmodes{flex:1;position:relative;max-width:none;width:100%;padding:0;min-height:0}
+.hwstage{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;z-index:1}
+.hwstage::-webkit-scrollbar{display:none}
+.hwworld{position:relative;margin-top:4px}
+.hwsvg{position:absolute;top:0;overflow:visible}
+.hwsvg polygon{stroke:#4a3550;stroke-width:1.3;stroke-linejoin:round}
+.hwsvg .hwi{cursor:pointer;transition:filter .15s}
+.hwsvg .hwi:hover{filter:brightness(1.06) saturate(1.1)}
+.hwsvg .hwi[data-m="hub"]{cursor:default}
+.hwlayer{position:absolute;inset:0;pointer-events:none}
+.hwsign,.hwsign *{color:#4a3550}
+.hwsign{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;padding:0;margin:0;background:none!important;border:0!important;cursor:pointer;
+  transform:translate(-50%,-100%) scale(var(--sc,1));transform-origin:50% 100%;font-family:"Jua","IBM Plex Sans KR",sans-serif;color:#4a3550;z-index:2}
+.hwboard{display:flex;flex-direction:column;min-width:150px;max-width:190px;background:#fffaf0;border:3px solid #4a3550;border-radius:14px;box-shadow:0 4px 0 #4a3550;overflow:hidden;transition:transform .15s;rotate:-1.5deg}
+.hs-real .hwboard,.hs-my .hwboard,.hs-lab .hwboard{rotate:1.5deg}
+.hwsign:hover .hwboard,.hwsign:focus-visible .hwboard{transform:translateY(-3px)}
+.hwsign:focus-visible{outline:none}.hwsign:focus-visible .hwboard{box-shadow:0 4px 0 #4a3550,0 0 0 4px #ffd35a}
+.hwtop{display:flex;align-items:center;gap:6px;padding:5px 8px 5px 6px;background:var(--c);border-bottom:2.5px solid #4a3550}
+.hwtop b{font-weight:400;font-size:16px;white-space:nowrap}
+.hwic{flex:none;width:24px;height:24px;border-radius:50%;background:#fffaf0;border:2px solid #4a3550;display:grid;place-items:center}
+.hwic svg{width:17px;height:17px}
+.hwtop em,.hwph em{margin-left:auto;font-style:normal;font-size:11px;padding:1px 7px;border-radius:99px;background:#fffaf0;border:2px solid #4a3550;white-space:nowrap}
+.hwtop em.live,.hwph em.live{background:#ff5a6e;color:#fff!important}
+.hwtop em.soon,.hwph em.soon{background:#ffe7a3}
+.hwwhat{padding:5px 9px 7px;font-size:12.5px;line-height:1.3;text-align:left;color:#5a4560;font-family:"IBM Plex Sans KR",sans-serif;font-weight:500}
+.hwpost{width:7px;height:20px;background:#d79a68;border:2px solid #4a3550;border-top:0;border-radius:0 0 3px 3px}
+.hwsign.below{flex-direction:column-reverse;transform:translate(-50%,0) scale(var(--sc,1));transform-origin:50% 0}
+.hwsign.below .hwpost{height:26px;border-top:2px solid #4a3550;border-bottom:0;border-radius:3px 3px 0 0}
+.hwsign.below .hwboard{rotate:0deg}
+.hwsign.soon .hwboard{border-style:dashed}
+.hwsign.soon .hwtop{background:repeating-linear-gradient(-45deg,#ffd35a 0 8px,#ffe9a8 8px 16px)}
+.hwsign.sel .hwboard{box-shadow:0 4px 0 #4a3550,0 0 0 4px rgba(255,211,90,.85)}
+.hwstar{position:absolute;top:-30px;left:50%;translate:-50% 0;padding:3px 10px;border-radius:99px;background:#ff6f91;color:#fff;font-size:13px;border:2.5px solid #4a3550;white-space:nowrap;animation:hmhop 1s ease-in-out infinite}
+.hwmas{position:absolute;z-index:3;pointer-events:none;translate:-50% -92%}
+.hwmas .hmmas{display:block;transition:transform .2s}
+.hwmas.flip .hmmas{transform:scaleX(-1)}
+.hwmas.walking .hmmas{animation:hwstep .32s ease-in-out infinite}
+@keyframes hwstep{0%,100%{translate:0 0;rotate:-4deg}50%{translate:0 -5px;rotate:4deg}}
+.hwmas.hop .hmmas{animation:hwhop .5s ease-out}
+@keyframes hwhop{30%{translate:0 -14px}60%{translate:0 0}75%{translate:0 -5px}}
+.hwsay{position:absolute;bottom:100%;left:50%;translate:-50% -2px;white-space:nowrap;padding:5px 11px;border-radius:14px;background:#fffaf0;border:2.5px solid #4a3550;box-shadow:0 3px 0 #4a3550;font-size:13.5px;font-family:"Jua",sans-serif}
+.hwsay::after{content:"";position:absolute;left:50%;bottom:-8px;width:10px;height:10px;background:#fffaf0;border-right:2.5px solid #4a3550;border-bottom:2.5px solid #4a3550;transform:translateX(-50%) rotate(45deg)}
+.hwpanel{position:absolute;left:20px;bottom:20px;z-index:4;width:min(400px,calc(100% - 40px));box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:14px 16px 16px;background:#fffaf0;border:3px solid #4a3550;border-radius:22px;box-shadow:0 5px 0 #4a3550;color:#4a3550;font-family:"Jua","IBM Plex Sans KR",sans-serif;animation:hwin .25s ease-out}
+@keyframes hwin{from{translate:0 12px;opacity:.4}}
+.hwpanel.soon{border-style:dashed}
+.hwph{display:flex;align-items:center;gap:8px}
+.hwph .hwic{background:var(--c,#fffaf0)}
+.hwpt{font-size:21px}.hwpp{font-size:13px;color:#8a7392}
+.hwpd{margin:0;font-size:14.5px;line-height:1.45;color:#5a4560;font-family:"IBM Plex Sans KR",sans-serif;font-weight:500}
+.hwpd b{color:#e0557f;font-family:"Jua",sans-serif;font-weight:400}
+.hwpanel.walking .hwpd{color:#8a7392}
+.hwpanel .hmstars{font-size:13px}.hwpanel .hmstars span{color:#5a4560}.hwpanel .hmstars span{white-space:nowrap}
+.hmact button:disabled{opacity:.55;box-shadow:none!important}
+@media (min-width:1000px){.journey[data-view="modes"] .hwstage{left:420px;overflow:visible}.journey[data-view="modes"] .hwpanel{top:50%;bottom:auto;translate:0 -50%;width:380px;animation:none}}
+@media (max-width:720px){
+  .hwstage{bottom:220px}
+  .hwpanel{left:0;right:0;bottom:0;width:auto;border-radius:24px 24px 0 0;border-bottom:0;box-shadow:0 -4px 0 rgba(74,53,80,.12);min-height:220px;padding:14px 16px max(16px,env(safe-area-inset-bottom))}
+  .hwboard{min-width:118px;max-width:150px}.hwwhat{font-size:11.5px}.hwtop b{font-size:14px}
+}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.38. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.39. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4642,6 +4703,178 @@ hubModes=function(){const r=JS.rec,n=LEVELS.filter(l=>jStars(l.id)>=1).length,O=
   `</div><button type="button" class="hmlab" data-act="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" fill="#e8dcff" stroke="#4a3550" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 15h9" stroke="#4a3550" stroke-width="2"/><circle cx="10" cy="18" r="1" fill="#ff8fb1"/><circle cx="13.5" cy="17" r="1.2" fill="#8fd3ff"/></svg><span><b>실험실</b><small>레벨 제약 없이 모든 도구로 자유롭게 실험 (별과 랭킹 없음)</small></span></button>`;};
 // 깜빡이 눈 깜빡임과 등 순환
 setInterval(()=>{if(JR.hidden||JS.view!=='modes')return;for(const e of JR.querySelectorAll('.hmeye')){e.classList.add('blink');setTimeout(()=>e.classList.remove('blink'),160);}},3800);
+// ---------- 게임 모드 월드(시안 B): 가운데 교차로 섬 + 네 갈래 길 끝의 모드 섬 ----------
+// 아이소메트릭 SVG를 화면에서 바로 만듦(hwBuild). 좌표: 월드 격자 (x, y, z), 화면 = ((x-y)*0.866k, (x+y)*0.5k - z*k)
+// 서쪽 = 튜토리얼(신호 학교), 북쪽 = 실제 교차로(세계 도시), 동쪽 = 일일 챌린지(공연장), 남쪽 = 나만의 교차로(우리 동네)
+// 징검다리 너머: PvP 경기장(공사 중), 실험실
+const HW=(()=>{
+let K=30,OX=0,OY=0;const setO=(x,y)=>{OX=x;OY=y;};
+const P=(x,y,z)=>[((x+OX)-(y+OY))*.866*K,((x+OX)+(y+OY))*.5*K-z*K];
+const pt=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+const C={cream:['#fff6e4','#f3d9b5','#e2bf93'],pink:['#ffd3e0','#f4a9c0','#de88a6'],mint:['#cff3df','#9fdcbc','#7cc39f'],sky:['#d6e6ff','#a9c4f2','#8aa6dc'],
+ lav:['#e8dcff','#c6b2f2','#a790dc'],peach:['#ffe0c7','#f6bb92','#e09a6d'],road:['#9a96ad','#7a7590','#68637d'],grass:['#c6edb0','#97d17f','#7bb865'],
+ night:['#5b4f8a','#43386e','#352b5b'],gold:['#ffe7a3','#f6c95a','#e0ab33'],white:['#ffffff','#e8e1f0','#d6cde3'],dark:['#4a3550','#3a2840','#2c1e31'],
+ coral:['#ffb4a8','#f08a7d','#d8705f'],teal:['#bfeee8','#86d6cc','#62bdb2'],plaza:['#fdeedd','#efd3b4','#ddb893'],stone:['#efe6f2','#d4c6dc','#bba9c6']};
+const S='stroke="#4a3550" stroke-width="1.3" stroke-linejoin="round"';
+function box(x,y,z,w,d,h,c,noS){const t=[P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)],l=[P(x,y+d,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x,y+d,z+h)],r=[P(x+w,y,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x+w,y,z+h)];
+ const s=noS?'':S;return`<polygon points="${pt(l)}" fill="${c[1]}" ${s}/><polygon points="${pt(r)}" fill="${c[2]}" ${s}/><polygon points="${pt(t)}" fill="${c[0]}" ${s}/>`;}
+function flat(x,y,z,w,d,col,op){return`<polygon points="${pt([P(x,y,z),P(x+w,y,z),P(x+w,y+d,z),P(x,y+d,z)])}" fill="${col}"${op?` opacity="${op}"`:''}/>`;}
+function gable(x,y,z,w,d,h,c){const a=P(x,y+d/2,z+h),b=P(x+w,y+d/2,z+h);return`<polygon points="${pt([P(x,y,z),P(x+w,y,z),b,a])}" fill="${c[0]}" ${S}/><polygon points="${pt([P(x,y+d,z),P(x+w,y+d,z),b,a])}" fill="${c[1]}" ${S}/><polygon points="${pt([P(x+w,y,z),P(x+w,y+d,z),b])}" fill="${c[2]}" ${S}/>`;}
+function tree(x,y,s){s=s||1;const b=P(x,y,0);return box(x-.07,y-.07,0,.14,.14,.45*s,C.peach)+`<circle cx="${b[0].toFixed(1)}" cy="${(b[1]-K*.72*s).toFixed(1)}" r="${(K*.38*s).toFixed(1)}" fill="#8fd18a" ${S}/><circle cx="${(b[0]-K*.1).toFixed(1)}" cy="${(b[1]-K*.82*s).toFixed(1)}" r="${(K*.16*s).toFixed(1)}" fill="#b9e8a9"/>`;}
+function signal(x,y,h,lit){const b=P(x,y,h);return box(x-.05,y-.05,0,.1,.1,h,C.dark)+`<g transform="translate(${b[0].toFixed(1)} ${(b[1]-K*.15).toFixed(1)})"><rect x="${-K*.22}" y="${-K*.8}" width="${K*.44}" height="${K*1.02}" rx="${K*.15}" fill="#4a3550"/>`+['#ff6f7f','#ffd35a','#64e3a0'].map((c,i)=>`<circle cx="0" cy="${(-K*.57+i*K*.29).toFixed(1)}" r="${(K*.1).toFixed(1)}" fill="${i===lit?c:'#6a5a7a'}"/>`).join('')+`</g>`;}
+function car(x,y,dir,col){// dir 'x' or 'y'
+ const w=dir==='x'?.9:.5,d=dir==='x'?.5:.9;return box(x,y,.05,w,d,.32,col)+box(x+(dir==='x'?.2:.08),y+(dir==='x'?.08:.2),.37,dir==='x'?.45:.34,dir==='x'?.34:.45,.2,C.white);}
+function mascot(cx,cy,s){s=s||1;return`<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) scale(${s})"><ellipse cx="0" cy="32" rx="16" ry="3.5" fill="#4a3550" opacity=".18"/><rect x="-4" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><rect x="1" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><path d="M-17,-2 q-9,-3 -10,-12" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M17,-2 q8,4 9,11" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="-18" y="-43" width="36" height="62" rx="16" fill="#5a4a7a" stroke="#4a3550" stroke-width="3"/><rect x="-5" y="-49" width="10" height="7" rx="2" fill="#4a3550"/><circle cx="0" cy="-27" r="8" fill="#ff7a8a"/><circle cx="0" cy="-3" r="11" fill="#ffd35a"/><circle cx="0" cy="12" r="5.5" fill="#64e3a0"/><ellipse cx="-4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><ellipse cx="4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><circle cx="-7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><circle cx="7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><path d="M-2.5,1 q2.5,2.6 5,0" stroke="#3a2840" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>`;}
+function rival(cx,cy,s){// PvP 상대: 파란 깜빡이(라이벌)
+ return mascot(cx,cy,s).replace('#5a4a7a','#3f6fb0').replace('#ffd35a','#9fe0ff').replace('#ff7a8a','#ffd35a');}
+// 떠 있는 섬 받침(층층이 좁아짐)
+function island(x,y,w,d,top){const q=Math.max(1,Math.min(1.7,Math.min(w,d)/4)),T=(f,z,h)=>box(x+w*f,y+d*f,z*q,w*(1-2*f),d*(1-2*f),h*q,C.peach);
+ return T(.4,-3.3,.7)+T(.27,-2.6,.9)+T(.12,-1.7,1.1)+box(x,y,-.6,w,d,.6,top);}
+
+const hwG=(m,s)=>`<g class="hwi" data-m="${m}">${s}</g>`;
+function build(){
+const E=2.6;const parts=[];
+function part(dx,dy,isl,body){setO(dx,dy);const L=[];const add=(k,s)=>L.push({k,s});let pre=isl?isl():'';body(add);L.sort((a,b)=>a.k-b.k);const out=pre+L.map(x=>x.s).join('');setO(0,0);return out;}
+const roadStrip=(x,y,w,d)=>box(x,y,-.35,w,d,.35,C.road)+flat(x,y,.01,w,d,'#9a96ad');
+// 허브 섬: 가운데 교차로(4..10)
+const hub=part(0,0,()=>island(3,3,8,8,C.grass)+flat(6,3,.012,2,8,'#9a96ad')+flat(3,6,.012,8,2,'#9a96ad')+[0,1,2,3,4].map(i=>{const o=6.15+i*.36;return flat(o,5.2,.02,.2,.7,'#fff')+flat(o,8.1,.02,.2,.7,'#fff')+flat(5.2,o,.02,.7,.2,'#fff')+flat(8.1,o,.02,.7,.2,'#fff');}).join(''),add=>{
+add(11.3,signal(5.7,5.7,1.6,2));add(14.3,signal(8.3,5.7,1.6,0));add(14.4,signal(5.7,8.3,1.6,0));add(16.6,signal(8.3,8.3,1.6,2));
+add(7.5,car(6.2,2.2,'y',C.coral));add(9,car(7.2,10.4,'y',C.sky));add(9.5,car(2.6,7.1,'x',C.gold));add(16.5,car(10.6,6.2,'x',C.mint));add(11,car(6.3,4.4,'y',C.lav));
+});
+// 다리(도로): 허브에서 사방으로
+let bridges='';
+bridges+=roadStrip(6,0,2,3)+roadStrip(6,11,2,3)+roadStrip(0,6,3,2)+roadStrip(11,6,3,2);
+for(const t of [.5,1.6])bridges+=flat(6.96,t,.02,.08,.6,'#fff')+flat(6.96,t+11,.02,.08,.6,'#fff')+flat(t,6.96,.02,.6,.08,'#fff')+flat(t+11,6.96,.02,.6,.08,'#fff');
+// 징검다리(PvP, 실험실로 가는 떠 있는 돌)
+let stones='';for(let i=0;i<3;i++)stones+=box(11.4+i*1.05,2.2-i*.9,-.2-i*.05,.7,.7,.25,C.stone);
+let stones2='';for(let i=1;i>=0;i--)stones2+=box(1.9-i*1.05,1.9-i*1.05,-.2+i*.1,.7,.7,.25,C.stone);
+const tutI=hwG('tut',part(-6,4,()=>island(0,0,6,6,C.sky),add=>{// ----- 1 튜토리얼(북서): 신호 학교 -----
+add(2,box(1,1,0,3.2,2.2,2,C.cream)+box(1,1,2,3.2,2.2,.3,C.pink)+box(2,1.4,2.3,1.2,1.2,.8,C.cream)+gable(2,1.4,3.1,1.2,1.2,.6,C.pink));
+add(3.5,box(1.4,3.2,.6,.5,.02,.6,C.sky)+box(2.4,3.2,.6,.5,.02,.6,C.sky)+box(3.3,3.2,0,.6,.02,1,C.coral));
+add(4,signal(4.6,4.2,1.8,2)+tree(1,4.6,1)+tree(4.8,1.2,.9));
+// 운동장 작은 연습 교차로
+add(3,flat(1,4.2,.02,2.6,.5,'#b8b4c8')+flat(2.05,3.6,.02,.5,1.6,'#b8b4c8'));
+}));
+const realI=hwG('real',part(-4,-6,()=>island(8,0,6,6,C.mint),add=>{// ----- 2 실제 교차로(북동): 도시와 지구본 -----
+add(9,box(9,1,0,1.6,1.6,4.2,C.sky));add(10.5,box(11.6,.8,0,1.6,1.6,3,C.pink));add(12.5,box(9.2,3.4,0,1.5,1.5,2.2,C.cream));
+add(15,box(12,3.6,0,.8,.8,.6,C.white));
+{const g=P(12.4,4,1.25),k=30;add(15.5,`<g transform="translate(${g[0].toFixed(1)} ${g[1].toFixed(1)})"><circle r="${k*.62}" fill="#a9dcf5" stroke="#4a3550" stroke-width="2.2"/><path d="M${-k*.45},${-k*.12} q${k*.2},${-k*.3} ${k*.42},${-k*.12} q${k*.1},${k*.25} ${-k*.12},${k*.36} z M${k*.08},${k*.1} q${k*.3},${-k*.08} ${k*.38},${k*.18} q${-k*.12},${k*.25} ${-k*.36},${k*.1} z" fill="#9be08f"/></g>`);}
+for(let i=0;i<5;i++)add(9.1,box(9.15,2.62,.5+i*.7,.4,.01,.35,i%2?C.gold:C.white));
+{const e=P(13.2,5.4,1.3);add(18.6,box(13.15,5.35,0,.1,.1,1.3,C.dark)+`<g transform="translate(${e[0].toFixed(1)} ${(e[1]-4).toFixed(1)})"><rect x="-25" y="-14" width="50" height="19" rx="4" fill="#1f8a50" stroke="#fff" stroke-width="2"/><text x="0" y="0" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Jua,sans-serif">EXIT 5</text></g>`);}
+add(14,tree(13.3,1.8,1));
+}));
+const myI=hwG('my',part(4,6,()=>island(0,8,6,6,C.grass),add=>{// ----- 4 나만의 교차로(남서): 우리 동네 집들 -----
+for(const [x,y,c,r] of [[1,9,C.cream,C.peach],[3.4,9.2,C.pink,C.coral],[1.2,11.6,C.sky,C.peach]]){add(x+y+1,box(x,y,0,1.7,1.5,1,c)+gable(x,y,1,1.7,1.5,.8,r)+box(x+.6,y+1.5,0,.45,.02,.6,C.coral));}
+add(17,tree(4,12.6,1.1)+tree(5.2,10.6,.8));
+for(let i=0;i<6;i++)add(13.8,box(.6+i*.6,13.4,0,.08,.08,.4,C.white));
+{const p=P(4.2,11.6,2.6),k=30;add(16.5,`<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><path d="M0,${k*.9} C${-k*.9},${-k*.1} ${-k*.6},${-k*1.1} 0,${-k*1.1} C${k*.6},${-k*1.1} ${k*.9},${-k*.1} 0,${k*.9}Z" fill="#ff6f6f" stroke="#4a3550" stroke-width="2.2"/><circle cy="${-k*.45}" r="${k*.25}" fill="#fff"/></g>`);}
+}));
+const dailyI=hwG('daily',part(6,-4,()=>island(8,8,6,6,C.lav),add=>{// ----- 3 일일 챌린지(남동): 공연장 -----
+add(19,box(9,9,0,4,1.6,.35,C.night)+box(9,9,.35,.4,1.6,2.2,C.lav)+box(12.6,9,.35,.4,1.6,2.2,C.lav)+box(9,9,2.55,4,1.6,.4,C.pink));
+{const b=P(11,9.8,1.6);add(20,`<g transform="translate(${b[0].toFixed(1)} ${b[1].toFixed(1)})"><rect x="-34" y="-14" width="68" height="26" rx="5" fill="#2a1f36" stroke="#fff" stroke-width="1.8"/><circle cx="-21" cy="-1" r="4" fill="#ff5a6e"/><text x="6" y="4" text-anchor="middle" font-size="12" font-weight="900" fill="#ffd35a" font-family="Jua,sans-serif">LIVE</text></g>`);}
+for(let i=0;i<8;i++){const p=P(9.2+i*.5,11.2+Math.sin(i)*.2,.4);add(22,`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="${['#ffd35a','#ff8fb1','#8fd3ff'][i%3]}" stroke="#4a3550" stroke-width="1"/>`);}
+for(const [x,y,c] of [[9.6,12.3,'#ff8fb1'],[10.6,12.8,'#8fd3ff'],[11.7,12.4,'#ffd35a'],[12.6,12.9,'#9be08f'],[10.1,13.3,'#c6b2f2']]){const p=P(x,y,0);add(x+y,`<circle cx="${p[0].toFixed(1)}" cy="${(p[1]-12).toFixed(1)}" r="5" fill="#ffd8b5" stroke="#4a3550" stroke-width="1"/><rect x="${(p[0]-5).toFixed(1)}" y="${(p[1]-7).toFixed(1)}" width="10" height="9" rx="3.5" fill="${c}" stroke="#4a3550" stroke-width="1"/>`);}
+}));
+const pvpI=hwG('pvp',part(-2.4,-9.6,()=>island(16.6,4.2,5.6,5.6,C.stone),add=>{// ----- PvP 섬: 경기장(공사 중) -----
+add(26,box(17.4,5,0,4,4,.5,C.white)+box(17.4,5,.5,4,.5,1.1,C.coral)+box(17.4,5.5,.5,.5,3.5,1.1,C.coral));
+add(28,flat(18.1,5.7,.52,3.1,3.1,'#9a96ad')+flat(19.55,5.7,.53,.2,3.1,'#fff')+flat(18.1,7.15,.53,3.1,.2,'#fff'));
+add(30,box(21.2,5.5,.5,.2,3.5,.6,C.coral)+box(17.9,8.8,.5,3.5,.2,.6,C.coral));
+// 크레인
+add(24,box(21.6,4.6,0,.25,.25,4.2,C.gold));{const a=P(21.7,4.7,4.2),b=P(18.6,4.7,4.2);add(24.1,`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#e0ab33" stroke-width="5" stroke-linecap="round"/><line x1="${b[0]}" y1="${b[1]}" x2="${b[0]}" y2="${b[1]+44}" stroke="#4a3550" stroke-width="1.5"/><rect x="${b[0]-7}" y="${b[1]+44}" width="14" height="10" rx="2" fill="#ffb4a8" stroke="#4a3550" stroke-width="1.2"/>`);}
+// 공사 바리케이드
+for(const y of [6.4,7.3])add(16+y,box(15.4,y,0,.15,.6,.45,C.coral)+flat(15.4,y,.46,.15,.6,'#fff'));
+// 두 캐릭터: 깜빡이 vs 라이벌
+{const a=P(18.9,7,.55),b=P(20.4,7.3,.55);add(29,mascot(a[0],a[1]-20,.62)+rival(b[0],b[1]-20,.62)+`<text x="${((a[0]+b[0])/2).toFixed(1)}" y="${(a[1]-48).toFixed(1)}" text-anchor="middle" font-size="18" font-family="Jua,sans-serif" fill="#ff5a6e" stroke="#fff" stroke-width="4" paint-order="stroke">VS</text>`);}
+}));
+const labW=hwG('lab',(()=>{setO(3.3,-8.5);let lab=island(-6.2,5.6,2.8,2.8,C.lav)+box(-5.5,6.3,0,1.4,1.4,1.2,C.white)+box(-5.2,6.6,1.2,.8,.8,.5,C.lav);const f=P(-4.8,7,2.3);lab+=`<g transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})"><path d="M-6,-22 h12 M-4,-22 v10 l-10,16 a4,4 0 0 0 3.5,6 h21 a4,4 0 0 0 3.5,-6 l-10,-16 v-10" fill="#e8dcff" stroke="#4a3550" stroke-width="2.2" stroke-linejoin="round"/><circle cx="-2" cy="3" r="2.4" fill="#ff8fb1"/><circle cx="4" cy="0" r="1.8" fill="#8fd3ff"/></g>`;setO(0,0);return lab;})());
+
+return labW+stones2+tutI+realI+pvpI+stones+bridges+`<g class="hwi" data-m="hub">${hub}</g>`+myI+dailyI;}
+const VB=[-440,-200,1120,850];
+// 걷기 경로(월드 좌표): 가운데에서 각 섬 앞까지
+const HUBC=[7,7];
+const ROUTE={hub:[[7,7]],tut:[[7,7],[3,7],[0,7],[-2.2,7]],real:[[7,7],[7,3],[7,0],[7,-2.2]],daily:[[7,7],[11,7],[14,7],[16.2,7]],my:[[7,7],[7,11],[7,14],[7,16.2]],
+  pvp:[[7,7],[10.2,3.8],[11.75,2.55],[12.8,1.65],[13.85,.75],[15.4,-.6]],lab:[[7,7],[3.6,3.6],[2.25,2.25],[1.2,1.2],[-.9,-.9]]};
+// 표지판 자리(월드 좌표, 섬 앞쪽 가장자리)
+const SIGN={tut:[-5.6,9.2,0],real:[4.6,-5.4,0],daily:[19.4,9.6,-3.2],my:[9.6,19.4,-3.2],pvp:[14.8,-5,0],lab:[-2.7,-2.7,0]};
+return{build,VB,ROUTE,SIGN,P:(x,y,z)=>{const o=[OX,OY];OX=0;OY=0;const p=P(x,y,z||0);OX=o[0];OY=o[1];return p;},mascot,rival};})();
+// ---------- 모드 월드 화면: 표지판 + 깜빡이 걷기 + 정보 패널 ----------
+// 섬이나 표지판을 누르면 깜빡이가 길(다리, 징검다리)을 따라 그 섬까지 걸어가고, 도착하면 아래 패널에 그 모드 설명과 시작 버튼이 나옴
+const HWS={svg:null,at:'hub',sel:null,walk:null,s:1,ox:0,oy:0,raf:0};
+const HW_MODE={
+  tut:{n:'1',t:'튜토리얼',place:'신호 학교',what:'신호 바꾸는 법을 차근차근 배워요',col:'#a9c4f2',ic:'<path d="M5 9l7-4 7 4-7 4z" fill="#fff" stroke="#4a3550" stroke-width="2" stroke-linejoin="round"/><path d="M8 11v4c2 2 6 2 8 0v-4" fill="none" stroke="#4a3550" stroke-width="2"/>'},
+  real:{n:'2',t:'실제 교차로',place:'세계 도시',what:'세계의 상습 정체 교차로를 풀고 랭킹 도전',col:'#9fdcbc',ic:'<circle cx="12" cy="12" r="7" fill="#a9dcf5" stroke="#4a3550" stroke-width="2"/><path d="M6 10q3-2 6 0t6 0M7 15q3 2 5 0t5 0" fill="none" stroke="#4a3550" stroke-width="1.6"/>'},
+  daily:{n:'3',t:'일일 챌린지',place:'오늘의 공연장',what:'매일 바뀌는 교통 상황, 오늘의 랭킹',col:'#c6b2f2',ic:'<rect x="5" y="6" width="14" height="13" rx="2" fill="#fff" stroke="#4a3550" stroke-width="2"/><path d="M5 10h14M9 4v4M15 4v4" stroke="#4a3550" stroke-width="2"/><circle cx="12" cy="14.5" r="2" fill="#ff5a6e"/>'},
+  my:{n:'4',t:'나만의 교차로',place:'우리 동네',what:'우리 동네 주소로 나만의 스테이지',col:'#f6bb92',ic:'<path d="M12 20s6-5.5 6-10a6 6 0 0 0-12 0c0 4.5 6 10 6 10z" fill="#ff6f6f" stroke="#4a3550" stroke-width="2"/><circle cx="12" cy="10" r="2.2" fill="#fff"/>'},
+  pvp:{n:'VS',t:'PvP 대결',place:'대결 경기장',what:'같은 교차로로 1대1 대결',col:'#f08a7d',soon:1,ic:'<path d="M6 18l6-6M12 12l6-6M15 6h3v3M9 18H6v-3" fill="none" stroke="#4a3550" stroke-width="2" stroke-linecap="round"/><path d="M18 18l-6-6M6 6l3 3" stroke="#4a3550" stroke-width="2" stroke-linecap="round"/>'},
+  lab:{n:'',t:'실험실',place:'실험실',what:'별과 랭킹 없이 자유 실험',col:'#e8dcff',ic:'<path d="M9 4h6M10 4v6l-5 8a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-8V4" fill="#e8dcff" stroke="#4a3550" stroke-width="2" stroke-linejoin="round"/>'}};
+const HW_ORDER=['tut','real','daily','my','pvp','lab'];
+const hwSvg=(ic)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`;
+// 모드별 상태(진행, 칩, 패널 내용)
+function hwInfo(k){const r=JS.rec,n=LEVELS.filter(l=>jStars(l.id)>=1).length,O=OFFICIAL(),rs=O.reduce((a,x)=>a+jStars('real-'+x.id),0),first=r.first;
+  const d=HUB.sum.daily?HUB.sum.daily():null,m=HUB.sum.my?HUB.sum.my():null,btn=(act,t,p)=>`<button type="button" class="${p?'primary':''}" data-act="${act}">${t}</button>`;
+  if(k==='tut')return{chip:`${n} / ${LEVELS.length}`,desc:'신호 나누기부터 보행 신호까지 6장 24단계로 배워요. 처음이라면 여기부터!',
+    meta:`<div class="hmprog"><i style="width:${Math.round(n/LEVELS.length*100)}%"></i><span>${n} / ${LEVELS.length} 단계</span></div>`,
+    acts:(r.done?'':btn('tut',first?'1-1부터 시작':'이어서 하기: '+hmEsc(lvLabel(LEVELS[r.m.idx])),1))+btn('v:tut','단계 지도')};
+  if(k==='real')return{chip:`★ ${rs} / ${O.length*3}`,desc:`${O.map(x=>(J_CITY[x.id]||[x.city])[0]).join(', ')}의 실제 차로와 교통량으로 만든 교차로. 모든 도구로 풀고 서버가 검증한 랭킹에 도전해요.`,
+    meta:`<div class="hmstars">${O.map(x=>{const s=jStars('real-'+x.id);return`<span>${hmEsc((J_CITY[x.id]||[x.city])[0])} ${'★'.repeat(s)}<s>${'★'.repeat(3-s)}</s></span>`;}).join('')}</div>`,acts:btn('v:real','도시 고르기',1)};
+  if(k==='daily')return{chip:'LIVE',live:1,desc:d&&d.title?`오늘: ${hmEsc(d.title)}. 매일 바뀌는 하루 한정 교통 상황과 오늘의 랭킹.`:'매일 바뀌는 하루 한정 교통 상황과 오늘의 랭킹.',
+    meta:`<small class="hmmeta">${d?d.sub:'불러오는 중'}</small>`,acts:(d&&d.ready?btn('daily','도전하기',1):'')+btn('v:daily','자세히')};
+  if(k==='my')return{chip:m&&m.has?'1곳':'',desc:m&&m.has?`내 교차로: ${hmEsc(m.name)}. 친구와 함께 최적의 신호를 찾아요.`:'우리 동네 교차로 주소를 넣으면 지도 자료로 나만의 스테이지가 만들어져요. 친구와 공동 기록판에서 겨뤄요.',
+    meta:`<small class="hmmeta">${m?m.sub:'한 사람당 1곳'}</small>`,acts:(m&&m.has?btn('my','플레이',1):btn('mynew','만들기',1))+btn('v:my','자세히')};
+  if(k==='pvp'){const on=store.get('pvp-notify-v1');return{chip:'공사 중',soon:1,desc:'친구나 다른 플레이어와 같은 교차로, 같은 교통량을 동시에 풀어 점수로 겨루는 1대1 대결 경기장이에요. 지금 짓고 있어요.',
+    meta:`<small class="hmmeta">${on?'오픈 알림을 신청했어요':'경기장이 열리면 알려 드릴게요'}</small>`,acts:on?'<button type="button" disabled>알림 신청 완료</button>':btn('pvpnotify','오픈 알림 받기',1)};}
+  if(k==='lab')return{chip:'',desc:'레벨 제약 없이 모든 도구로 자유롭게 실험해요. 별과 랭킹은 없어요.',meta:'',acts:btn('lab','실험실 열기',1)};
+  return{chip:'',desc:'',meta:'',acts:''};}
+// 월드 좌표 → 화면(무대 안 px)
+function hwPx(x,y,z){const p=HW.P(x,y,z),V=HW.VB;return[(p[0]-V[0])*HWS.s+HWS.ox,(p[1]-V[1])*HWS.s+HWS.oy];}
+function hwHere(){const r=JS.rec;return r.done?'real':'tut';}
+hubModes=function(){const here=hwHere();HWS.at='hub';HWS.sel=null;cancelAnimationFrame(HWS.raf);HWS.walk=null;
+  $('vmodes').innerHTML=hmBack()+`<div class="hwstage" id="hwstage"><div class="hwworld" id="hwworld"><svg class="hwsvg" viewBox="${HW.VB.join(' ')}" aria-hidden="true">${HWS.svg||(HWS.svg=HW.build())}</svg>
+    <div class="hwlayer" id="hwlayer">${HW_ORDER.map(k=>{const M=HW_MODE[k],I=hwInfo(k);return`<button type="button" class="hwsign hs-${k}${HW.SIGN[k][2]<0?' below':''}${M.soon?' soon':''}${k===here?' here':''}" data-m="${k}" style="--c:${M.col}" aria-label="${M.t}: ${M.what}">
+      <span class="hwboard"><span class="hwtop"><i class="hwic">${hwSvg(M.ic)}</i><b>${M.t}</b>${I.chip?`<em class="${I.live?'live':''}${M.soon?' soon':''}">${I.chip}</em>`:''}</span><span class="hwwhat">${M.what}</span></span><span class="hwpost"></span>${k===here?'<span class="hwstar">여기부터!</span>':''}</button>`;}).join('')}
+      <div class="hwmas" id="hwmas"><div class="hwsay" id="hwsay"></div>${hmMascot(46)}</div></div></div></div>
+    <div class="hwpanel" id="hwpanel"></div>`;
+  hwLayout();hwPanel(null);hwSay(JS.rec.first?'안녕하세요! 깜빡이예요. 섬을 눌러 보세요':'어디로 갈까요? 섬을 눌러 보세요');
+  const st=$('hwstage');if(st&&st.scrollWidth>st.clientWidth){const c=hwPx(7,7,0);st.scrollLeft=Math.max(0,c[0]-st.clientWidth/2);}};
+// 무대 크기에 맞춰 SVG와 표지판, 깜빡이 위치 다시 계산
+function hwLayout(){const st=$('hwstage'),wd=$('hwworld');if(!st||!wd)return;const V=HW.VB,mob=innerWidth<720;
+  const H=Math.max(360,st.clientHeight-8),W=st.clientWidth;let s=Math.min((W-(mob?0:60))/V[2],(H-30)/V[3]);if(mob)s=Math.max(s,H/V[3]*.92);
+  HWS.s=s;const w=V[2]*s,h=V[3]*s;wd.style.width=Math.max(w,W)+'px';wd.style.height=h+'px';HWS.ox=Math.max(mob?70:0,(W-w)/2);HWS.oy=Math.max(24,(H-h)/2);wd.style.height=(h+HWS.oy+10)+'px';if(mob)wd.style.width=(w+140)+'px';
+  const sv=wd.querySelector('.hwsvg');sv.style.left=HWS.ox+'px';sv.style.top=HWS.oy+'px';sv.style.width=w+'px';sv.style.height=h+'px';
+  for(const b of wd.querySelectorAll('.hwsign')){const a=HW.SIGN[b.dataset.m],p=hwPx(a[0],a[1],a[2]);b.style.left=p[0]+'px';b.style.top=p[1]+'px';}
+  wd.style.setProperty('--sc',Math.min(1,Math.max(.72,s*1.25)).toFixed(3));
+  const pos=HWS.walk?HWS.walk.cur:HW.ROUTE[HWS.at].slice(-1)[0];hwPlace(pos);}
+function hwPlace(p,dir){const m=$('hwmas');if(!m)return;const q=hwPx(p[0],p[1],0);m.style.left=q[0]+'px';m.style.top=q[1]+'px';const st=$('hwstage');if(st&&st.scrollWidth>st.clientWidth+4&&HWS.walk){const want=q[0]-st.clientWidth/2;st.scrollLeft+= (want-st.scrollLeft)*.08;}if(dir)m.classList.toggle('flip',dir<0);}
+function hwSay(t){const e=$('hwsay');if(!e)return;e.innerHTML=t;e.hidden=!t;}
+// 정보 패널: 고른 섬(없으면 안내)
+function hwPanel(k,walking){const P=$('hwpanel');if(!P)return;
+  if(!k){const r=JS.rec;P.className='hwpanel guide';P.innerHTML=`<div class="hwph"><span class="hwpt">게임 모드 월드</span></div><p class="hwpd">${r.first?'가운데 교차로에서 네 갈래 길이 각 모드 섬으로 이어져요. <b>신호 학교</b>부터 가 볼까요?':r.done?'튜토리얼을 모두 마쳤어요! 북쪽 <b>세계 도시</b>로 가 볼까요?':`다음은 <b>${hmEsc(r.name)}</b> 차례예요.`}</p><div class="hmact">${r.done?'<button type="button" class="primary" data-go="real">세계 도시로 가기</button>':`<button type="button" class="primary" data-act="tut">${r.first?'1-1부터 시작':'이어서 하기'}</button><button type="button" data-go="tut">신호 학교 둘러보기</button>`}</div>`;return;}
+  const M=HW_MODE[k],I=hwInfo(k);P.className='hwpanel'+(M.soon?' soon':'')+(walking?' walking':'');P.style.setProperty('--c',M.col);
+  P.innerHTML=`<div class="hwph"><i class="hwic">${hwSvg(M.ic)}</i><span class="hwpt">${M.t}</span><span class="hwpp">${M.place}</span>${I.chip?`<em class="${I.live?'live':''}${M.soon?' soon':''}">${I.chip}</em>`:''}</div>
+    <p class="hwpd">${walking?`깜빡이가 <b>${M.place}</b>(으)로 가는 중이에요`:I.desc}</p>${walking?'':I.meta+`<div class="hmact">${I.acts}</div>`}`;}
+// 걷기: 지금 있는 곳 → 가운데 교차로 → 고른 섬(길을 따라)
+function hwGo(k){if(!HW.ROUTE[k])return;if(HWS.walk&&HWS.walk.to===k)return;
+  const from=HWS.walk?[HWS.walk.cur]:HW.ROUTE[HWS.at].slice().reverse(),pts=(HWS.at===k&&!HWS.walk)?[]:[...from,...HW.ROUTE[k].slice(1)];
+  try{anTrack('hub_walk',{to:k});}catch(e){}
+  for(const b of document.querySelectorAll('.hwsign'))b.classList.toggle('sel',b.dataset.m===k);
+  if(pts.length<2){HWS.at=k;hwArrive(k);return;}
+  cancelAnimationFrame(HWS.raf);const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+  const tot=L[L.length-1],sp=reduceMotion()?999:6.5,t0=performance.now();HWS.walk={to:k,pts,L,tot,cur:pts[0]};
+  $('hwmas').classList.add('walking');hwSay('');hwPanel(k,true);
+  const step=now=>{const d=Math.min(tot,(now-t0)/1000*sp);let i=1;while(i<L.length-1&&L[i]<d)i++;const f=(d-L[i-1])/Math.max(1e-6,L[i]-L[i-1]),a=pts[i-1],b=pts[i];
+    const p=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];HWS.walk.cur=p;const sa=HW.P(a[0],a[1],0),sb=HW.P(b[0],b[1],0);hwPlace(p,Math.sign(sb[0]-sa[0])||0);
+    if(d>=tot){HWS.walk=null;HWS.at=k;$('hwmas').classList.remove('walking');hwArrive(k);return;}HWS.raf=requestAnimationFrame(step);};
+  HWS.raf=requestAnimationFrame(step);}
+const reduceMotion=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}};
+function hwArrive(k){HWS.sel=k;hwPanel(k);const M=HW_MODE[k];hwSay(k==='hub'?'어디로 갈까요?':M.soon?'여기는 아직 공사 중이에요!':`${M.place} 도착!`);
+  const m=$('hwmas');if(m){m.classList.remove('hop');void m.offsetWidth;m.classList.add('hop');}}
+// 누르기: 표지판, 섬, 패널의 '가기' 버튼
+$('vmodes').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){e.stopPropagation();hwGo(g.dataset.go);return;}
+  const s=e.target.closest('.hwsign');if(s){hwGo(s.dataset.m);return;}
+  const i=e.target.closest('.hwi');if(i){hwGo(i.dataset.m);}});
+HUB.act.pvpnotify=()=>{store.set('pvp-notify-v1',Date.now());try{anTrack('pvp_interest',{});}catch(e){}hwPanel('pvp');hwSay('경기장이 열리면 꼭 알려 드릴게요!');};
+addEventListener('resize',()=>{if(!JR.hidden&&JS.view==='modes')hwLayout();});
+window.__hw={go:hwGo,state:HWS,layout:hwLayout};
 // ---------- 오늘의 도전(일일 퀘스트): 하루 한정 교통 상황 + 그날만의 랭킹 ----------
 // 시나리오는 Supabase Edge Function 'daily'가 하루 1번 만듦(Claude가 쓴 사건 이야기와 교통량 배율, 실패하면 규칙 생성기). 날짜는 한국 시간 기준
 // 게임에서는 실제 교차로 모드에 daily:YYYYMMDD를 붙여 플레이(mode={kind:'real',id,daily}). 기록 키 'daily-YYYYMMDD'(별, 도전 5번, 랭킹 모두 그날 따로)
