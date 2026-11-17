@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116171851">
+<meta name="gl-build" content="20261116222515">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1077,12 +1077,48 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 .title .tgtoast{position:absolute;left:50%;top:40%;transform:translateX(-50%);background:rgba(40,22,48,.94);border:1px solid #ffd35a;color:#fff8ee;padding:7px 14px;border-radius:12px;font-size:13px;white-space:nowrap;pointer-events:none;z-index:5}
 .title .tglobe[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.title .tgli{transition:none}}
+/* ----- 상점, 광고, 결제(테스트 모드) ----- */
+.shopchip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,211,90,.45);color:#ffe3a0;cursor:pointer}
+.shopchip .shopic{width:12px;height:10px;border:2px solid currentColor;border-top-width:3px;border-radius:2px 2px 4px 4px;display:inline-block}
+.shopchip.pass{background:linear-gradient(90deg,#1f6f43,#2c9a5c);color:#eafff1;border-color:#5fe39a}
+.montest{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:99px;background:rgba(255,107,107,.14);border:1px dashed #ff8a8a;color:#ffb3b3;margin-bottom:10px}
+.monshop{display:flex;flex-direction:column;gap:7px}.monshop .montest{margin-bottom:0;align-self:flex-start}
+.monpass{border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,#1d5a3a,#2f8a57 60%,#57b77a);color:#f2fff6;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.monpass.on{outline:2px solid #ffd35a}
+.monph{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.monph b{font-size:17px}.monph span{font-size:13px;opacity:.9}
+.monpass ul{margin:6px 0 8px;padding-left:18px;font-size:13px;line-height:1.5;display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.monpass button{background:#ffd35a;color:#2b2200;border-color:#ffd35a;font-weight:700}
+.monh4{margin:8px 0 0;font-size:14px}.monh4 small{font-weight:400;color:var(--muted);margin-left:6px}
+.mongrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mongrid button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 12px}.mongrid small{color:var(--muted);font-size:11.5px}
+.monskins{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:6px}
+.monsk{display:grid;grid-template-columns:28px 1fr auto;grid-template-rows:auto auto;column-gap:8px;row-gap:0;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);align-items:center}
+.monsk.cur{border-color:var(--accent)}
+.monsw{grid-row:1/3;width:28px;height:28px;border-radius:9px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.monsw b{position:absolute;left:0;right:0;top:10px;height:8px}
+.monskn{font-size:13px;font-weight:700}.monsk small{font-size:11.5px;color:var(--muted)}
+.monsk button{grid-column:3;grid-row:1/3;padding:5px 10px;font-size:12.5px}
+.monfair{font-size:12px;margin:6px 0 0}
+.monov{position:fixed;inset:0;z-index:200;background:rgba(5,7,10,.62);display:flex;align-items:center;justify-content:center;padding:16px}
+.monov[hidden]{display:none}
+.monovbox{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.monh{margin:0 0 4px;font-size:17px}.monprice{font-size:22px;font-weight:800;color:var(--accent);margin-bottom:6px}
+.monrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}.monrow .monsec{color:var(--muted);font-size:13px}
+.monad{height:170px;border-radius:12px;background:linear-gradient(160deg,#ffc4d6,#cfe0ff 55%,#c8f0d2);color:#2a3140;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;position:relative;overflow:hidden}
+.monad b{font-size:16px}.monad span{font-size:12px;opacity:.75;padding:0 16px}
+.monadart{display:flex;gap:6px;margin-bottom:6px}.monadart i{width:14px;height:14px;border-radius:50%;background:#ff6b6b;animation:monblink 1.5s infinite}
+.monadart i:nth-child(2){background:#ffd35a;animation-delay:.5s}.monadart i:nth-child(3){background:#3ecf75;animation-delay:1s}
+@keyframes monblink{0%,100%{opacity:.35}40%{opacity:1}}
+.monadbar{height:5px;border-radius:9px;background:var(--line);margin-top:10px;overflow:hidden}.monadbar i{display:block;height:100%;width:0;background:var(--accent)}
+.mvopts>b small{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:4px}
+body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
+@media (max-width:520px){.mongrid button{padding:6px 9px}.monpass ul{grid-template-columns:1fr}}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.34. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.35. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -1888,14 +1924,14 @@ function thresholds(){if(mode.kind==='level')return curLevel().stars;
  if(mode.kind==='real'&&REAL_STARS[mode.id])return REAL_STARS[mode.id];const b=Math.max(1,baseline?baseline.score:1),k=mode.kind==='real'?[1.1,1.25,1.4]:[1,1.3,1.6];return k.map(x=>Math.ceil(b*x));}
 // 확정 기회: 스테이지마다 5번(실험실은 무제한). 다 쓰면 처음부터 다시. 이 브라우저에 저장
 // 조작 수(N수 퍼즐): 조작 1번마다 점수가 바로 나오고, 한 번 도전에 쓸 수 있는 조작 수가 정해져 있음. 실험실은 무제한
-const TRIES_MAX=()=>mode.kind==='level'?8:mode.daily?10:12,limited=()=>mode.kind!=='lab';
+const TRIES_BASE=()=>mode.kind==='level'?8:mode.daily?10:12,TRIES_MAX=()=>TRIES_BASE()+(((store.get('mvbonus-v1')||{})[modeId()]||{}).n||0),limited=()=>mode.kind!=='lab';
 // 세션 = 3분 관찰 + 확정 1번. 점수는 관찰 시간과 별개로 5분 시뮬레이션 x 시드 3개(evalCfg)라 별 기준은 그대로
 const OBS_T=180;
 const sessLabel=()=>limited()?`조작 ${triesUsed()}/${TRIES_MAX()}`:`조작 ${Math.max(0,sessNo-1)}번`;
 function triesUsed(){return(store.get('moves-v1')||{})[modeId()]||0;}
 function triesLeft(){return limited()?Math.max(0,TRIES_MAX()-triesUsed()):Infinity;}
 function triesAdd(){const t=store.get('moves-v1')||{},k=modeId();t[k]=(t[k]||0)+1;store.set('moves-v1',t);return t[k];}
-function restartStage(){const t=store.get('moves-v1')||{};delete t[modeId()];store.set('moves-v1',t);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
+function restartStage(){const t=store.get('moves-v1')||{};delete t[modeId()];store.set('moves-v1',t);const bo=store.get('mvbonus-v1')||{};delete bo[modeId()];store.set('mvbonus-v1',bo);const ra=store.get('restart-v1')||{};ra[modeId()]=Date.now();store.set('restart-v1',ra);closePop();closeModal();cfg=clone(baseCfg());syncControls();startSession();buildArms();updateUI();}
 // 다음 스테이지: 레벨은 다음 레벨, 마지막 레벨 다음은 첫 실제 교차로, 실제 교차로는 다음 도시
 function nextTarget(){if(mode.kind==='level'){if(mode.idx+1<LEVELS.length){const l=LEVELS[mode.idx+1];return{m:{kind:'level',idx:mode.idx+1},name:lvLabel(l)+' '+l.title};}
     const ids=OFFICIAL().map(R=>R.id);return ids.length?{m:{kind:'real',id:ids[0]},name:'실제 교차로: '+REAL[ids[0]].title}:null;}
@@ -2168,7 +2204,7 @@ function finishWith(fc,ev,keep,quiet){const base=baseCfg(),st=ev.st,score=ev.sco
   const prevBest=history.filter(h=>h.sameDemand).reduce((m,h)=>Math.max(m,h.score),-Infinity);
   const stars=sameDemand&&!jam?starsOf(score,st.risk):0;
   const rec={no:sessNo,cfg:clone(fc),st,score,changes,sameDemand,stars,jam,record:sameDemand&&!jam&&score>prevBest&&history.length>0};
-  rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX()-rec.try);}
+  rec.at=Date.now();if(limited()){rec.try=triesAdd();rec.triesLeft=Math.max(0,TRIES_MAX()-rec.try);rec.boost=rec.try>TRIES_BASE();}
   if(mode.kind==='real'&&sameDemand){const id=modeId(),p=prog[id]||{stars:0,best:-1e9};prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);}
   if(mode.kind==='level'&&sameDemand){const id=curLevel().id,p=prog[id]||{stars:0,best:-1e9},nextLocked=mode.idx+1<LEVELS.length&&!levelUnlocked(mode.idx+1);
     prog[id]={stars:Math.max(stars,p.stars),best:Math.max(score,p.best)};store.set('prog-v3',prog);
@@ -4798,7 +4834,7 @@ async function cxBoard(){const id=cxIdOf();if(!id)return;const sec=CX_SEC;sec.in
 // 세션 결과: 공동 기록판에 올리기(닉네임 + 한 줄 메모)
 window.addEventListener('session-done',async ev=>{const d=ev.detail;if(!d||!/^custom-/.test(d.stage))return;const id=d.stage.slice(7).split('-')[0],box=$('lbbox');if(!box)return;
   if(id[0]==='l'){box.innerHTML='<div class="lb"><div class="msg">이 기기에만 있는 교차로라 공동 기록판이 없어요.</div></div>';return;}
-  const nick=store.get('lb-nick')||'',rec=d.rec;
+  const nick=store.get('lb-nick')||'',rec=d.rec;if(rec.boost){box.innerHTML='<div class="lb"><div class="msg">추가 조작(광고, 조작 +5)으로 낸 기록은 공동 기록판에 올라가지 않아요.</div></div>';return;}
   box.innerHTML=`<div class="lb"><h3>공동 기록판</h3>${rec.sameDemand?`<div class="row"><label>닉네임 <input class="cxnick" maxlength="20" value="${cxEsc(nick)}"></label><label class="cxmemo">무엇을 바꿨나요 <input class="cxm" maxlength="80" placeholder="예: 남북 직진 녹색 +8초, 동측 좌회전 보호"></label><button type="button" class="primary cxpost">기록판에 올리기 (${rec.score}점)</button><span class="msg cxmsg"></span></div>`:'<div class="msg">교통량이나 날씨를 바꾼 세션은 올리지 않아요.</div>'}<div class="cxlist"></div></div>`;
   const list=box.querySelector('.cxlist');const show=async()=>{list.innerHTML=await cxBoardHTML(id);cxWire(list,id);};show();
   const go=box.querySelector('.cxpost');if(go)go.onclick=async()=>{const n=box.querySelector('.cxnick').value.trim(),m=box.querySelector('.cxm').value.trim(),msg=box.querySelector('.cxmsg');
@@ -5188,10 +5224,10 @@ window.__dx={laneAt:e=>laneAt(e),pick:(a,i)=>dxLanePick(a,i),render:dxRender,sig
 // 조작 1번 = 설정이 바뀌고 0.8초 동안 그대로 있으면 1번으로 셈(띠를 끄는 중, 현시 그리기 중에는 세지 않음). 바로 점수를 계산해 조작한 자리에 결과를 띄움
 // 한 번 도전에 쓸 수 있는 조작 수: 튜토리얼 8, 실제 교차로 12, 일일 챌린지 10(TRIES_MAX). 실험실은 무제한
 // 도전권: 실제 교차로, 일일 챌린지, 나만의 교차로에서 도전의 첫 조작 때 1장. 5장까지 30분마다 1장 충전. 도전 중 내 최고 기록을 넘기면 돌려받음
-// 무료 충전: 일일 챌린지 퀘스트 3개 완료 +2, 튜토리얼 스테이지 첫 클리어 +1. 광고와 유료 상품은 자리만(누른 횟수만 기록)
+// 무료 충전: 일일 챌린지 퀘스트 3개 완료 +2, 튜토리얼 스테이지 첫 클리어 +1. 광고와 유료 상품은 monet.js(테스트 모드)
 const MV={id:null,sig:null,cfg:null,pend:null,stableAt:0,busy:false,pt:null,ref:null};
 const TIX_MAX=5,TIX_REGEN=30*60e3;
-const tixNeed=()=>mode.kind==='real';
+const tixReal=()=>mode.kind==='real',tixNeed=()=>tixReal()&&!passOn();
 function tixGet(){const now=Date.now(),o=store.get('tix-v1')||{n:TIX_MAX,t:now};
   if(o.n<TIX_MAX){const k=Math.floor((now-o.t)/TIX_REGEN);if(k>0){o.n=Math.min(TIX_MAX,o.n+k);o.t=o.n>=TIX_MAX?now:o.t+k*TIX_REGEN;store.set('tix-v1',o);}}return o;}
 function tixAdd(d,why){const o=tixGet(),was=o.n;o.n=Math.max(0,o.n+d);if(was>=TIX_MAX&&o.n<TIX_MAX)o.t=Date.now();store.set('tix-v1',o);tixRender();
@@ -5200,12 +5236,11 @@ function tixNext(){const o=tixGet();if(o.n>=TIX_MAX)return'';const s=Math.max(0,
 function attGet(){return(store.get('att-v1')||{})[modeId()]||null;}
 function attSet(v){const a=store.get('att-v1')||{};if(v)a[modeId()]=v;else delete a[modeId()];store.set('att-v1',a);}
 function mvToast(t,fn,lab){if(typeof dxToast==='function')dxToast(t,fn,lab);}
-function mvMon(k){try{anTrack('mon_click',{k,stage:modeId()});}catch(e){}mvToast('준비 중인 기능이에요. 관심 표시를 기록해 두었어요');}
 // 도전권 표시(계기판 아래)
 const tixEl=(()=>{const d=document.createElement('div');d.id='tixchip';d.className='tixchip';d.hidden=true;const g=$('gauge');(g&&g.parentNode||$('hudtop')).insertBefore(d,g?g.nextSibling:null);
   d.addEventListener('click',()=>mvNoTix(true));return d;})();
-function tixRender(){const on=!!(cfg&&tixNeed()&&typeof playMode!=='undefined'&&playMode);tixEl.hidden=!on;if(!on)return;const o=tixGet(),nx=tixNext();
-  const h=`<b>도전권 ${o.n}</b><span>${nx?`다음 충전 ${nx}`:'가득'}</span>`;if(tixEl.innerHTML!==h)tixEl.innerHTML=h;tixEl.classList.toggle('empty',o.n<=0);}
+function tixRender(){const on=!!(cfg&&tixReal()&&typeof playMode!=='undefined'&&playMode);tixEl.hidden=!on;if(!on)return;const o=tixGet(),nx=tixNext();
+  const h=passOn()?`<b>도전권 무제한</b><span>그린라이트 패스</span>`:`<b>도전권 ${o.n}</b><span>${nx?`다음 충전 ${nx}`:'가득'}</span>`;if(tixEl.innerHTML!==h)tixEl.innerHTML=h;tixEl.classList.toggle('empty',o.n<=0&&!passOn());}
 // 조작한 자리(마지막으로 누른 곳)에 결과 칩
 document.addEventListener('pointerup',e=>{if(e.target.closest&&e.target.closest('#stage'))MV.pt=[e.clientX,e.clientY];},true);
 function mvChip(html,cls,ms){const st=$('stage');if(!st)return null;const r=st.getBoundingClientRect(),c=document.createElement('div');c.className='mvchip '+(cls||'');c.innerHTML=html;st.appendChild(c);
@@ -5259,10 +5294,12 @@ function mvNext(n){const nx=nextTarget(),st='★'.repeat(n)+'☆'.repeat(3-n);op
 function mvOut(){const b=mvBest(),L=TRIES_MAX();openModal(`조작 ${L}번을 모두 썼어요`,[]);
   $('modalbody').innerHTML=`<p class="note" style="margin-top:0">${b?`이번 도전 최고 <b>${b.score}점</b>, 별 ${b.stars}개. `:''}받은 별과 최고 기록은 그대로 남아요. 처음 설정부터 다시 도전하거나 조작을 더 받아 이어 가세요.</p>
   <div class="mvopts"><button type="button" class="primary" data-k="retry">처음부터 다시 도전${tixNeed()?' (도전권 1장)':''}</button>
-  <button type="button" data-k="plus5">조작 +5번 더 <small>준비 중</small></button>
+  <b>이어서 더 하기 <small>여기서부터 낸 기록은 랭킹 제외</small></b>
+  <button type="button" data-k="adm" ${bonusGet().ad?'disabled':''}>광고 보고 조작 +2 <small>${bonusGet().ad?'이번 도전에서 받음':'도전마다 1번'}</small></button>
+  <button type="button" data-k="plus5">조작 +5번 <small>${passOn()&&!bonusGet().pp?'패스 혜택으로 무료':won(SKU.plus5.p)+' (테스트 결제)'}</small></button>
   <button type="button" data-k="modes">다른 모드 하기</button></div>`;
-  $('modalbody').querySelector('.mvopts').onclick=e=>{const k=(e.target.closest('button')||{}).dataset;if(!k||!k.k)return;
-    if(k.k==='retry'){closeModal();restartStage();}else if(k.k==='plus5')mvMon('plus5');else{closeModal();journeyOpen();}};}
+  $('modalbody').querySelector('.mvopts').onclick=e=>{const bt=e.target.closest('button');if(!bt||bt.disabled)return;const k=bt.dataset;if(!k.k)return;
+    if(k.k==='retry'){closeModal();restartStage();}else if(k.k==='adm')monAdMoves();else if(k.k==='plus5')monPlus5();else{closeModal();journeyOpen();}};}
 // 도전권이 없을 때(또는 도전권 표시를 눌렀을 때)
 function mvNoTix(info){const o=tixGet(),nx=tixNext(),dq=mvDqDone();
   openModal(info&&o.n>0?`도전권 ${o.n}장`:'도전권이 없어요',[]);
@@ -5271,10 +5308,11 @@ function mvNoTix(info){const o=tixGet(),nx=tixNext(),dq=mvDqDone();
   <button type="button" data-k="daily" ${dq?'disabled':''}>일일 챌린지 퀘스트 3개 완료 +2${dq?' (오늘 받음)':''}</button>
   <button type="button" data-k="tut">튜토리얼 스테이지 처음 깨기 +1 (튜토리얼은 도전권 없이 플레이)</button>
   <b>더 빨리</b>
-  <button type="button" data-k="ad">광고 보고 +1 <small>준비 중</small></button>
-  <button type="button" data-k="pack">도전권 묶음 <small>준비 중</small></button></div>`;
+  <button type="button" data-k="ad" ${adTixLeft()<=0?'disabled':''}>광고 보고 +1 <small>오늘 ${adTixLeft()}번 남음</small></button>
+  <button type="button" data-k="pack">도전권 묶음 <small>10장 ${won(SKU.tix10.p)}부터</small></button>
+  <button type="button" data-k="pass">그린라이트 패스 <small>도전권 무제한, 30일 ${won(SKU.pass.p)}</small></button></div>`;
   $('modalbody').querySelector('.mvopts').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const k=b.dataset.k;
-    if(k==='daily'||k==='tut'){closeModal();hubShow(k);}else mvMon(k);};}
+    if(k==='daily'||k==='tut'){closeModal();hubShow(k);}else if(k==='ad')monAdTix();else{closeModal();shopOpen(k==='pass'?'pass':'tix');}};}
 // 무료 충전: 튜토리얼 첫 클리어, 일일 퀘스트 3개
 window.addEventListener('session-done',ev=>{const d=ev.detail,r=d&&d.rec;if(!r||mode.kind!=='level'||!r.sameDemand||r.stars<1)return;const id=curLevel().id,got=store.get('tixtut-v1')||{};
   if(got[id])return;got[id]=1;store.set('tixtut-v1',got);setTimeout(()=>tixAdd(1,'튜토리얼 스테이지 첫 클리어'),1200);});
@@ -5286,6 +5324,116 @@ function mvRetry(){if(!limited())return;if(triesUsed()===0){mvToast('아직 조�
   $('mvre').onclick=()=>{closeModal();restartStage();};$('mvno').onclick=closeModal;}
 openOutOfTries=mvOut;
 window.__mv={retry:mvRetry,tix:tixGet,add:tixAdd,out:mvOut,noTix:mvNoTix,get state(){return{...MV,cfg:null}}};
+// ---------- 수익 모델 v1 (테스트 모드) ----------
+// 1 보상형 광고: 도전권 +1(하루 5번), 조작이 끝났을 때 조작 +2(도전마다 1번)
+// 2 조작 +5, 도전권 묶음: 추가 조작으로 낸 기록은 별과 내 기록에는 남지만 랭킹에는 올라가지 않음(rec.boost)
+// 3 그린라이트 패스(30일): 도전권 무제한, 모든 스킨, 도전마다 조작 +5 한 번 무료, 패스 배지
+// 4 스킨: 점수에 영향 없음. 아기자기 마을, 노을 도시, 한낮 도시는 무료
+// 실제 광고 네트워크와 결제사는 아직 연결 전. MON.ads, MON.pay 공급자만 바꾸면 됨(웹: Google H5 Games Ads adBreak reward, 결제는 서버 검증 후 지급)
+// 지금은 돈이 오가지 않는 테스트 모드이고 보유 상태(ent-v1)는 이 기기에만 저장
+const MON={test:true};
+const MON_DAY=864e5,AD_TIX_DAY=5,PASS_DAYS=30;
+const SKIN_PRICE={control:2200,retro:2200,night:1500,blueprint:1500,story:1500};
+const SKU={plus5:{t:'조작 +5번',p:1100},tix10:{t:'도전권 10장',p:2200,n:10},tix30:{t:'도전권 30장 + 보너스 5장',p:5500,n:35},
+  pass:{t:'그린라이트 패스 30일',p:4900}};
+for(const k in SKIN_PRICE)SKU['sk_'+k]={t:`스킨: ${(SKINS[k]||{}).name||k}`,p:SKIN_PRICE[k],skin:k};
+const won=p=>p.toLocaleString('ko-KR')+'원';
+function entGet(){const e=store.get('ent-v1')||{};e.skins=e.skins||[];e.pass=e.pass||0;return e;}
+function entSet(e){store.set('ent-v1',e);}
+function passOn(){return entGet().pass>Date.now();}
+function passLeft(){const d=Math.ceil((entGet().pass-Date.now())/MON_DAY);return Math.max(0,d);}
+function skinOwned(k){return !SKIN_PRICE[k]||passOn()||entGet().skins.includes(k);}
+function monTrack(n,o){try{anTrack(n,Object.assign({test:MON.test?1:0},o||{}));}catch(e){}}
+// 도전 단위 추가 조작(app.js TRIES_MAX가 읽음)
+function bonusGet(){return(store.get('mvbonus-v1')||{})[modeId()]||{n:0};}
+function bonusAdd(n,tag){const a=store.get('mvbonus-v1')||{},k=modeId(),o=a[k]||{n:0};o.n+=n;if(tag)o[tag]=1;a[k]=o;store.set('mvbonus-v1',a);try{updateUI();}catch(e){}}
+function adTixLeft(){const d=new Date().toDateString(),o=store.get('adtix-v1')||{};return o.d===d?Math.max(0,AD_TIX_DAY-o.n):AD_TIX_DAY;}
+function adTixUse(){const d=new Date().toDateString(),o=store.get('adtix-v1')||{};const n=o.d===d?o.n+1:1;store.set('adtix-v1',{d,n});}
+
+// ----- 겹치는 작은 창(상점 위에도 뜸) -----
+function monOv(html){let o=$('monov');if(!o){o=document.createElement('div');o.id='monov';o.className='monov';document.body.appendChild(o);}
+  o.innerHTML=`<div class="monovbox">${html}</div>`;o.hidden=false;return o;}
+function monOvClose(){const o=$('monov');if(o){o.hidden=true;o.innerHTML='';}}
+
+// ----- 공급자 1: 보상형 광고(테스트: 5초 가짜 광고) -----
+MON.ads={name:'test',show(place){return new Promise(res=>{let s=5,done=false;monTrack('ad_start',{place});
+  const o=monOv(`<div class="montest">테스트 광고</div><div class="monad"><div class="monadart"><i></i><i></i><i></i></div><b>여기에 광고가 나와요</b><span>광고 네트워크를 연결하면 실제 광고로 바뀌어요</span></div>
+    <div class="monadbar"><i></i></div><div class="monrow"><span class="monsec">${s}초 뒤 보상</span><button type="button" class="monx">그만 보기</button></div>`);
+  const bar=o.querySelector('.monadbar i'),sec=o.querySelector('.monsec'),x=o.querySelector('.monx');
+  requestAnimationFrame(()=>{bar.style.transition=`width ${s}s linear`;bar.style.width='100%';});
+  const iv=setInterval(()=>{s--;if(s>0){sec.textContent=`${s}초 뒤 보상`;return;}clearInterval(iv);done=true;sec.textContent='보상을 받을 수 있어요';x.textContent='보상 받기';x.classList.add('primary');},1000);
+  x.onclick=()=>{clearInterval(iv);monOvClose();monTrack('ad_end',{place,ok:done?1:0});res(done);};});}};
+
+// ----- 공급자 2: 결제(테스트: 확인 창만, 청구 없음) -----
+MON.pay={name:'test',buy(sku){const it=SKU[sku];return new Promise(res=>{monTrack('buy_start',{sku});
+  const o=monOv(`<div class="montest">테스트 결제</div><h3 class="monh">${dEsc(it.t)}</h3><div class="monprice">${won(it.p)}</div>
+    <p class="note">결제사를 아직 연결하지 않아 실제로 청구되지 않아요. 확인을 누르면 테스트용으로 바로 지급돼요.</p>
+    <div class="monrow"><button type="button" class="monno">취소</button><button type="button" class="primary monyes">테스트 구매</button></div>`);
+  o.querySelector('.monno').onclick=()=>{monOvClose();monTrack('buy_cancel',{sku});res(false);};
+  o.querySelector('.monyes').onclick=()=>{monOvClose();res(true);};});}};
+
+// ----- 지급 -----
+function monGrant(sku){const it=SKU[sku],e=entGet();
+  if(sku==='plus5')bonusAdd(5,'p5');
+  else if(it.n)tixAdd(it.n,it.t);
+  else if(sku==='pass'){e.pass=Math.max(Date.now(),e.pass)+PASS_DAYS*MON_DAY;entSet(e);tixRender();monSkinLabels();}
+  else if(it.skin){if(!e.skins.includes(it.skin))e.skins.push(it.skin);entSet(e);monSkinLabels();}
+  const L=store.get('buys-v1')||[];L.push({sku,p:it.p,at:Date.now(),test:MON.test?1:0});store.set('buys-v1',L.slice(-50));
+  monTrack('buy_done',{sku,p:it.p});}
+async function monBuy(sku){if(!(await MON.pay.buy(sku)))return false;monGrant(sku);return true;}
+
+// ----- 진입점: 조작이 끝났을 때, 도전권이 없을 때 -----
+async function monAdMoves(){const b=bonusGet();if(b.ad){mvToast('광고 보상 조작은 도전마다 한 번이에요');return;}
+  closeModal();if(!(await MON.ads.show('moves')))return;bonusAdd(2,'ad');
+  mvToast('조작 +2: 이어서 조작하세요. 지금부터 낸 기록은 별은 받지만 랭킹에는 올라가지 않아요');}
+async function monPlus5(){const b=bonusGet();closeModal();
+  if(passOn()&&!b.pp){bonusAdd(5,'pp');monTrack('pass_plus5');mvToast('패스 혜택: 조작 +5. 지금부터 낸 기록은 랭킹에는 올라가지 않아요');return;}
+  if(await monBuy('plus5'))mvToast('조작 +5: 이어서 조작하세요. 지금부터 낸 기록은 랭킹에는 올라가지 않아요');}
+async function monAdTix(){if(adTixLeft()<=0){mvToast('오늘 광고 보상은 다 받았어요. 내일 다시 채워져요');return;}
+  closeModal();if(!(await MON.ads.show('tix')))return;adTixUse();tixAdd(1,'광고 보상');}
+
+// ----- 상점 -----
+function shopHTML(){const e=entGet(),on=passOn(),t=tixGet(),al=adTixLeft();
+  const sk=SKIN_ORDER.filter(k=>SKINS[k]).map(k=>{const p=SKIN_PRICE[k],own=skinOwned(k),cur=skin===k;
+    const st=!p?'무료':e.skins.includes(k)?'보유':on?'패스':won(p);
+    return`<div class="monsk${cur?' cur':''}" data-sk="${k}"><i class="monsw" style="background:${(SKINS[k].col||{}).ground||'#888'}"><b style="background:${(SKINS[k].col||{}).asphalt||'#555'}"></b></i>
+      <span class="monskn">${dEsc(SKINS[k].name)}</span><small>${st}</small>
+      <button type="button" class="${own?'':'primary'}" data-a="${own?'use':'buy'}" ${cur?'disabled':''}>${cur?'사용 중':own?'적용':'구매'}</button></div>`;}).join('');
+  return`<div class="monshop"><div class="montest">테스트 모드: 결제와 광고가 아직 연결되지 않아 눌러도 돈이 나가지 않아요</div>
+  <section class="monpass${on?' on':''}"><div class="monph"><b>그린라이트 패스</b><span>${on?`이용 중, ${passLeft()}일 남음`:`30일 ${won(SKU.pass.p)}`}</span></div>
+    <ul><li>도전권 무제한</li><li>스킨 전부 사용</li><li>도전마다 조작 +5 한 번 무료 (랭킹 제외)</li><li>랭킹 점수에는 영향 없음</li></ul>
+    <button type="button" class="primary" data-b="pass">${on?'30일 연장':'패스 시작'}</button></section>
+  <h4 class="monh4">도전권 <small>지금 ${on?'무제한':t.n+'장'}</small></h4>
+  <div class="mongrid">
+    <button type="button" data-b="ad" ${al<=0||on?'disabled':''}><b>광고 보고 +1</b><small>${on?'패스 이용 중':`오늘 ${al}번 남음`}</small></button>
+    <button type="button" data-b="tix10" ${on?'disabled':''}><b>10장</b><small>${won(SKU.tix10.p)}</small></button>
+    <button type="button" data-b="tix30" ${on?'disabled':''}><b>30장 + 5장</b><small>${won(SKU.tix30.p)}</small></button></div>
+  <h4 class="monh4">스킨 <small>보기만 바뀌고 점수에는 영향이 없어요</small></h4>
+  <div class="monskins">${sk}</div>
+  <p class="note monfair">공정한 랭킹: 점수를 올려 주는 상품은 없어요. 광고나 구매로 받은 추가 조작으로 낸 기록은 별과 내 기록에는 남지만 랭킹에는 올라가지 않아요.</p></div>`;}
+function shopOpen(sec){openModal('상점',[]);const B=$('modalbody');shopDraw();monTrack('shop_view',{sec:sec||''});
+  if(sec){const el=B.querySelector(sec==='skin'?'.monskins':sec==='tix'?'.mongrid':'.monpass');if(el)el.scrollIntoView({block:'center'});}}
+function shopDraw(){const B=$('modalbody');B.innerHTML=shopHTML();
+  B.firstElementChild.onclick=async e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+    if(b.dataset.b==='ad'){if(adTixLeft()<=0)return;if(!(await MON.ads.show('shop')))return;adTixUse();tixAdd(1,'광고 보상');shopDraw();return;}
+    if(b.dataset.b){if(await monBuy(b.dataset.b)){mvToast(b.dataset.b==='pass'?'그린라이트 패스가 시작됐어요 (테스트)':`${SKU[b.dataset.b].t} 지급 (테스트)`);shopDraw();}return;}
+    const c=b.closest('[data-sk]');if(!c)return;const k=c.dataset.sk;
+    if(b.dataset.a==='buy'){if(!(await monBuy('sk_'+k)))return;}
+    monSkinUse(k);shopDraw();};}
+function monSkinUse(k){const sel=$('skinsel');sel.value=k;sel.dispatchEvent(new Event('change',{bubbles:true}));}
+// 스킨 선택 목록에 잠금 표시
+function monSkinLabels(){const sel=$('skinsel');if(!sel)return;for(const o of sel.options)o.textContent=SKINS[o.value].name+(skinOwned(o.value)?'':' (잠김)');}
+// 잠긴 스킨을 고르면 적용하지 않고 상점의 스킨 칸으로
+{const e=entGet();if(SKIN_PRICE[skin]&&!e.skins.includes(skin)){e.skins.push(skin);entSet(e);}// 이미 쓰던 스킨은 그대로 보유
+  const _ap=applySkin;applySkin=function(id){if(SKINS[id]&&!skinOwned(id)){const sel=$('skinsel');if(sel)sel.value=skin;const sc=$('spdcol');if(sc)showSpeed=sc.checked;monTrack('skin_locked',{k:id});shopOpen('skin');return;}return _ap(id);};
+  monSkinLabels();}
+// 상점 버튼: 위쪽 칩(메뉴 옆)과 메뉴 목록
+{const b=document.createElement('button');b.type='button';b.id='shopbtn';b.className='chip shopchip';b.innerHTML='<i class="shopic"></i>상점';
+  const j=$('jbtn');if(j)j.parentNode.insertBefore(b,j.nextSibling);b.addEventListener('click',()=>shopOpen());
+  const m=$('jmpop');if(m){const it=document.createElement('button');it.type='button';it.setAttribute('role','menuitem');it.innerHTML='상점<small>그린라이트 패스, 도전권, 스킨</small>';
+    it.addEventListener('click',ev=>{ev.stopPropagation();m.hidden=true;shopOpen();});m.appendChild(it);}}
+setInterval(()=>{const b=$('shopbtn');if(b)b.classList.toggle('pass',passOn());},5000);
+window.__mon={MON,SKU,ent:entGet,passOn,open:shopOpen,grant:monGrant,bonus:bonusGet};
 // ---------- 데스크톱 화면 A안(네 모서리): 오른쪽 옆 칸을 없애고 지도를 가로 전체로 씀 ----------
 // 도로 밖 네 블록에 카드 하나씩: 왼쪽 위 할 일, 오른쪽 위 점수 막대, 왼쪽 아래 지금 흐름, 오른쪽 아래 조작
 // 나머지 메뉴(게임 모드, 도움말, 기록, 다시, 보기, 설정)는 ⋯ 버튼, 지도 우클릭, 휠 클릭으로 여는 원형 메뉴 하나로
@@ -5377,7 +5525,7 @@ function hqPlace(B){if(!HQ.on)return[];const g=8,ps=$('phstrip');const top0=ps&&
 const hqB=(id,label,key)=>()=>{const e=$(id);if(!e||e.hidden)return null;return{t:label||e.textContent.trim(),k:key,run:()=>e.click()};};
 const hqK=id=>()=>{const e=$(id);if(!e)return null;const l=e.closest('label');if(l&&l.hidden)return null;return{t:(l?l.textContent:id).trim(),on:e.checked,keep:1,run:()=>e.click()};};
 const hqS=(id,name)=>()=>{const e=$(id);if(!e)return null;const l=e.closest('label');if(l&&l.hidden)return null;return[...e.options].map(o=>({t:`${name}: ${o.text}`,on:o.value===e.value,keep:1,run:()=>{e.value=o.value;e.dispatchEvent(new Event('change',{bubbles:true}));}}));};
-const HQRAD=[{ic:'☰',t:'게임 모드',s:'모드, 레벨',it:[hqB('jbtn','메뉴 (모드 고르기)'),hqB('lvchip','레벨 바꾸기'),hqB('cxchip')]},
+const HQRAD=[{ic:'☰',t:'게임 모드',s:'모드, 레벨',it:[hqB('jbtn','메뉴 (모드 고르기)'),hqB('lvchip','레벨 바꾸기'),hqB('cxchip'),hqB('shopbtn','상점: 패스, 도전권, 스킨')]},
   {ic:'?',t:'도움말',s:'안내, 카메라',it:[hqB('coachbtn','이 단계 안내 다시 보기','H'),hqB('lcbtn','실시간 카메라')]},
   {ic:'≡',t:'기록',s:'조작, 랭킹',it:[hqB('dxhist','조작 기록'),hqB('lbbtn','랭킹')]},
   {ic:'↺',t:'다시',s:'처음부터',it:[hqB('skip','처음부터 다시 도전','R'),hqB('resetcfg','처음 설정으로'),hqB('newsess','관찰 다시 시작')]},
@@ -5567,6 +5715,7 @@ function formHTML(d){const nick=ls.get('lb-nick')||'';
   return`<div class="row"><label>닉네임 <input class="lbnick" maxlength="20" value="${esc(nick)}" placeholder="1~20자"></label><button type="button" class="lbgo primary">이 기록 등록</button><span class="lbmsg msg"></span><span class="lbmine msg"></span></div>`;}
 // ---------- 세션 끝 ----------
 window.addEventListener('session-done',async ev=>{const d=ev.detail,box=$('lbbox');if(!box)return;if(/^custom-/.test(d.stage))return;box.innerHTML='';
+  if(d.rec&&d.rec.boost){box.innerHTML='<div class="lb"><div class="msg">추가 조작(광고, 조작 +5)으로 낸 기록은 별과 내 기록에는 남지만 랭킹에는 올라가지 않아요. 처음부터 다시 도전하면 랭킹에 올릴 수 있어요.</div></div>';return;}
   if(!d.eligible){box.innerHTML='<div class="lb"><div class="msg">교통량을 바꾸거나 실험실에서 한 세션은 랭킹에 올라가지 않습니다.</div></div>';return;}
   const nick=ls.get('lb-nick'),b=ls.get('lb-best')||{},k=d.stage+':'+d.weather,prevBest=b[k];
   let note=formHTML(d);
