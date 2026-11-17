@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116162417">
+<meta name="gl-build" content="20261116162940">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1082,7 +1082,7 @@ body.sk-retro #hqctl .seg,body.sk-cute #hqctl .seg{background:none}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.28. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.29. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4028,8 +4028,6 @@ function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,
   // 바다: 납작한 파스텔 하늘색(조금 비침)
   g.save();g.beginPath();g.arc(cx,cy,R,0,7);g.clip();
   g.fillStyle='rgba(143,206,226,.78)';g.fillRect(0,0,S,S);
-  // 물결 띠(옅은 동심원)
-  g.strokeStyle='rgba(255,255,255,.16)';g.lineWidth=R*.06;for(const k of [.42,.66,.88]){g.beginPath();g.arc(cx-R*.18,cy-R*.2,R*k,0,7);g.stroke();}
   // 경위선: 차선 같은 흰 점선
   g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1.2;g.setLineDash([5,6]);
   for(const la of [-30,0,30,60]){g.beginPath();let on=false;for(let lo=-180;lo<=180;lo+=5){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
@@ -4038,6 +4036,7 @@ function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,
   // 육지: 아래쪽에 두께(옆면) 한 겹 + 윗면. 시작 화면 잔디와 건물 색
   for(const ring of GL_LAND){g.save();g.translate(1.6,2.4);if(glPath(ring)){g.fillStyle='#6f9a63';g.fill();}g.restore();}
   for(const ring of GL_LAND){if(!glPath(ring))continue;g.fillStyle='#b6dc9a';g.fill();g.strokeStyle='#86b574';g.lineWidth=1;g.stroke();}
+  glDoodles();
   // 단단한 그림자(오른쪽 아래 초승달)와 왼쪽 위 노을빛
   g.fillStyle='rgba(74,45,90,.22)';g.beginPath();g.arc(cx,cy,R,0,7);g.arc(cx-R*.2,cy-R*.24,R*1.02,0,7,true);g.fill('evenodd');
   g.fillStyle='rgba(255,226,180,.28)';g.beginPath();g.ellipse(cx-R*.42,cy-R*.5,R*.3,R*.16,-.6,0,7);g.fill();
@@ -4053,6 +4052,52 @@ function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,
     for(let j=0;j<3;j++){g.fillStyle=j===2?'#6ff0a0':'#4a4f58';g.beginPath();g.arc(x,y-13.5+j*5,1.9,0,7);g.fill();}
     g.fillStyle='#2b2f36';g.fillRect(x-.8,y-1,1.6,3);}
   for(const [id,,la,lo] of GL_CAND){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);g.fillStyle=GL.mine.has(id)?'#ff8fab':'#fff8ee';g.strokeStyle='#6b4a6e';g.lineWidth=1.5;g.beginPath();g.arc(x,y,4.2,0,7);g.fill();g.stroke();}
+  g.globalAlpha=1;}
+
+// ---- 땅 위 작은 그림(랜드마크, 동물): 납작한 파스텔 + 자두색 윤곽. 지구본을 향해 서 있는 그림이라 앞쪽일수록 크고 진함 ----
+// 실제 교차로 핀(서울, 도쿄, 런던 등)과 겹치는 곳은 피함
+const INKG='#6b4a6e';
+let GLDS=1;function gO(g,w){g.strokeStyle=INKG;g.lineWidth=(w||1.1)/GLDS;g.lineJoin='round';g.lineCap='round';}
+function gC(g,x,y,r,f){g.beginPath();g.arc(x,y,r,0,7);g.fillStyle=f;g.fill();g.stroke();}
+function gE(g,x,y,rx,ry,f,a){g.beginPath();g.ellipse(x,y,rx,ry,a||0,0,7);g.fillStyle=f;g.fill();g.stroke();}
+function gP(g,pts,f){g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fillStyle=f;g.fill();g.stroke();}
+const GL_DOODLE=[
+ // 자유의 여신상(뉴욕 핀 조금 북동쪽 바다 쪽으로 비켜)
+ [44,-66,(g,u,t)=>{gO(g);gP(g,[[-.35,1],[.35,1],[.25,-.1],[-.25,-.1]],'#8fd3b8');gC(g,0,-.35,.26,'#8fd3b8');gP(g,[[-.25,-.55],[0,-.8],[.25,-.55]],'#8fd3b8');g.beginPath();g.moveTo(.3,-.2);g.lineTo(.45,-.95);g.stroke();gC(g,.45,-1.05,.12+.03*Math.sin(t*6),'#ffd35a');}],
+ // 에펠탑(파리 후보 핀 옆, 조금 남쪽)
+ [45.5,4.5,(g,u)=>{gO(g);gP(g,[[-.55,1],[-.12,-.2],[0,-1.1],[.12,-.2],[.55,1],[.25,1],[0,.45],[-.25,1]],'#c9a98a');g.beginPath();g.moveTo(-.3,.35);g.lineTo(.3,.35);g.stroke();}],
+ // 피라미드와 낙타(이집트, 사하라)
+ [26,28,(g)=>{gO(g);gP(g,[[-.9,.8],[0,-.6],[.9,.8]],'#f3dca2');gP(g,[[0,-.6],[.9,.8],[.35,.8]],'#e3c27f');}],
+ [22,2,(g,u,t)=>{const b=Math.sin(t*3)*.05;gO(g);gE(g,0,b,.6,.32,'#e6b57e');gC(g,-.1,-.25+b,.22,'#e6b57e');gC(g,.72,-.35+b,.18,'#e6b57e');g.beginPath();g.moveTo(.5,-.1+b);g.lineTo(.68,-.3+b);g.moveTo(-.4,.3);g.lineTo(-.4,.75);g.moveTo(.4,.3);g.lineTo(.4,.75);g.stroke();}],
+ // 기린(동아프리카)
+ [-3,34,(g,u,t)=>{const n=Math.sin(t*1.5)*.08;gO(g);g.beginPath();g.moveTo(.1,0);g.lineTo(.35+n,-1);g.lineWidth=3.2/GLDS;g.strokeStyle=INKG;g.stroke();g.lineWidth=2/GLDS;g.strokeStyle='#f6c453';g.stroke();gO(g);gE(g,0,.15,.42,.25,'#f6c453');gC(g,.42+n,-1.05,.17,'#f6c453');g.beginPath();g.moveTo(-.25,.35);g.lineTo(-.25,.8);g.moveTo(.25,.35);g.lineTo(.25,.8);g.stroke();}],
+ // 코끼리(아프리카 서남쪽)
+ [-17,22,(g,u,t)=>{gO(g);gE(g,0,0,.62,.42,'#b9bfd6');gC(g,.55,-.15,.3,'#b9bfd6');g.beginPath();g.moveTo(.8,-.05);g.quadraticCurveTo(1,.3+Math.sin(t*2)*.1,.85,.55);g.stroke();gE(g,.35,-.15,.18,.25,'#a3a9c4');g.beginPath();g.moveTo(-.35,.35);g.lineTo(-.35,.7);g.moveTo(.2,.35);g.lineTo(.2,.7);g.stroke();}],
+ // 판다(중국)
+ [32,104,(g)=>{gO(g);gC(g,0,.15,.5,'#fff8ee');gC(g,0,-.45,.38,'#fff8ee');gC(g,-.3,-.75,.12,'#3a2840');gC(g,.3,-.75,.12,'#3a2840');g.fillStyle='#3a2840';g.beginPath();g.ellipse(-.14,-.47,.08,.11,.4,0,7);g.ellipse(.14,-.47,.08,.11,-.4,0,7);g.fill();}],
+ // 타지마할(인도 북부)
+ [27.5,80,(g)=>{gO(g);g.beginPath();g.rect(-.6,0,1.2,.75);g.fillStyle='#fff8ee';g.fill();g.stroke();g.beginPath();g.arc(0,0,.38,Math.PI,0);g.fillStyle='#fff8ee';g.fill();g.stroke();g.beginPath();g.moveTo(0,-.38);g.lineTo(0,-.6);g.stroke();for(const x of [-.75,.75]){g.beginPath();g.moveTo(x,.75);g.lineTo(x,-.3);g.stroke();}}],
+ // 캥거루와 오페라하우스(호주)
+ [-24,133,(g,u,t)=>{const h=Math.max(0,Math.sin(t*3))*.35;gO(g);g.save();g.translate(0,-h);gE(g,0,.1,.32,.5,'#e6a987',-.3);gC(g,.25,-.45,.2,'#e6a987');gP(g,[[.25,-.6],[.3,-.9],[.4,-.6]],'#e6a987');g.beginPath();g.moveTo(-.2,.5);g.quadraticCurveTo(-.7,.7,-.85,.4);g.stroke();g.restore();}],
+ [-34,151.5,(g)=>{gO(g);for(const [x,s] of [[-.4,.8],[.05,1],[.45,.7]]){g.beginPath();g.moveTo(x-.3*s,.5);g.quadraticCurveTo(x,-.6*s,x+.35*s,.5);g.closePath();g.fillStyle='#fff8ee';g.fill();g.stroke();}g.beginPath();g.moveTo(-.85,.5);g.lineTo(.9,.5);g.stroke();}],
+ // 북극곰(캐나다 북쪽)과 무스
+ [70,-95,(g,u,t)=>{gO(g);gE(g,0,0,.62,.36,'#fff8ee');gC(g,.6,-.1,.25,'#fff8ee');gC(g,.55,-.33,.08,'#fff8ee');g.beginPath();g.moveTo(-.35,.3);g.lineTo(-.35,.6);g.moveTo(.25,.3);g.lineTo(.25,.6);g.stroke();}],
+ [55,-112,(g)=>{gO(g);gE(g,0,0,.55,.32,'#a8744f');gC(g,.6,-.15,.22,'#a8744f');g.beginPath();g.moveTo(.5,-.35);g.lineTo(.3,-.75);g.lineTo(.1,-.6);g.moveTo(.7,-.35);g.lineTo(.95,-.75);g.lineTo(1.1,-.55);g.moveTo(-.3,.3);g.lineTo(-.3,.65);g.moveTo(.25,.3);g.lineTo(.25,.65);g.stroke();}],
+ // 선인장(멕시코 북부), 라마(안데스), 투칸(아마존)
+ [29,-109,(g)=>{gO(g);g.beginPath();g.moveTo(0,.8);g.lineTo(0,-.7);g.moveTo(0,.1);g.lineTo(-.4,.1);g.lineTo(-.4,-.35);g.moveTo(0,-.1);g.lineTo(.4,-.1);g.lineTo(.4,-.5);g.lineWidth=4.5/GLDS;g.stroke();g.strokeStyle='#7bc47a';g.lineWidth=2.5/GLDS;g.stroke();}],
+ [-17,-69,(g,u,t)=>{gO(g);gE(g,0,.1,.45,.3,'#fff8ee');g.beginPath();g.moveTo(.35,0);g.lineTo(.45,-.7);g.lineWidth=3.4/GLDS;g.stroke();g.strokeStyle='#fff8ee';g.lineWidth=1.6/GLDS;g.stroke();gO(g);gC(g,.48,-.78,.16,'#fff8ee');g.beginPath();g.moveTo(-.25,.35);g.lineTo(-.25,.7);g.moveTo(.25,.35);g.lineTo(.25,.7);g.stroke();}],
+ [-4,-63,(g,u,t)=>{const b=Math.sin(t*4)*.06;gO(g);gE(g,0,b,.32,.45,'#3a2840');gC(g,0,-.4+b,.24,'#3a2840');gE(g,.42,-.4+b,.3,.13,'#ff9f5a');gC(g,.05,-.42+b,.07,'#fff');}],
+ // 고래(태평양), 모아이(이스터섬), 펭귄(파타고니아)
+ [18,-150,(g,u,t)=>{gO(g);gE(g,0,0,.75,.38,'#7aa7d8');gP(g,[[-.7,0],[-1.1,-.35],[-1.05,.25]],'#7aa7d8');const k=(t*.7)%1;if(k<.5){g.strokeStyle='rgba(255,255,255,'+(1-k*2).toFixed(2)+')';g.lineWidth=1.4/GLDS;g.beginPath();g.moveTo(.2,-.4);g.lineTo(.2,-.8-k);g.moveTo(.2,-.7-k);g.lineTo(-.05,-.95-k);g.moveTo(.2,-.7-k);g.lineTo(.45,-.95-k);g.stroke();}}],
+ [-27,-109,(g)=>{gO(g);gP(g,[[-.3,.8],[-.38,-.6],[0,-.85],[.38,-.6],[.3,.8]],'#a39a8c');g.beginPath();g.moveTo(-.15,-.25);g.lineTo(.15,-.25);g.moveTo(0,-.2);g.lineTo(0,.2);g.stroke();}],
+ [-50,-70,(g,u,t)=>{const w=Math.sin(t*5)*.12;gO(g);gE(g,0,0,.33,.5,'#3a2840',w);gE(g,.05,.08,.2,.36,'#fff8ee',w);gC(g,0,-.48,.2,'#3a2840');gP(g,[[.18,-.5],[.38,-.44],[.18,-.4]],'#ffb800');}],
+ // 순록(북유럽)
+ [66,24,(g)=>{gO(g);gE(g,0,0,.5,.3,'#c9a98a');gC(g,.55,-.15,.2,'#c9a98a');g.beginPath();g.moveTo(.5,-.3);g.lineTo(.4,-.75);g.moveTo(.42,-.55);g.lineTo(.22,-.65);g.moveTo(.65,-.3);g.lineTo(.8,-.75);g.moveTo(.75,-.55);g.lineTo(.95,-.6);g.moveTo(-.3,.28);g.lineTo(-.3,.62);g.moveTo(.25,.28);g.lineTo(.25,.62);g.stroke();gC(g,.75,-.12,.06,'#ff5a6e');}]];
+function glDoodles(){const g=GLX,t=performance.now()/1000,k=GL.R*.105;
+  for(const [la,lo,f] of GL_DOODLE){const [x,y,z]=glProj(la,lo);if(z<.15)continue;const s=k*(.55+.45*z);g.save();g.globalAlpha=Math.min(1,(z-.15)*3);g.translate(x,y);g.scale(s,s);
+    // 그림자
+    g.fillStyle='rgba(70,40,70,.18)';g.beginPath();g.ellipse(.15,.85,.7,.18,0,0,7);g.fill();
+    GLDS=s;try{f(g,s,t);}catch(e){}g.restore();}
   g.globalAlpha=1;}
 const glEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // 이름표: 앞쪽(z 큰) 것부터 놓고, 겹치면 아래로 한 번 비켜 보고, 그래도 겹치면 숨김
