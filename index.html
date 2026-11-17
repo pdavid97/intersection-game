@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261116222515">
+<meta name="gl-build" content="20261117123842">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1118,7 +1118,7 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.35. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.36. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -1893,8 +1893,9 @@ function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for
 // 좌측 통행 스테이지: 시뮬레이션 안의 동/서, 좌/우는 실제와 반대. 화면 글자를 실제 기준으로 바꿔 보여 줌
 const HAND={on:false,nodes:new Set(),orig:new WeakMap(),done:new WeakMap(),obs:null};
 const LR_MAP={'좌회전':'우회전','우회전':'좌회전','직좌':'직우','직우':'직좌','좌직':'우직','우직':'좌직','좌유':'우유','우유':'좌유'};
-function lrSwap(t){return t.replace(/좌회전|우회전|직좌|직우|좌직|우직|좌유|우유/g,m=>LR_MAP[m]).replace(/(^|[\s(/,])(좌|우)(?=$|[\s)/,·:])/g,(m,a,b)=>a+(b==='좌'?'우':'좌'));}
-function handNode(n){if(n.nodeType!==3)return;const pe=n.parentElement;if(!pe||pe.closest('.noswap,script,style,textarea'))return;const t=n.data;if(HAND.done.get(n)===t||!/[좌우]/.test(t))return;
+const LR_GLYPH={'↰':'↱','↱':'↰','↶':'↷','↷':'↶','⮌':'⮎','⮎':'⮌'};
+function lrSwap(t){return t.replace(/[↰↱↶↷⮌⮎]/g,m=>LR_GLYPH[m]).replace(/좌회전|우회전|직좌|직우|좌직|우직|좌유|우유/g,m=>LR_MAP[m]).replace(/(^|[\s(/,])(좌|우)(?=$|[\s)/,·:])/g,(m,a,b)=>a+(b==='좌'?'우':'좌'));}
+function handNode(n){if(n.nodeType!==3)return;const pe=n.parentElement;if(!pe||pe.closest('.noswap,script,style,textarea'))return;const t=n.data;if(HAND.done.get(n)===t||!/[좌우↰↱↶↷⮌⮎]/.test(t))return;
   const o=lrSwap(t);if(o===t)return;HAND.orig.set(n,t);HAND.nodes.add(n);HAND.done.set(n,o);n.data=o;}
 function handWalk(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))handNode(n);}
 function setHand(on){on=!!on;MX=on?-1:1;NAME.E=on?'서측':'동측';NAME.W=on?'동측':'서측';SHORT.E=on?'서':'동';SHORT.W=on?'동':'서';
@@ -1903,6 +1904,11 @@ function setHand(on){on=!!on;MX=on?-1:1;NAME.E=on?'서측':'동측';NAME.W=on?'�
   if(on){handWalk(document.body);HAND.obs=new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')handNode(m.target);else for(const x of m.addedNodes){if(x.nodeType===3)handNode(x);else if(x.nodeType===1)handWalk(x);}}});
     HAND.obs.observe(document.body,{subtree:true,childList:true,characterData:true});}
   else{if(HAND.obs)HAND.obs.disconnect();HAND.obs=null;for(const n of HAND.nodes){const o=HAND.orig.get(n);if(o!=null&&n.isConnected&&n.data===HAND.done.get(n))n.data=o;}HAND.nodes.clear();}}
+
+// 좌측 통행 나라의 적색 신호 회전(게임 안 '적색 우회전' = 실제 적색 좌회전): 일본은 左折可 표지가 있는 곳만, 영국은 규정에 없음
+function lhtRedNote(){if(MX>0)return'';const r=typeof curReal==='function'&&curReal();if(!r)return'';const c=(r.city||'')+r.id;return /tokyo|도쿄|일본|오사카|교토|요코하마/i.test(c)?' (일본: 左折可 표지가 있는 곳만)':/london|런던|영국/i.test(c)?' (영국 규정에는 없음, 가상 실험)':' (나라마다 규정이 달라요)';}
+setInterval(()=>{const l=$('rtorlbl');if(!l)return;let n=l.querySelector('.rtornote');const t=lhtRedNote();if(!t){if(n)n.remove();return;}
+  if(!n){n=document.createElement('small');n.className='rtornote noswap';l.appendChild(n);}if(n.textContent!==t)n.textContent=t;},1000);
 // ---------- 상태 ----------
 let wideMap=false,mode={kind:'level',idx:0},scenKey='nsPeak',cfg,sim,baseline=null,running=true,speed=4,state='run',history=[],sessNo=1,PH=[];
 let prog={};
@@ -2098,7 +2104,7 @@ function arrowSVG(m){let d='M12 26V13';
   if(m.includes('T'))d+=' M12 13V4 M8 8L12 4L16 8';
   if(m.includes('L'))d+=' M12 15Q12 9 5 9 M8 6L5 9L8 12';
   if(m.includes('R'))d+=' M12 15Q12 9 19 9 M16 6L19 9L16 12';
-  return`<svg viewBox="0 0 24 28" aria-hidden="true"><path d="${d}"/></svg>`;}
+  return`<svg viewBox="0 0 24 28" aria-hidden="true" style="${MX<0?'transform:scaleX(-1)':''}"><path d="${d}"/></svg>`;}
 function laneOptions(c,i){const n=c.lanes.length,bus=unlocked('bus')?['B']:[],ut=unlocked('uturn')?['LU','U']:[];
   if(n===1)return['LT','T','TR','LU'];
   if(n===2)return i===0?['L',...ut,'LT','T']:['TR','T','R',...bus];
@@ -5014,7 +5020,7 @@ function dxSigMenu(a){closePop();const g=DX.geo[a];if(!g)return;const q=g.B[0],i
 // 교차로 전체 신호 설정(주기, 황색, 적색 우회전)
 function dxGlobal(){const it=[];
   if(unlocked('yellow'))it.push({ic:'Y',t:`황색 ${cfg.yellow}초`,f:()=>{cfg.yellow=cfg.yellow>=6?2:cfg.yellow+1;refreshPlan();}});
-  if(unlocked('rtor'))it.push({ic:'↱',t:cfg.rtor?'적색 우회전 허용':'적색 우회전 금지',on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();}});
+  if(unlocked('rtor'))it.push({ic:'↱',t:(cfg.rtor?'적색 우회전 허용':'적색 우회전 금지')+lhtRedNote(),on:!!cfg.rtor,f:()=>{cfg.rtor=!cfg.rtor;const r=$('rtor');if(r)r.checked=cfg.rtor;renderAllStatus();}});
   return it;}
 function dxCenter(){if(unlocked('phases')||unlocked('scheme'))return dxSchemePick();const it=dxGlobal().filter(x=>!x.lab);
   if(unlocked('scheme'))it.unshift({ic:'☰',t:'신호 방식',f:()=>{dxClose();openPhase();}});
