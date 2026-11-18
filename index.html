@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261117213116">
+<meta name="gl-build" content="20261117214628">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1279,12 +1279,145 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 .journey[data-view="modes"] .hmprog i{background:linear-gradient(90deg,#b9d6b0,#cfe3b8);border-right:0}
 .journey[data-view="modes"] .hmstars{color:#e0a96a}
 @media (max-width:720px){.hwpanel{border-radius:22px 22px 0 0}}
+/* 깜빡이 v2: 새싹 흔들림, 등 은은한 순환, 꿀색 등 빛 */
+.kbk .kbsprout{transform-box:fill-box;transform-origin:50% 100%;animation:kbsway 3.6s ease-in-out infinite}
+@keyframes kbsway{0%,100%{rotate:-6deg}50%{rotate:7deg}}
+.kbk .hmk-r{animation:kbred 6s ease-in-out infinite}.kbk .hmk-g{animation:kbgrn 6s ease-in-out infinite}
+@keyframes kbred{0%,40%{opacity:1}50%,90%{opacity:.6}100%{opacity:1}}@keyframes kbgrn{0%,40%{opacity:.6}50%,90%{opacity:1}100%{opacity:.6}}
+.kbk .kbglow{animation:kbglow 3s ease-in-out infinite}@keyframes kbglow{0%,100%{opacity:.55}50%{opacity:1}}
+.hwmas.walking .kbl1{animation:kbstep .32s ease-in-out infinite}.hwmas.walking .kbl2{animation:kbstep .32s ease-in-out infinite reverse}
+@keyframes kbstep{0%,100%{translate:0 0}50%{translate:0 -1.6px}}
+@media (prefers-reduced-motion:reduce){.kbk *{animation:none!important}}
+/* ===== 시작 화면 v2: 안개 위 테라스 ===== */
+.title{background:#f6e3da}
+.title #ttlcv{display:none}
+.title .tsh{background:linear-gradient(180deg,rgba(249,227,208,.55) 0%,rgba(249,227,208,0) 34%,rgba(243,238,246,0) 70%,rgba(243,238,246,.5) 100%)}
+.tbg2{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.tbg2 .t2sky{position:absolute;inset:0;background:linear-gradient(180deg,#f9e3d0 0%,#f3d9de 38%,#e6e1f1 72%,#f3eef6 100%)}
+.tbg2 .t2world{position:absolute;left:50%;bottom:-16%;width:min(150vw,1560px);translate:-50% 0;animation:t2float 14s ease-in-out infinite}
+.tbg2 .t2world svg{display:block;width:100%;height:auto}
+@keyframes t2float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.tbg2 .t2fog{position:absolute;inset:auto 0 0 0;height:34%;background:linear-gradient(180deg,rgba(243,238,246,0),rgba(243,238,246,.72) 55%,rgba(246,240,247,.92))}
+.tbg2 .t2cl{position:absolute;height:26px;border-radius:99px;background:rgba(255,250,248,.75);filter:blur(1px);animation:t2drift linear infinite}
+.tbg2 .t2cl::before{content:'';position:absolute;left:22%;top:-12px;width:42%;height:30px;border-radius:50%;background:inherit}
+.tbg2 .t2cl.a{top:20%;width:120px;animation-duration:70s;animation-delay:-20s}.tbg2 .t2cl.b{top:34%;width:84px;animation-duration:95s;animation-delay:-60s;opacity:.7}.tbg2 .t2cl.c{top:9%;width:150px;animation-duration:120s;animation-delay:-90s;opacity:.6}
+@keyframes t2drift{from{left:-180px}to{left:calc(100% + 40px)}}
+.tbg2 .t2tile{position:absolute;width:46px;height:40px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:linear-gradient(180deg,#c4d4a0 0 46%,#f0c4ad 46%,#f3e9f1 100%);opacity:.85;animation:t2bob 9s ease-in-out infinite}
+.tbg2 .t2tile.t1{left:9%;top:52%}.tbg2 .t2tile.t2{right:8%;top:44%;width:34px;height:30px;animation-delay:-3s;background:linear-gradient(180deg,#a7d3d3 0 46%,#e9c7c9 46%,#f3e9f1 100%)}.tbg2 .t2tile.t3{left:18%;top:30%;width:26px;height:22px;animation-delay:-6s;opacity:.6}
+@keyframes t2bob{0%,100%{translate:0 0}50%{translate:0 -9px}}
+.tbg2 .t2whale{position:absolute;bottom:7%;left:-20%;width:150px;opacity:.28;pointer-events:auto;cursor:pointer;animation:t2whale 46s linear infinite}
+.tbg2 .t2whale svg{width:100%;height:auto;display:block}
+.tbg2 .t2whale.spout::after{content:'';position:absolute;left:18%;top:-20px;width:14px;height:22px;border-radius:50% 50% 40% 40%;background:rgba(167,211,211,.9);animation:t2spout 1.3s ease-out}
+@keyframes t2whale{0%{left:-20%;transform:translateY(0)}50%{transform:translateY(-8px)}100%{left:110%;transform:translateY(0)}}
+@keyframes t2spout{0%{transform:scaleY(.2);opacity:0}30%{transform:scaleY(1.2);opacity:1}100%{transform:scaleY(1) translateY(-14px);opacity:0}}
+.title .tbox{z-index:2;color:#45364a}
+.title .t2kbk{display:inline-flex;margin-right:2px;animation:hmhop 3.2s ease-in-out infinite}
+.title .t2kbk .hmmas{width:clamp(40px,6vw,64px);height:auto}
+.title h1.tbrand{font-family:'Gowun Dodum',var(--f-display);font-weight:400;color:#45364a;letter-spacing:.01em;text-shadow:0 2px 0 rgba(255,250,246,.9),0 10px 30px rgba(120,80,110,.18)}
+.title h1.tbrand em{color:#7fae86;text-shadow:0 2px 0 rgba(255,250,246,.9),0 0 26px rgba(168,220,184,.55)}
+.title .tko{font-family:'Gowun Dodum',var(--f-display);color:#6f5a72;text-shadow:none;letter-spacing:.14em}
+.title .tsub{color:#5b4a63;text-shadow:0 1px 0 rgba(255,250,246,.8);font-weight:500}
+.title .tgo{font-family:'Gowun Dodum',var(--f-display);font-weight:400;color:#45364a;background:#f2b8a2;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 26px rgba(160,90,90,.25);border:1px solid rgba(255,255,255,.55)}
+.title .tgo:hover{background:#f5c6b4}
+.title .tver{color:rgba(91,74,99,.6)}
+.title .tglobe{color:#45364a}
+.title .tgl{box-shadow:0 6px 16px rgba(91,74,99,.18)}
+.title .tgl.live{background:rgba(255,252,248,.94);border:1px solid rgba(127,174,134,.55);color:#45364a}
+.title .tgl.live span{color:#5f8f68}.title .tgl.live:hover{background:#fff}
+.title .tgl.cand{background:rgba(255,252,248,.86);border:1px solid rgba(255,255,255,.9);color:#45364a}
+.title .tgl.cand .hv{color:#d9818a}.title .tgl.cand.me{background:#fbe3dc;border-color:#f2b8a2}
+.title .tgl:focus-visible{outline-color:#7fae86}
+.title .tgleg{text-shadow:none;color:#5b4a63}
+.title .tgleg i.gdl{background:radial-gradient(circle at 50% 76%,#a8dcb8 0 1.8px,transparent 2.2px),#5f4f78}.title .tgleg i.gdc{background:#fbefe4;border:1.5px solid rgba(91,74,99,.45)}
+.title .tgrank{background:rgba(255,252,248,.8);color:#45364a;border:1px solid rgba(255,255,255,.7);box-shadow:0 6px 18px rgba(91,74,99,.1)}
+.title .tgrank b{color:#c46f6a}
+.title .tgtoast{background:rgba(255,252,248,.96);border:1px solid rgba(91,74,99,.2);color:#45364a}
+@media (max-width:720px){.tbg2 .t2world{width:230vw;bottom:-6%}.tbg2 .t2whale{width:100px}}
+@media (prefers-reduced-motion:reduce){.tbg2 *{animation:none!important}}
+.tbg2 .t2world svg{position:static!important;inset:auto!important;width:100%!important;height:auto!important}
+.tbg2 .t2world{width:min(118vw,1400px);bottom:-46%}
+.title .tgo:focus-visible{outline:2px solid rgba(127,174,134,.8);outline-offset:3px}
+@media (max-width:720px){.tbg2 .t2world{width:250vw;bottom:-22%}}
+/* ===== 기본 스킨 v4: 안개 테라스 (플레이 화면 카드) ===== */
+html:has(body.sk-terrace.play),body.sk-terrace.play{background:linear-gradient(180deg,#f7ebe4 0%,#efe6ef 100%) fixed}
+body.sk-terrace.play header{color:#45364a}body.sk-terrace.play header .sub{color:#7a6880}
+body.sk-terrace.play h1.brand{font-family:'Gowun Dodum',var(--f-brand);font-weight:400}body.sk-terrace.play h1.brand span{color:#7fae86}body.sk-terrace.play h1.brand small{font-family:'Gowun Dodum',var(--f-display);color:#7a6880}
+body.sk-terrace.play .modebtn{background:rgba(255,252,248,.85);color:#45364a;border:1px solid rgba(91,74,99,.15)}
+body.sk-terrace .hqc,body.sk-terrace .phstrip,body.sk-terrace .hqsub,body.sk-terrace .mvchip,body.sk-terrace .dxtoast{--fg:#45364a;--muted:#7a6880;--accent:#d98a7a;color:#45364a;background:rgba(255,252,248,.94)!important;border:1px solid rgba(91,74,99,.12)!important;border-radius:18px;box-shadow:0 10px 28px rgba(91,74,99,.14),0 1px 0 rgba(255,255,255,.8) inset;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.sk-terrace .phh,body.sk-terrace .phh *{color:#5b4a63!important}
+body.sk-terrace .phc{background:color-mix(in srgb,var(--c) 22%,#fffaf6)!important;color:#45364a!important;border:1px solid color-mix(in srgb,var(--c) 40%,transparent)!important;border-radius:999px!important}
+body.sk-terrace .phc .no,body.sk-terrace .phc .sec{color:#45364a}
+body.sk-terrace .phc.live{box-shadow:0 0 0 2px #fffaf6,0 0 0 4px #f0be62}
+body.sk-terrace #hqtask #lvchip{color:#45364a;font-family:'Gowun Dodum',var(--f-body);font-weight:400;font-size:15px}body.sk-terrace #hqtask #lvchip .lvx,body.sk-terrace .hqfold{color:#a08aa6}
+body.sk-terrace #hqtask .sgoal{color:#5b4a63}
+body.sk-terrace .hqn{color:#d98a7a;font-family:'Gowun Dodum',sans-serif;font-weight:400;font-size:30px}
+body.sk-terrace .hqd{color:#a08aa6}body.sk-terrace .hqd.down{color:#d0707c}body.sk-terrace .hqd.up{color:#5f9f72}
+body.sk-terrace .hqst{color:#e6b85c;font-size:19px}body.sk-terrace .hqst i{color:#ebe3ee}
+body.sk-terrace .hqln{border:0;background:#ebe3ee!important;height:6px!important;top:14px!important;border-radius:6px!important}
+body.sk-terrace .hqmk .hqtk{background:#bfb0c6}body.sk-terrace .hqmk .hqlb{color:#a08aa6}body.sk-terrace .hqmk .hqlb.hi{color:#d9a440;font-size:12px}body.sk-terrace .hqmk .hqlb.ai{color:#6f95b8}
+body.sk-terrace .hqmk .hqdot{background:#e8a99a;border:3px solid #fffaf6;box-shadow:0 2px 8px rgba(91,74,99,.25);width:16px;height:16px;top:9px}body.sk-terrace .hqmk .hqdot.prev{background:#d6cadc;border-width:2px;width:10px;height:10px;top:12px;opacity:1}
+body.sk-terrace .hqgoals .g.ok{color:#5f9f72}body.sk-terrace .hqgoals .g.no{color:#7a6880}
+body.sk-terrace #hqflow .hqh b{color:#a08aa6}body.sk-terrace #hqflow .grid2 span{color:#7a6880}body.sk-terrace #hqflow .grid2 b{color:#c97a6c;font-family:'Gowun Dodum',sans-serif;font-weight:400;font-size:14px}
+body.sk-terrace .hqpips{color:#7a6880}body.sk-terrace .hqpips i{background:#f0be62;border:0;width:9px;height:9px}body.sk-terrace .hqpips i.u{background:#e6dcea}
+body.sk-terrace #hqctl .seg{background:none;border:0;gap:4px;overflow:visible}
+body.sk-terrace #hqctl button,body.sk-terrace #hqctl .seg button{font-family:'Gowun Dodum',var(--f-body);background:#fffaf6;border:1px solid rgba(91,74,99,.14)!important;border-radius:999px!important;color:#45364a;box-shadow:0 3px 10px rgba(91,74,99,.1)}
+body.sk-terrace #hqctl .seg button.on{background:#f6dca6;color:#45364a}
+body.sk-terrace #hqctl #dxsig{background:#bfe0c8;color:#45364a}body.sk-terrace #hqctl .hqmore{background:#f2c4b6}body.sk-terrace #hqctl #hqskip{background:#f6dca6}
+body.sk-terrace #hqrad .hqring button{background:rgba(255,252,248,.96);color:#45364a;border:1px solid rgba(91,74,99,.14);box-shadow:0 8px 20px rgba(91,74,99,.16);font-family:'Gowun Dodum',var(--f-body);font-weight:400}
+body.sk-terrace #hqrad .hqring button small{color:#a08aa6}body.sk-terrace #hqrad .hqring button.on{background:#f8e6bd}
+body.sk-terrace .hqsub button{background:#fffaf6;color:#45364a;border:1px solid rgba(91,74,99,.14)}body.sk-terrace .hqsub button.on{background:#f8e6bd}body.sk-terrace .hqsub kbd{color:#a08aa6}
+body.sk-terrace .hqrad{background:rgba(91,74,99,.12)}
+body.sk-terrace .monovbox,body.sk-terrace .monsk{border-radius:18px}
+body.sk-terrace .ov{--fg:#45364a;--muted:#7a6880;background:rgba(255,252,248,.94)!important;color:#45364a;border:1px solid rgba(91,74,99,.12)!important;box-shadow:0 10px 28px rgba(91,74,99,.14)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.sk-terrace .ov .chip,body.sk-terrace .ov .gauge{background:#f6eef0!important;color:#45364a;border:1px solid rgba(91,74,99,.1)!important}
+body.sk-terrace .ov button{background:#fffaf6;color:#45364a;border:1px solid rgba(91,74,99,.14)}body.sk-terrace .ov button.on,body.sk-terrace .ov .seg button.on{background:#f6dca6;color:#45364a}
+body.sk-terrace .ov button.primary{background:#f2b8a2;color:#45364a;box-shadow:none}
+body.sk-terrace #skip{background:#f6dca6!important;color:#45364a!important;box-shadow:0 4px 12px rgba(91,74,99,.14)!important}
+/* ===== 하위 화면(튜토리얼 길, 실제 교차로, 일일, 나만의): 안개 테라스 ===== */
+.journey{color:#45364a;background:radial-gradient(120% 50% at 50% 0%,#f9e3d0 0%,rgba(249,227,208,0) 60%),linear-gradient(180deg,#f6e2dc 0%,#efdde6 45%,#e6e1f1 80%,#f3eef6 100%)}
+.journey .jhead{background:rgba(255,252,248,.72);border-bottom:1px solid rgba(91,74,99,.1);box-shadow:0 6px 20px rgba(91,74,99,.06)}
+.journey .jt{font-family:'Gowun Dodum',var(--f-body);font-weight:400;color:#45364a}.journey .jsum{color:#7a6880}
+.journey .jx{background:rgba(255,252,248,.9)!important;border:1px solid rgba(91,74,99,.15)!important;color:#45364a!important}
+.journey h2,.journey h3,.journey .jsec{color:#45364a}
+.journey .jv>p,.journey .jv p,.journey .jv small{color:#7a6880}
+.journey .jl b{color:#45364a}.journey .jl{color:#5b4a63}
+.journey .jroad .r0{stroke:#fbefe4;stroke-width:42;opacity:.9}.journey .jroad .r1{stroke:#a39bb0}
+.journey .jroad .r2{stroke:#a8dcb8;opacity:.55}.journey .jroad .r3{stroke:#fbf6f0;opacity:.9}
+.journey .jsign{background:#8fb7c9;color:#fff;box-shadow:0 6px 16px rgba(91,74,99,.16);font-family:'Gowun Dodum',var(--f-body)}.journey .jsign span{color:#fff6e0}
+.journey .jsign.clr{background:#7fae86;box-shadow:0 6px 16px rgba(91,74,99,.16)}
+.journey .jsign.fin{background:#f3d694;color:#45364a;box-shadow:0 6px 16px rgba(91,74,99,.16)}.journey .jsign.fin span{color:#7a5a2a}
+.journey .jsig{background:#5f4f78!important}.journey .jsig i{background:#7a6890}.journey .jsig i.lr.on,.journey .jsig .lr.on{background:#e8848c}
+.journey .jno{background:#f3d694!important;color:#45364a}
+.journey .jexit{background:linear-gradient(180deg,#8bbf93,#78ad82)!important;color:#fff!important;border-radius:16px!important;box-shadow:0 10px 24px rgba(91,74,99,.16)!important}
+.journey .jexit .jeno{background:#f3d694;color:#45364a;box-shadow:0 0 0 2px #fffaf6}
+.journey .jexit em{color:#fff2c4}.journey .jexit .jearr{border-color:#fff}
+.journey .jexit.soon{background:rgba(255,252,248,.75)!important;color:#7a6880!important;box-shadow:0 6px 18px rgba(91,74,99,.08)!important;border:1px dashed rgba(91,74,99,.25)!important}.journey .jexit.soon .jeno{background:#e6dcea;color:#5b4a63}
+.journey .jexit.lab{background:linear-gradient(180deg,#9cbfd2,#86aec4)!important;box-shadow:0 10px 24px rgba(91,74,99,.16)!important}
+.journey .jexit.cur{outline:3px solid #f2b8a2}
+.journey .dcard{background:rgba(255,252,248,.95);border:1px solid rgba(240,190,98,.6);box-shadow:0 0 0 4px rgba(243,214,148,.25),0 12px 30px rgba(91,74,99,.14);color:#45364a}
+.journey .dtag{background:#e8848c}.journey .ddate,.journey .dtopn b,.journey .cxst{color:#c9893a}
+.journey .dq,.journey .dboard,.journey .myempty,.journey .jask,.journey .jtoast{background:rgba(255,252,248,.92)!important;border:1px solid rgba(91,74,99,.12)!important;color:#45364a;box-shadow:0 10px 26px rgba(91,74,99,.1)}
+.journey .myempty{border:1.5px dashed #e9a596!important}.journey .myempty span,.journey .drules,.journey .cxp{color:#6f5a72}
+.journey .dq *{color:inherit}.journey .dcard span:not(.dtag),.journey .dcard p{color:#5b4a63}
+.journey button.primary{background:#f2b8a2!important;color:#45364a!important;border:0!important;box-shadow:0 6px 16px rgba(217,138,122,.25)!important;font-family:'Gowun Dodum',var(--f-body)}
+.journey #jpick,.journey .mact button:not(.primary){background:#fffaf6!important;color:#45364a!important;border:1px solid rgba(91,74,99,.15)!important}
+.journey .jq b{color:#c97a6c}
+.journey .jcx,.journey .myh{background:linear-gradient(180deg,#eab39f,#d99a86)!important;color:#fff!important}
+.journey .cxchip{background:#e9a596!important;border-color:#e9a596!important;color:#fff!important}
+.journey .jvh b{color:#45364a;font-family:'Gowun Dodum',var(--f-body);font-weight:400;font-size:17px}.journey .jvh span{color:#7a6880!important}
+.journey .drules b{color:#c9893a}.journey .jexit em s{color:rgba(255,255,255,.45)}
+.journey .dcard .dtags span,.journey .dchip{background:#f3e9ee!important;color:#5b4a63!important;border-color:rgba(91,74,99,.12)!important}
+.journey .dchips span{background:#f3e9ee!important;color:#5b4a63!important;border:1px solid rgba(91,74,99,.12)!important}.journey .dleft{color:#7a6880}.journey .dleft b{color:#45364a}.journey .dtitle{font-family:"Gowun Dodum",var(--f-body);font-weight:400}
+.journey .jrh b,.journey .jrh{color:#45364a}.journey .jrh span,.journey .jrh small{color:#7a6880!important}
+.journey .jl b{color:#45364a;text-shadow:0 1px 0 rgba(255,252,248,.9)}.journey .jl em{color:#e0a443}.journey .jl em s{color:rgba(91,74,99,.22)}
+.journey .jt{font-size:19px}
+@media (max-width:480px){.journey .jt{font-size:16px}}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.42. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.43. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3213,6 +3346,66 @@ const PIX=document.createElement('canvas'),PIXC=PIX.getContext('2d');
     PIXC.imageSmoothingEnabled=true;PIXC.drawImage(cv,0,0,w,h);ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(PIX,0,0,w,h,0,0,w*f,h*f);ctx.imageSmoothingEnabled=true;}
   if(typeof ambLabels==='function')ambLabels();};}
 window.__sk={order:SKIN_ORDER,cells:()=>skCells()};
+// ---------- 기본 스킨 v4(2026-11-17): 안개 테라스(design/art-direction.md) ----------
+// 외곽선 없이 면 명암, 부드러운 그림자, 채도를 낮춘 파스텔. 레벨 교차로는 테라스 마을(파스텔 집, 둥근 나무 무리, 육각 연못),
+// 실제 교차로는 지도 건물을 같은 색으로. 처음 한 번은 예전 기본(아기자기 마을)을 쓰던 사람만 새 기본으로 옮김
+SKINS.terrace={name:'안개 테라스',car:'terrace',col:{ground:'#d3ddb4',asphalt:'#a39bb0',paint:'#fbf6f0',y:'#ecd08a',island:'#bfd09c',bld:'#fbefe4',bldEdge:'#e3cfc0',park:'#c4d4a0',mapRoad:'#f4ebe3',mapCase:'#e2d3c9',mapLabel:'#6f5a72',bus:'#e7a08f',head:'#5f4f78',headEdge:'#4a3d62',muted:'#6f5a72',fg:'#45364a',go:'#5fc08c',stop:'#e57f8a',warn:'#f0be62',wall:'#d8bfa8',metro:'#6f9f78'}};
+SKIN_ORDER.unshift('terrace');
+CAR_PAINT.terrace=['#e8a99a','#a7c7d9','#ecd08a','#a8d4b4','#c9b6d9','#f0c4ad','#fbefe4','#9fb0c8','#d98a7a'];
+// [윗면, 옆면]: 벽 크림, 지붕 산호, 하늘빛 탑, 세이지, 꿀색, 라벤더
+const TER_BLD=[['#fbefe4','#e7cdbd'],['#e9a596','#c98274'],['#d3dbe4','#a9b4c4'],['#cdd9b3','#a8b98c'],['#f3dbb0','#d6b682'],['#ded3ea','#b9aacd']];
+const TER_SH='rgba(91,74,99,.13)';
+{const _ap=applySkin;applySkin=function(id){_ap(id);const b=document.body;b.classList.toggle('sk-terrace',skin==='terrace');if(skin==='terrace')b.classList.add('sk-sunset');};}
+function terTree(x,y,r,k){ctx.fillStyle=TER_SH;ctx.beginPath();ctx.ellipse(x+r*.35,y-r*.45,r*1.05,r*.9,0,0,7);ctx.fill();
+  const c=k%3===0?['#9fb580','#b7c99a']:k%3===1?['#adc28e','#c6d6a8']:['#93ab7a','#aec392'];
+  ctx.fillStyle=c[0];ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.fillStyle=c[1];ctx.beginPath();ctx.arc(x-r*.28,y+r*.28,r*.62,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.beginPath();ctx.arc(x-r*.42,y+r*.42,r*.26,0,7);ctx.fill();}
+function terHouse(x,y,w,h,k){const P=TER_BLD[k%TER_BLD.length],ht=1.4+((k*7)%5)*.45;
+  ctx.fillStyle=TER_SH;rrect(x+ht*.9,y-ht*1.1,w,h,1.4);ctx.fill();
+  ctx.fillStyle=P[1];rrect(x+ht*.45,y-ht*.55,w,h,1.4);ctx.fill();
+  const g=ctx.createLinearGradient(x,y+h,x+w,y);g.addColorStop(0,P[0]);g.addColorStop(1,shade(P[0],-.05));ctx.fillStyle=g;rrect(x,y,w,h,1.4);ctx.fill();
+  // 지붕 능선과 작은 창
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(x+.8,y+h/2-.15,w-1.6,.3);
+  if(k%2){ctx.fillStyle='rgba(91,74,99,.16)';for(let i=0;i<2;i++)rrect(x+1.2+i*(w-3.4),y+1.1,1.2,1,.3),ctx.fill();}}
+function terPond(x,y,r){ctx.fillStyle='rgba(91,74,99,.08)';ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/3*i;ctx.lineTo(x+.6+Math.cos(a)*r,y-.6+Math.sin(a)*r);}ctx.closePath();ctx.fill();
+  ctx.fillStyle='#a7d3d3';ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/3*i;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=.25;ctx.beginPath();ctx.moveTo(x-r*.4,y+r*.15);ctx.quadraticCurveTo(x-r*.2,y+r*.3,x,y+r*.15);ctx.stroke();}
+function terDecor(stage){if(stage!=='ground'||!sim||curReal())return;sidewalks('#f1e4d9',null);
+  for(const c of skCells()){if(c.tree){if(c.park&&c.r4<.35)terPond(c.cx,c.cy,3.4);for(const [tx,ty,r] of c.park?c.trees:c.trees.slice(0,1))terTree(tx,ty,r,c.i+c.j);continue;}
+    terHouse(c.x,c.y,c.w,c.h,c.i*5+c.j*3+(c.sx>0?1:0)+(c.sy>0?2:0));}
+  streetTrees((x,y)=>terTree(x,y,1.4,Math.round(x+y)));}
+{const _dec=decorate;decorate=function(stage){if(skin==='terrace'){terDecor(stage);return;}_dec(stage);};}
+{const _dc=drawContext;drawContext=function(R){if(skin!=='terrace'){_dc(R);return;}const X=R.ctx;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.fillStyle=COL.park;for(const b of X.parks||[]){poly(b,true);ctx.fill();}
+  X.blds.forEach((b,i)=>{const P=TER_BLD[i%TER_BLD.length];ctx.fillStyle=TER_SH;poly(b.map((v,j)=>v+(j%2?-1.6:1.3)),true);ctx.fill();
+    ctx.fillStyle=P[1];poly(b.map((v,j)=>v+(j%2?-.7:.55)),true);ctx.fill();ctx.fillStyle=P[0];poly(b,true);ctx.fill();});
+  const wid={p:16,s:11,r:7,v:4,l:4.5};
+  ctx.save();ctx.strokeStyle=COL.wall;ctx.globalAlpha=.7;ctx.lineWidth=3.6;for(const w of X.roads){if(w.c!=='w')continue;poly(w.p,false);ctx.stroke();}ctx.restore();
+  if(typeof ctxTunnels==='function'&&X.tun)ctxTunnels(X,poly);
+  for(const pass of [0,1])for(const w of X.roads){if(w.c==='l'||w.c==='w')continue;const ww=wid[w.c]||4;ctx.lineWidth=pass?ww:ww+1.6;ctx.strokeStyle=pass?COL.mapRoad:COL.mapCase;poly(w.p,false);ctx.stroke();}
+  ctx.restore();};}
+{const _pv=paintVehicle;paintVehicle=function(v,p,now){if(SKINS[skin].car!=='terrace')return _pv(v,p,now);
+  const L=v.len,Wd=v.w,braking=!v.crashed&&(v.v<0.8||(v.acc||0)<-1.2),blink=v.move!=='T'&&Math.floor(now/380)%2===0,bus=v.cls==='bus';
+  const c=v.crashed?'#b8b0bf':bus?COL.bus:showSpeed?`hsl(${Math.round(2+128*Math.min(1,v.v/11))},55%,68%)`:hashPick(v.id,CAR_PAINT.terrace),r=Math.min(Wd*.46,1);
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.ang+(v.crashed?.35*Math.sin(v.id):0));
+  ctx.fillStyle='rgba(91,74,99,.2)';rrect(-L/2+.35,-Wd/2-.4,L,Wd,r);ctx.fill();
+  const g=ctx.createLinearGradient(0,-Wd/2,0,Wd/2);g.addColorStop(0,shade(c,-.12));g.addColorStop(.5,shade(c,.12));g.addColorStop(1,shade(c,-.06));ctx.fillStyle=g;rrect(-L/2,-Wd/2,L,Wd,r);ctx.fill();
+  ctx.fillStyle='rgba(255,252,248,.62)';if(bus){for(let q=-L/2+.9;q<L/2-2;q+=1.7){rrect(q,-Wd/2+.35,1.15,Wd-.7,.35);ctx.fill();}}else{rrect(-L/2+L*.2,-Wd/2+.36,L*.42,Wd-.72,.45);ctx.fill();ctx.fillStyle='rgba(91,74,99,.14)';rrect(L/2-1.45,-Wd/2+.4,.55,Wd-.8,.25);ctx.fill();}
+  ctx.fillStyle='#fff6dc';ctx.beginPath();ctx.arc(L/2-.22,Wd/2-.42,.2,0,7);ctx.arc(L/2-.22,-Wd/2+.42,.2,0,7);ctx.fill();
+  if(braking){ctx.fillStyle='#e57f8a';ctx.beginPath();ctx.arc(-L/2+.22,Wd/2-.42,.22,0,7);ctx.arc(-L/2+.22,-Wd/2+.42,.22,0,7);ctx.fill();}
+  if(blink){ctx.fillStyle='#f0be62';ctx.beginPath();ctx.arc(L/2-.18,v.move==='L'?Wd/2-.18:-Wd/2+.18,.28,0,7);ctx.fill();}
+  if(v.crashed){ctx.strokeStyle=COL.stop;ctx.lineWidth=.3;rrect(-L/2,-Wd/2,L,Wd,r);ctx.stroke();}
+  ctx.restore();};}
+{const _dr=draw;draw=function(){if(skin!=='terrace'){_dr();return;}drawMain();if(!cw)return;if(typeof ambDraw==='function')ambDraw();ctx.setTransform(dpr,0,0,dpr,0,0);
+  // 가장자리 안개(아래는 라벤더, 위는 복숭아빛)
+  const g=ctx.createRadialGradient(cw/2,ch/2,Math.min(cw,ch)*.42,cw/2,ch/2,Math.max(cw,ch)*.78);g.addColorStop(0,'rgba(243,238,246,0)');g.addColorStop(1,'rgba(236,228,242,.42)');ctx.fillStyle=g;ctx.fillRect(0,0,cw,ch);
+  const t=ctx.createLinearGradient(0,0,0,ch);t.addColorStop(0,'rgba(249,227,208,.16)');t.addColorStop(.35,'rgba(249,227,208,0)');ctx.fillStyle=t;ctx.fillRect(0,0,cw,ch);
+  if(typeof ambLabels==='function')ambLabels();};}
+// 선택 목록 다시 채우고, 예전 기본(아기자기 마을)을 쓰던 사람은 한 번만 새 기본으로
+{const sel=$('skinsel');sel.innerHTML='';for(const k of SKIN_ORDER)if(SKINS[k]){const o=document.createElement('option');o.value=k;o.textContent=SKINS[k].name;sel.appendChild(o);}
+  let st=null;try{st=JSON.parse(localStorage.getItem('skin-v3'));}catch(e){}
+  let mig=null;try{mig=localStorage.getItem('skin-mig-terrace');localStorage.setItem('skin-mig-terrace','1');}catch(e){}
+  if(!st||!SKINS[st.skin]||(!mig&&st.skin==='cute')){showSpeed=false;applySkin('terrace');}else applySkin(st.skin);}
 // ---------- 도시 생동감(2026-11-16): 교차로 밖 건물, 공원, 하늘에 가끔 짧은 애니메이션 ----------
 // 6~12초마다 하나(동시에 최대 2개). 스킨마다 다른 이벤트. 시뮬레이션이 멈추면 새로 만들지 않음. 동작 줄이기 설정이면 끔
 // 좌표는 교차로 중심 기준 m(시뮬레이션과 같음). 글자는 화면 좌표로 따로 그림
@@ -4354,40 +4547,40 @@ const GL_PJ=typeof d3!=='undefined'&&d3.geoOrthographic?d3.geoOrthographic().cli
 // 시작 화면 도시와 같은 말투: 납작한 파스텔 면, 한쪽에 단단한 그림자, 길 차선 같은 점선 경위선, 노을빛 테두리
 function glDraw(){const g=GLX,S=GL.S,R=GL.R,cx=GL.cx,cy=GL.cy;g.clearRect(0,0,S,S);
   // 땅에 떨어진 그림자(건물 그림자처럼 오른쪽 아래)
-  g.fillStyle='rgba(70,40,70,.18)';g.beginPath();g.ellipse(cx+R*.12,cy+R*1.02,R*.78,R*.12,0,0,7);g.fill();
+  g.fillStyle='rgba(91,74,99,.10)';g.beginPath();g.ellipse(cx,cy+R*1.06,R*.72,R*.1,0,0,7);g.fill();
   // 바다: 납작한 파스텔 하늘색(조금 비침)
   g.save();g.beginPath();g.arc(cx,cy,R,0,7);g.clip();
-  g.fillStyle='rgba(143,206,226,.78)';g.fillRect(0,0,S,S);
+  {const og=g.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R*1.05);og.addColorStop(0,'#d3ecea');og.addColorStop(.6,'#a7d3d3');og.addColorStop(1,'#8dbfc6');g.fillStyle=og;g.fillRect(0,0,S,S);}
   // 경위선: 차선 같은 흰 점선
-  g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1.2;g.setLineDash([5,6]);
+  g.strokeStyle='rgba(255,255,255,.32)';g.lineWidth=1;g.setLineDash([4,7]);
   for(const la of [-30,0,30,60]){g.beginPath();let on=false;for(let lo=-180;lo<=180;lo+=5){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
   for(let lo=-180;lo<180;lo+=30){g.beginPath();let on=false;for(let la=-75;la<=75;la+=5){const [x,y,z]=glProj(la,lo);if(z>0){on?g.lineTo(x,y):g.moveTo(x,y);on=true;}else on=false;}g.stroke();}
   g.setLineDash([]);
   // 육지: 아래쪽에 두께(옆면) 한 겹 + 윗면. 시작 화면 잔디와 건물 색
   if(GL_PATH){GL_PJ.rotate([-GL.lon,-GL.lat]).translate([cx,cy]).scale(R);
-    g.save();g.translate(1.6,2.4);g.beginPath();GL_PATH(GL_LAND);g.fillStyle='#6f9a63';g.fill();g.restore();
-    g.beginPath();GL_PATH(GL_LAND);g.fillStyle='#b6dc9a';g.fill();g.strokeStyle='#86b574';g.lineWidth=1;g.stroke();}
+    g.save();g.translate(1.6,2.4);g.beginPath();GL_PATH(GL_LAND);g.fillStyle='#e9c3b2';g.fill();g.restore();
+    g.beginPath();GL_PATH(GL_LAND);g.fillStyle='#c4d4a0';g.fill();}
   glDoodles();
   // 단단한 그림자(오른쪽 아래 초승달)와 왼쪽 위 노을빛
-  g.fillStyle='rgba(74,45,90,.22)';g.beginPath();g.arc(cx,cy,R,0,7);g.arc(cx-R*.2,cy-R*.24,R*1.02,0,7,true);g.fill('evenodd');
+  g.fillStyle='rgba(91,74,99,.14)';g.beginPath();g.arc(cx,cy,R,0,7);g.arc(cx-R*.2,cy-R*.24,R*1.02,0,7,true);g.fill('evenodd');
   g.fillStyle='rgba(255,226,180,.28)';g.beginPath();g.ellipse(cx-R*.42,cy-R*.5,R*.3,R*.16,-.6,0,7);g.fill();
   g.restore();
   // 테두리: 건물 윤곽처럼 진한 자두색 + 노을빛 바깥 선
-  g.strokeStyle='rgba(255,200,150,.7)';g.lineWidth=5;g.beginPath();g.arc(cx,cy,R+2.5,0,7);g.stroke();
-  g.strokeStyle='#6b4a6e';g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();
+  g.strokeStyle='rgba(255,246,240,.75)';g.lineWidth=6;g.beginPath();g.arc(cx,cy,R+3,0,7);g.stroke();
+  g.strokeStyle='rgba(91,74,99,.18)';g.lineWidth=1;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();
   // 핀: 실제 교차로는 작은 신호등(초록불), 후보 도시는 분홍 원
   const t=performance.now()/1000;
   for(const [id,,,la,lo] of GL_LIVE){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);const k=(t*.8+la)%1;
-    g.strokeStyle='rgba(111,240,160,'+(1-k).toFixed(2)+')';g.lineWidth=2;g.beginPath();g.ellipse(x,y,4+k*12,(4+k*12)*.55,0,0,7);g.stroke();
-    g.fillStyle='#2b2f36';g.beginPath();g.roundRect?g.roundRect(x-4.5,y-17,9,17,3):g.rect(x-4.5,y-17,9,17);g.fill();
-    for(let j=0;j<3;j++){g.fillStyle=j===2?'#6ff0a0':'#4a4f58';g.beginPath();g.arc(x,y-13.5+j*5,1.9,0,7);g.fill();}
-    g.fillStyle='#2b2f36';g.fillRect(x-.8,y-1,1.6,3);}
-  for(const [id,,la,lo] of GL_CAND){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);g.fillStyle=GL.mine.has(id)?'#ff8fab':'#fff8ee';g.strokeStyle='#6b4a6e';g.lineWidth=1.5;g.beginPath();g.arc(x,y,4.2,0,7);g.fill();g.stroke();}
+    g.strokeStyle='rgba(127,191,150,'+(1-k).toFixed(2)+')';g.lineWidth=2;g.beginPath();g.ellipse(x,y,4+k*12,(4+k*12)*.55,0,0,7);g.stroke();
+    g.fillStyle='#5f4f78';g.beginPath();g.roundRect?g.roundRect(x-4.5,y-17,9,17,3):g.rect(x-4.5,y-17,9,17);g.fill();
+    for(let j=0;j<3;j++){g.fillStyle=j===2?'#a8dcb8':j===1?'#7a6890':'#7a6890';g.beginPath();g.arc(x,y-13.5+j*5,1.9,0,7);g.fill();}
+    g.fillStyle='#5f4f78';g.fillRect(x-.8,y-1,1.6,3);}
+  for(const [id,,la,lo] of GL_CAND){const [x,y,z]=glProj(la,lo);if(z<=0)continue;g.globalAlpha=Math.min(1,z*2.5);g.fillStyle=GL.mine.has(id)?'#f2b8a2':'#fbefe4';g.strokeStyle='rgba(91,74,99,.5)';g.lineWidth=1.2;g.beginPath();g.arc(x,y,4.2,0,7);g.fill();g.stroke();}
   g.globalAlpha=1;}
 
 // ---- 땅 위 작은 그림(랜드마크, 동물): 납작한 파스텔 + 자두색 윤곽. 지구본을 향해 서 있는 그림이라 앞쪽일수록 크고 진함 ----
 // 실제 교차로 핀(서울, 도쿄, 런던 등)과 겹치는 곳은 피함
-const INKG='#6b4a6e';
+const INKG='rgba(91,74,99,.32)';
 let GLDS=1;function gO(g,w){g.strokeStyle=INKG;g.lineWidth=(w||1.1)/GLDS;g.lineJoin='round';g.lineCap='round';}
 function gC(g,x,y,r,f){g.beginPath();g.arc(x,y,r,0,7);g.fillStyle=f;g.fill();g.stroke();}
 function gE(g,x,y,rx,ry,f,a){g.beginPath();g.ellipse(x,y,rx,ry,a||0,0,7);g.fillStyle=f;g.fill();g.stroke();}
@@ -4730,15 +4923,29 @@ function hmScene(kind,here){const vb='-92 -72 184 220';let s=`<svg class="hmsvg"
     const p=hmP(2.9,1.6,2.2),k=HMI.k;s+=`<g class="hmpin" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><path d="M0,${k*.9} C${-k*.9},${-k*.1} ${-k*.6},${-k*1.1} 0,${-k*1.1} C${k*.6},${-k*1.1} ${k*.9},${-k*.1} 0,${k*.9}Z" fill="#ff6f6f" stroke="#4a3550" stroke-width="2"/><circle cy="${-k*.45}" r="${k*.25}" fill="#fff"/></g>`;}
   if(here){const at={tut:[3.2,3.1],real:[2.1,3.3],daily:[2,1.9],my:[2.6,3.1]}[kind],p=hmP(at[0],at[1],kind==='daily'?.35:0);s+=`<g transform="translate(${(p[0]-14).toFixed(1)} ${(p[1]-46).toFixed(1)})">${hmMascot(28,'mini')}</g>`;}
   return s+`</g></svg>`;}
-// 깜빡이: 노란 등에 얼굴. size(px)
-function hmMascot(sz,cls){return`<svg class="hmmas ${cls||''}" width="${sz}" height="${sz*1.35}" viewBox="-30 -46 60 81" aria-hidden="true">
-  <ellipse cx="0" cy="32" rx="16" ry="3.5" fill="#4a3550" opacity=".15"/>
-  <g class="hmbody"><rect x="-4" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/><rect x="1" y="16" width="3.5" height="12" rx="1.7" fill="#4a3550"/>
-  <path class="hmarm" d="M-17,-2 q-9,-3 -10,-12" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M17,-2 q8,4 9,11" stroke="#4a3550" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-  <rect x="-18" y="-43" width="36" height="62" rx="16" fill="#5a4a7a" stroke="#4a3550" stroke-width="3"/><rect x="-5" y="-49" width="10" height="7" rx="2" fill="#4a3550"/>
-  <circle class="hmk-r" cx="0" cy="-27" r="8" fill="#ff7a8a"/><circle cx="0" cy="-3" r="11" fill="#ffd35a"/><circle class="hmk-g" cx="0" cy="12" r="5.5" fill="#64e3a0"/>
-  <g class="hmeye"><ellipse cx="-4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/><ellipse cx="4" cy="-5" rx="1.8" ry="2.4" fill="#3a2840"/></g>
-  <circle cx="-7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><circle cx="7.5" cy="0" r="2" fill="#ff9a8a" opacity=".7"/><path d="M-2.5,1 q2.5,2.6 5,0" stroke="#3a2840" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>`;}
+// 깜빡이 v2(2026-11-17, 안개 위 테라스 아트 디렉션): 외곽선 없이 면 명암과 그라데이션, 차양 달린 세 등, 가운데 꿀색 등에 얼굴, 머리 위 새싹. size(px)
+let KBK_N=0;const KBK_DEFS=`<defs><linearGradient id="kbkB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a6890"/><stop offset=".55" stop-color="#5f4f78"/><stop offset="1" stop-color="#4a3d62"/></linearGradient>
+  <radialGradient id="kbkR" cx=".38" cy=".35" r=".75"><stop offset="0" stop-color="#ffd6d4"/><stop offset=".45" stop-color="#f0a3a6"/><stop offset="1" stop-color="#d9818a"/></radialGradient>
+  <radialGradient id="kbkY" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff4d2"/><stop offset=".5" stop-color="#f6d68f"/><stop offset="1" stop-color="#e8b86a"/></radialGradient>
+  <radialGradient id="kbkG" cx=".38" cy=".35" r=".75"><stop offset="0" stop-color="#e2f6e6"/><stop offset=".45" stop-color="#a8dcb8"/><stop offset="1" stop-color="#7fbf98"/></radialGradient>
+  <radialGradient id="kbkGl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff1c9" stop-opacity=".75"/><stop offset="1" stop-color="#fff1c9" stop-opacity="0"/></radialGradient></defs>`;
+function hmMascot(sz,cls){const u='k'+(++KBK_N);return(`<svg class="hmmas kbk ${cls||''}" width="${sz}" height="${sz*1.48}" viewBox="-30 -54 60 89" aria-hidden="true">${KBK_DEFS}
+  <ellipse cx="0" cy="31.5" rx="15" ry="3" fill="#5b4a63" opacity=".14"/>
+  <g class="hmbody">
+  <g class="kbleg"><rect class="kbl1" x="-6.5" y="16" width="4.6" height="12.5" rx="2.3" fill="#54456c"/><rect class="kbl2" x="1.9" y="16" width="4.6" height="12.5" rx="2.3" fill="#4a3d62"/>
+    <ellipse cx="-4.4" cy="28.8" rx="4.4" ry="2.6" fill="#f2b8a2"/><ellipse cx="4.4" cy="28.8" rx="4.4" ry="2.6" fill="#e9a790"/></g>
+  <path class="hmarm" d="M-16,-1 q-8,-3 -9.5,-11" stroke="#54456c" stroke-width="4" fill="none" stroke-linecap="round"/><circle class="hmarm" cx="-25.6" cy="-12.6" r="3" fill="#fbefe4"/>
+  <path d="M16,-1 q7.5,4 8.5,10.5" stroke="#4a3d62" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="24.6" cy="9.8" r="3" fill="#f3e2d6"/>
+  <g class="kbsprout"><path d="M0,-44 q-.6,-4 .4,-7" stroke="#8fae78" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M.4,-50 q-6,-2.5 -7.5,1.5 q4.5,2 7.5,-1.5z" fill="#adc28e"/><path d="M.4,-50 q5,-3.5 7,0 q-4,2.6 -7,0z" fill="#c4d4a0"/></g>
+  <rect x="-5.5" y="-45.5" width="11" height="5" rx="2.5" fill="#4a3d62"/>
+  <rect x="-17.5" y="-42" width="35" height="61" rx="16.5" fill="url(#kbkB)"/>
+  <path d="M-12.5,-38 q-3.5,6 -3.6,22 l0,16" stroke="#fff" stroke-opacity=".13" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <circle cx="0" cy="-27" r="8.6" fill="#3e3352"/><circle class="hmk-r kblamp" cx="0" cy="-26.6" r="7" fill="url(#kbkR)"/><path d="M-9.4,-28.6 a9.4,9.4 0 0 1 18.8,0 l-1.4,0 a8,8 0 0 0 -16,0z" fill="#4c4064"/>
+  <circle cx="0" cy="-2" r="12.2" fill="#3e3352"/><circle cx="0" cy="-2" r="16" fill="url(#kbkGl)" class="kbglow"/><circle cx="0" cy="-1.6" r="10.6" fill="url(#kbkY)"/><path d="M-12.8,-4.4 a12.8,12.8 0 0 1 25.6,0 l-1.6,0 a11.2,11.2 0 0 0 -22.4,0z" fill="#4c4064"/>
+  <circle cx="0" cy="12.5" r="5.6" fill="#3e3352"/><circle class="hmk-g kblamp" cx="0" cy="12.7" r="4.4" fill="url(#kbkG)"/>
+  <g class="hmeye"><ellipse cx="-3.9" cy="-2.6" rx="1.7" ry="2.3" fill="#45364a"/><ellipse cx="3.9" cy="-2.6" rx="1.7" ry="2.3" fill="#45364a"/><circle cx="-3.4" cy="-3.4" r=".6" fill="#fff"/><circle cx="4.4" cy="-3.4" r=".6" fill="#fff"/></g>
+  <ellipse cx="-7" cy="1.6" rx="2.1" ry="1.4" fill="#ef9f92" opacity=".55"/><ellipse cx="7" cy="1.6" rx="2.1" ry="1.4" fill="#ef9f92" opacity=".55"/>
+  <path d="M-2.3,2.2 q2.3,2.2 4.6,0" stroke="#45364a" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></svg>`).replace(/kbk([BRYG]l?)\b/g,'kbk$1'+u);}
 // 배경: 구름, 작은 떠 있는 바위, 새
 function hmBack(){return`<div class="hmbg" aria-hidden="true"><i class="hmcl c1"></i><i class="hmcl c2"></i><i class="hmcl c3"></i><i class="hmrock r1"></i><i class="hmrock r2"></i><i class="hmrock r3"></i><i class="hmbird b1"></i><i class="hmbird b2"></i></div>`;}
 // 모드 화면 다시 그리기
@@ -4954,6 +5161,20 @@ function hwCarsStart(){HWC.cars=[];HWC.last=0;HWC.lampSt='';const n=performance.
   if(!HWC.raf)HWC.raf=requestAnimationFrame(hwCarsLoop);}
 {const _hm=hubModes;hubModes=function(){_hm();hwCarsStart();};}
 window.__hw={go:hwGo,state:HWS,layout:hwLayout};
+// ---------- 시작 화면 v2(2026-11-17, 안개 위 테라스 아트 디렉션) ----------
+// 노을 도시 캔버스 대신, 게임 모드 월드(육각 테라스 섬)를 멀리서 본 장면 위에 지구본이 떠 있음. 로고 옆 신호등은 깜빡이로
+// 이스터 에그: 안개 속을 가끔 지나가는 고래 그림자(누르면 물보라)
+tsStep=function(){};tsDraw=function(){};
+{const bg=document.createElement('div');bg.className='tbg2';bg.setAttribute('aria-hidden','true');
+  const w=HW.build().replace('id="hwcars"','');
+  bg.innerHTML=`<div class="t2sky"></div><i class="t2cl a"></i><i class="t2cl b"></i><i class="t2cl c"></i>
+    <div class="t2world"><svg viewBox="${HW.VB.join(' ')}" class="hwsvg">${w}</svg></div>
+    <i class="t2tile t1"></i><i class="t2tile t2"></i><i class="t2tile t3"></i>
+    <div class="t2fog"></div><div class="t2whale" title=""><svg viewBox="0 0 160 60"><path d="M6,34 q22,-26 70,-24 q44,2 62,20 q10,-10 18,-14 q-2,12 -8,20 q8,6 8,16 q-10,-4 -18,-10 q-22,18 -66,14 q-46,-4 -66,-22z" fill="#8f7fa8"/><circle cx="34" cy="28" r="2.4" fill="#f3eef6"/></svg></div>`;
+  TTL.insertBefore(bg,TTL.firstChild);
+  const lamp=TTL.querySelector('.tlamp');if(lamp){lamp.className='t2kbk';lamp.innerHTML=hmMascot(64);}
+  const wh=bg.querySelector('.t2whale');wh.addEventListener('click',e=>{e.stopPropagation();wh.classList.add('spout');setTimeout(()=>wh.classList.remove('spout'),1400);});}
+window.__hub=v=>hubShow(v);
 // ---------- 오늘의 도전(일일 퀘스트): 하루 한정 교통 상황 + 그날만의 랭킹 ----------
 // 시나리오는 Supabase Edge Function 'daily'가 하루 1번 만듦(Claude가 쓴 사건 이야기와 교통량 배율, 실패하면 규칙 생성기). 날짜는 한국 시간 기준
 // 게임에서는 실제 교차로 모드에 daily:YYYYMMDD를 붙여 플레이(mode={kind:'real',id,daily}). 기록 키 'daily-YYYYMMDD'(별, 도전 5번, 랭킹 모두 그날 따로)
