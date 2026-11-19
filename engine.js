@@ -62,6 +62,20 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // ---------- 도로망 ----------
 function mkSeg(pts,v0){const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return{pts,cum,length:cum[cum.length-1],v0,vehicles:[]};}
 function bez(P0,P1,P2,P3,n){const o=[];for(let i=0;i<=n;i++){const t=i/n,u=1-t,a=u*u*u,b=3*u*u*t,c=3*u*t*t,e=t*t*t;o.push([a*P0[0]+b*P1[0]+c*P2[0]+e*P3[0],a*P0[1]+b*P1[1]+c*P2[1]+e*P3[1]]);}return o;}
+// 실제 도로 모양(OSM)이 정지선 앞 직선 구간(6m)과 만나는 곳이 급하게 꺾이면(예: 토론토 남쪽 파를러먼트, 비스듬히 들어오는 길) 약 20m에 걸쳐 완만한 곡선으로 이음
+// pts: 교차로 쪽이 끝(마지막 점 = 정지선). 마지막 직선 구간 방향과 그 앞 도로 방향이 8도 넘게 다를 때만 바꿈
+function easeJoin(pts,R=20){const n=pts.length;if(n<4)return pts;const E=pts[n-1],S=pts[n-2],dv=sub(E,S),dl=Math.hypot(dv[0],dv[1]);if(dl<1e-6)return pts;const d=mul(dv,1/dl);
+  let acc=0,i=n-2,A=null,t=null;
+  while(i>0){const P=pts[i-1],Q=pts[i],sl=Math.hypot(Q[0]-P[0],Q[1]-P[1]);if(sl<1e-6){i--;continue;}
+    if(acc+sl>=R){const f=(R-acc)/sl;A=[Q[0]+(P[0]-Q[0])*f,Q[1]+(P[1]-Q[1])*f];t=mul(sub(Q,P),1/sl);break;}acc+=sl;i--;}
+  if(!A)return pts;
+  const s1=sub(pts[n-2],pts[n-3]),l1=Math.hypot(s1[0],s1[1]);if(l1>1e-6&&dot(mul(s1,1/l1),d)>Math.cos(8*Math.PI/180)&&dot(t,d)>Math.cos(8*Math.PI/180))return pts;
+  const ch=Math.hypot(S[0]-A[0],S[1]-A[1]),k=.4*ch;
+  return[...pts.slice(0,i),A,...bez(A,add(A,mul(t,k)),sub(S,mul(d,k)),S,14).slice(1),E];}
+// 그리기 전용 모양(vis): 시뮬레이션은 원래 경로(pts)로 계산하고(점수 그대로), 화면의 도로와 차는 부드럽게 이은 모양에 같은 비율로 얹음
+function visOf(seg,vp){if(vp===seg.pts||vp.length===seg.pts.length&&vp.every((q,i)=>q===seg.pts[i]))return;const m=mkSeg(vp,0);seg.vis={pts:m.pts,cum:m.cum,length:m.length};}
+function posAtV(seg,s){if(!seg.vis)return posAt(seg,s);const k=seg.vis.length/seg.length;return posAt(seg.vis,s*k);}
+function vehPoseV(v){const seg=v.route[v.si],s=v.s-v.len/2;if(s<0&&v.si>0){const pv=v.route[v.si-1];return posAtV(pv,pv.length+s);}return posAtV(seg,s);}
 function buildNet(G){const D=geoDims(G),W=G.LW;
   const inL={},outL={},conn={},conns=[],ins=[],outs=[];
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),sd=D.stopD(a);
@@ -69,9 +83,9 @@ function buildNet(G){const D=geoDims(G),W=G.LW;
       let pts=[add(p,mul(d,-L)),add(p,mul(d,-sd-(sl?SLIP_BACK:0)))];
       if(sg){const latMin=(G.nIn[a]+.5)*W+D.off(a),q=sg.in.map(x=>{const lt=dot(x,r);return lt<latMin?add(x,mul(r,latMin-lt)):x;});pts=[add(mul(r,dot(q[0],r)),mul(d,-L)),...q];}
       const ig=!sl&&G.inGeo&&G.inGeo[a]&&G.inGeo[a][i];if(ig)pts=[...ig,add(p,mul(d,-sd))];
-      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;ins.push(s);return s;});}
+      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,easeJoin(pts));ins.push(s);return s;});}
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),bd=D.boxD(a);
-    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);outs.push(s);return s;});}
+    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);if(og)visOf(s,easeJoin([...s.pts].reverse()).reverse());outs.push(s);return s;});}
   // 실제 교차로: 분리 우회전 도로의 전용 진출 차로(합류하지 않고 이어지는 차로)
   const slipOut={};
   if(G.slipGeo)for(const a of APPR){const sg=G.slipGeo[a];if(!sg||sg.merge)continue;const d2=turnDir(HEAD[a],'R'),r2=rightOf(d2),q=sg.out,lt=dot(q[q.length-1],r2);
@@ -659,5 +673,5 @@ function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,p
 function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
   if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
-return {VER:'v0.48',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
+return {VER:'v0.49',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
 })();

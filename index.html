@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261119144011">
+<meta name="gl-build" content="20261119145206">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1395,7 +1395,7 @@ body.mobile.m2 .stage>.hud-tr #nextbtn{flex:1 1 100%;font-size:14px;padding:8px 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.48. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.49. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -1579,6 +1579,20 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // ---------- 도로망 ----------
 function mkSeg(pts,v0){const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return{pts,cum,length:cum[cum.length-1],v0,vehicles:[]};}
 function bez(P0,P1,P2,P3,n){const o=[];for(let i=0;i<=n;i++){const t=i/n,u=1-t,a=u*u*u,b=3*u*u*t,c=3*u*t*t,e=t*t*t;o.push([a*P0[0]+b*P1[0]+c*P2[0]+e*P3[0],a*P0[1]+b*P1[1]+c*P2[1]+e*P3[1]]);}return o;}
+// 실제 도로 모양(OSM)이 정지선 앞 직선 구간(6m)과 만나는 곳이 급하게 꺾이면(예: 토론토 남쪽 파를러먼트, 비스듬히 들어오는 길) 약 20m에 걸쳐 완만한 곡선으로 이음
+// pts: 교차로 쪽이 끝(마지막 점 = 정지선). 마지막 직선 구간 방향과 그 앞 도로 방향이 8도 넘게 다를 때만 바꿈
+function easeJoin(pts,R=20){const n=pts.length;if(n<4)return pts;const E=pts[n-1],S=pts[n-2],dv=sub(E,S),dl=Math.hypot(dv[0],dv[1]);if(dl<1e-6)return pts;const d=mul(dv,1/dl);
+  let acc=0,i=n-2,A=null,t=null;
+  while(i>0){const P=pts[i-1],Q=pts[i],sl=Math.hypot(Q[0]-P[0],Q[1]-P[1]);if(sl<1e-6){i--;continue;}
+    if(acc+sl>=R){const f=(R-acc)/sl;A=[Q[0]+(P[0]-Q[0])*f,Q[1]+(P[1]-Q[1])*f];t=mul(sub(Q,P),1/sl);break;}acc+=sl;i--;}
+  if(!A)return pts;
+  const s1=sub(pts[n-2],pts[n-3]),l1=Math.hypot(s1[0],s1[1]);if(l1>1e-6&&dot(mul(s1,1/l1),d)>Math.cos(8*Math.PI/180)&&dot(t,d)>Math.cos(8*Math.PI/180))return pts;
+  const ch=Math.hypot(S[0]-A[0],S[1]-A[1]),k=.4*ch;
+  return[...pts.slice(0,i),A,...bez(A,add(A,mul(t,k)),sub(S,mul(d,k)),S,14).slice(1),E];}
+// 그리기 전용 모양(vis): 시뮬레이션은 원래 경로(pts)로 계산하고(점수 그대로), 화면의 도로와 차는 부드럽게 이은 모양에 같은 비율로 얹음
+function visOf(seg,vp){if(vp===seg.pts||vp.length===seg.pts.length&&vp.every((q,i)=>q===seg.pts[i]))return;const m=mkSeg(vp,0);seg.vis={pts:m.pts,cum:m.cum,length:m.length};}
+function posAtV(seg,s){if(!seg.vis)return posAt(seg,s);const k=seg.vis.length/seg.length;return posAt(seg.vis,s*k);}
+function vehPoseV(v){const seg=v.route[v.si],s=v.s-v.len/2;if(s<0&&v.si>0){const pv=v.route[v.si-1];return posAtV(pv,pv.length+s);}return posAtV(seg,s);}
 function buildNet(G){const D=geoDims(G),W=G.LW;
   const inL={},outL={},conn={},conns=[],ins=[],outs=[];
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),sd=D.stopD(a);
@@ -1586,9 +1600,9 @@ function buildNet(G){const D=geoDims(G),W=G.LW;
       let pts=[add(p,mul(d,-L)),add(p,mul(d,-sd-(sl?SLIP_BACK:0)))];
       if(sg){const latMin=(G.nIn[a]+.5)*W+D.off(a),q=sg.in.map(x=>{const lt=dot(x,r);return lt<latMin?add(x,mul(r,latMin-lt)):x;});pts=[add(mul(r,dot(q[0],r)),mul(d,-L)),...q];}
       const ig=!sl&&G.inGeo&&G.inGeo[a]&&G.inGeo[a][i];if(ig)pts=[...ig,add(p,mul(d,-sd))];
-      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;ins.push(s);return s;});}
+      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,easeJoin(pts));ins.push(s);return s;});}
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),bd=D.boxD(a);
-    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);outs.push(s);return s;});}
+    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);if(og)visOf(s,easeJoin([...s.pts].reverse()).reverse());outs.push(s);return s;});}
   // 실제 교차로: 분리 우회전 도로의 전용 진출 차로(합류하지 않고 이어지는 차로)
   const slipOut={};
   if(G.slipGeo)for(const a of APPR){const sg=G.slipGeo[a];if(!sg||sg.merge)continue;const d2=turnDir(HEAD[a],'R'),r2=rightOf(d2),q=sg.out,lt=dot(q[q.length-1],r2);
@@ -2952,7 +2966,7 @@ function drawLaneSpeed(sim,LV,visX,visY){if(!showSpeed)return;const G=sim.cfg.ge
   const fade=(x,y)=>Math.max(0,Math.min(1,Math.min(visX-Math.abs(x),visY-Math.abs(y))/22,armCut(x,y)));
   const near=(list,s)=>{let bv=null,bd=NEAR;for(const o of list){const d=Math.abs(o.s-s);if(d<bd){bd=d;bv=o.v;}}return bv;};
   const add=(pts,vals)=>{for(let k=0;k<pts.length-1;k++){const a=pts[k],b=pts[k+1],al=Math.min(fade(a[0],a[1]),fade(b[0],b[1]));if(al<=.05)continue;paths[lsBin(vals[k])].push([a,b,al]);}};
-  const along=(seg,list)=>{const pts=[],vals=[];for(let s0=0;s0<=seg.length;s0+=STEP){const q=posAt(seg,Math.min(s0,seg.length-.01));pts.push([q.x,q.y]);vals.push(near(list,s0+STEP/2));}return[pts,vals];};
+  const along=(seg,list)=>{const pts=[],vals=[];for(let s0=0;s0<=seg.length;s0+=STEP){const q=posAtV(seg,Math.min(s0,seg.length-.01));pts.push([q.x,q.y]);vals.push(near(list,s0+STEP/2));}return[pts,vals];};
   const shift=(a,x,y)=>{const d=HEAD[a],u=[-d[0],-d[1]],r=rightOf(d),b=bendAt(Rr,a,x*u[0]+y*u[1]);return[x+r[0]*b,y+r[1]*b];};
   // 들어오는 차로: 시뮬레이션 구간 + 경계 바깥(대기열, 다가오는 차량)
   for(const a of APPR)sim.net.inL[a].forEach((seg,i)=>{const[pts,vals]=along(seg,seg.vehicles.map(v=>({s:v.s,v:v.crashed?0:v.v})));add(pts,vals);
@@ -3024,9 +3038,9 @@ function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=ge
   ctx.fillStyle=COL.asphalt;ctx.fillRect(-D.stopD('W'),-D.stopD('S'),D.stopD('W')+D.stopD('E'),D.stopD('S')+D.stopD('N'));
   const visX=VIEW*cw/Math.min(cw,ch),visY=VIEW*ch/Math.min(cw,ch),LV=Math.max(L,Math.max(visX,visY)*1.1+8);
   // 실제 교차로: 정지선 앞에서 비스듬히 들어오는 차로는 지도 경로 그대로 그림
-  if(G.outGeo)for(const a of APPR){const og=G.outGeo[a];if(!og)continue;const ol=sim.net.outL[hk([-HEAD[a][0],-HEAD[a][1]])];for(const i in og){const sg=ol&&ol[+i];if(!sg)continue;const path=[...sg.pts,extPt(sg.pts,false,LV)];ctx.save();ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0],path[0][1]);for(const q of path)ctx.lineTo(q[0],q[1]);
+  if(G.outGeo)for(const a of APPR){const og=G.outGeo[a];if(!og)continue;const ol=sim.net.outL[hk([-HEAD[a][0],-HEAD[a][1]])];for(const i in og){const sg=ol&&ol[+i];if(!sg)continue;const vp=(sg.vis||sg).pts,path=[...vp,extPt(vp,false,LV)];ctx.save();ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0],path[0][1]);for(const q of path)ctx.lineTo(q[0],q[1]);
     ctx.globalAlpha=.5;ctx.strokeStyle=COL.paint;ctx.lineWidth=W+.5;ctx.stroke();ctx.globalAlpha=1;ctx.strokeStyle=COL.asphalt;ctx.lineWidth=W+.1;ctx.stroke();ctx.restore();}}
-  if(G.inGeo)for(const a of APPR){const ig=G.inGeo[a];if(!ig)continue;for(const i in ig){const path=[extPt(sim.net.inL[a][+i].pts,true,LV),...sim.net.inL[a][+i].pts];ctx.save();ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0],path[0][1]);for(const q of path)ctx.lineTo(q[0],q[1]);
+  if(G.inGeo)for(const a of APPR){const ig=G.inGeo[a];if(!ig)continue;for(const i in ig){const vp=(sim.net.inL[a][+i].vis||sim.net.inL[a][+i]).pts,path=[extPt(vp,true,LV),...vp];ctx.save();ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0],path[0][1]);for(const q of path)ctx.lineTo(q[0],q[1]);
     ctx.globalAlpha=.5;ctx.strokeStyle=COL.paint;ctx.lineWidth=W+.5;ctx.stroke();ctx.globalAlpha=1;ctx.strokeStyle=COL.asphalt;ctx.lineWidth=W+.1;ctx.stroke();ctx.restore();}}
   for(const a of APPR){const d=HEAD[a],c=sc2.appr[a],n=G.nIn[a],sgA=G.slipGeo&&G.slipGeo[a],nA=sgA?n:D.nAll(a),no=G.nOut[a],sd=D.stopD(a),bd=D.exitD(a),md=D.oOff(a)+D.off(a),igA=G.inGeo&&G.inGeo[a],LVi=igA?sd+6:LV;ctx.save();local([0,0],d);ctx.translate(0,-D.off(a));{const cl=Math.min(G.drawLen&&G.drawLen[a]||1e9,R&&R.bend&&R.bend[a]?L:1e9);if(cl<1e9){ctx.beginPath();ctx.rect(-cl,-300,cl+300,600);ctx.clip();}}
     ctx.globalAlpha=1;ctx.fillStyle=COL.asphalt;for(let i=0;i<n;i++)ctx.fillRect(-(igA&&igA[i]?LVi:LV),-(i+1)*W,(igA&&igA[i]?LVi:LV)-sd,W);{const og=G.outGeo&&G.outGeo[a],LO=og?bd+6:LV;ctx.fillRect(-LO,md,LO-bd,no*W);}if(nA>n)ctx.fillRect(-LV,-nA*W,LV-sd-SLIP_BACK,W);
@@ -3079,7 +3093,7 @@ function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=ge
   for(const ac of sim.accidents){const pulse=.5+.5*Math.sin(now/180);ctx.globalAlpha=.18+.22*pulse;ctx.fillStyle=COL.stop;ctx.beginPath();ctx.arc(ac.x,ac.y,5+pulse*1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
   if(R&&R.ctx&&R.ctx.tun)ctxTunnelsOver(R.ctx);
   decorate('light');
-  drawLaneSpeed(sim,LV,visX,visY);drawOneway(sim);drawBeyond(sim,LV,visX,visY,now);for(const v of sim.vehicles)paintVehicle(v,vehPose(v),now);drawPeds(sim);
+  drawLaneSpeed(sim,LV,visX,visY);drawOneway(sim);drawBeyond(sim,LV,visX,visY,now);for(const v of sim.vehicles)paintVehicle(v,vehPoseV(v),now);drawPeds(sim);
   // 직접 조작 화면에서는 SVG 신호등(direct.js)이 대신 그림
   if(!document.body.classList.contains('dx'))for(const a of APPR){const d=HEAD[a],r=rightOf(d),p=add(mul(r,(G.slipGeo&&G.slipGeo[a]?G.nIn[a]:D.nAll(a))*W+2.8+D.off(a)),mul(d,-D.stopD(a)-1));
     ctx.save();local(p,d);ctx.fillStyle=COL.head;ctx.strokeStyle=COL.headEdge;ctx.lineWidth=.2;
@@ -3475,7 +3489,7 @@ function fxStep(){if(!sim||state!=='run'||!cw)return;
     else if(S.peak>=8&&q<=1){const [x,y]=armAnchor(a);fxBubble(x,y-26,`쭉쭉! ${S.peak}대 통과`,'good','good');S.peak=0;}
     S.g=g;}
   // 2) 정지선에서 45초 넘게 서 있는 맨 앞 차
-  for(const sg of sim.net.ins){const h=sg.vehicles[0];if(h&&!h.fxA&&(h.waitT||0)>45){h.fxA=1;const p=vehPose(h),[x,y]=fxW(p.x,p.y);fxBubble(x,y-18,'빵빵! 언제 가요','bad','honk');}}
+  for(const sg of sim.net.ins){const h=sg.vehicles[0];if(h&&!h.fxA&&(h.waitT||0)>45){h.fxA=1;const p=vehPoseV(h),[x,y]=fxW(p.x,p.y);fxBubble(x,y-18,'빵빵! 언제 가요','bad','honk');}}
   // 3) 보행자 무리가 다 건넜을 때, 무단 횡단
   if(sim.net.cw&&sim.net.cw.length){for(const c of sim.net.cw){const n=sim.peds.filter(p=>p.cw===c&&p.st==='walk').length,S=FXS.W[c.a]||(FXS.W[c.a]={max:0});
       if(n>S.max)S.max=n;if(n===0&&S.max>=6){const m=(c.lat0+c.lat1)/2,[x,y]=fxW(...add(mul(c.d,-c.cwD),mul(c.r,m)));fxBubble(x,y-16,`♥ ${S.max}명 건넜어요`,'ped','ped');S.max=0;}}
@@ -6077,14 +6091,14 @@ function dxAt(P,s){for(let i=1;i<P.length;i++){const L=Math.hypot(P[i][0]-P[i-1]
 // 갈래마다: 정지선에서 바깥으로 가는 진입 차로 묶음의 가운데 선(화면 좌표), 화면 안에서 쓸 수 있는 길이
 function dxArmGeo(){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,out={};
   for(const a of APPR){const L=(net.inL[a]||[]).filter(s=>!s.slip);if(!L.length)continue;
-    const f=s=>s.pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(L[0]),B=f(L[L.length-1]),la=dxPolyLen(A),lb=dxPolyLen(B),len=Math.min(la,lb);
+    const f=s=>(s.vis||s).pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(L[0]),B=f(L[L.length-1]),la=dxPolyLen(A),lb=dxPolyLen(B),len=Math.min(la,lb);
     const C=[];for(let s=0;s<=len;s+=6){const p=dxAt(A,s),q=dxAt(B,s);C.push([(p[0]+q[0])/2,(p[1]+q[1])/2]);}
     let avail=0;for(let i=1;i<C.length;i++){const p=C[i];if(p[0]<8||p[1]<8||p[0]>cw-8||p[1]>ch-8)break;avail+=Math.hypot(p[0]-C[i-1][0],p[1]-C[i-1][1]);}
     out[a]={C,len,avail,wpx:Math.max(10,L.length*W*sc*.9),skip:0,A,B,n:L.length,sc};}
   return out;}
 // 차로 묶음(lo~hi)의 가운데 선과 폭
 function dxBandGeo(a,lo,hi){const net=sim.net,sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW,Ls=net.inL[a]||[];if(!Ls[lo]||!Ls[hi])return null;
-  const f=s=>s.pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(Ls[lo]),B=f(Ls[hi]),len=Math.min(dxPolyLen(A),dxPolyLen(B)),C=[];for(let s=0;s<=len;s+=6){const p=dxAt(A,s),q=dxAt(B,s);C.push([(p[0]+q[0])/2,(p[1]+q[1])/2]);}
+  const f=s=>(s.vis||s).pts.map(p=>toScreen(p[0],p[1])).reverse(),A=f(Ls[lo]),B=f(Ls[hi]),len=Math.min(dxPolyLen(A),dxPolyLen(B)),C=[];for(let s=0;s<=len;s+=6){const p=dxAt(A,s),q=dxAt(B,s);C.push([(p[0]+q[0])/2,(p[1]+q[1])/2]);}
   return{C,len,wpx:Math.max(8,(hi-lo+1)*W*sc*.9),skip:0,n:hi-lo+1,sc};}
 // 이 갈래가 녹색을 받는 현시(보행 전용 제외)
 const dxPhasesOf=a=>PH.map((p,i)=>({p,i})).filter(({p})=>!p.x&&p.g>0&&p.m.some(m=>m[0]===a));
@@ -6350,7 +6364,7 @@ function dxLanePick(a,i){const c=cfg.appr[a];if(!c||i>=c.lanes.length)return;dxC
 const dEsc0=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 // 지도 위 고른 차로 강조 + "2차로" 표시
 function dxLaneSVG(){const L=DX.lane;if(!L||!sim)return'';const sg=(sim.net.inL[L.a]||[])[L.i];if(!sg)return'';const sc=Math.min(cw,ch)/(2*VIEW),W=cfg.geo.LW*sc;
-  const P=sg.pts.map(p=>toScreen(p[0],p[1])),d='M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),e=P[P.length-1],f=P[Math.max(0,P.length-2)],an=Math.atan2(e[1]-f[1],e[0]-f[0]);
+  const P=(sg.vis||sg).pts.map(p=>toScreen(p[0],p[1])),d='M'+P.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'),e=P[P.length-1],f=P[Math.max(0,P.length-2)],an=Math.atan2(e[1]-f[1],e[0]-f[0]);
   const bx=e[0]-Math.cos(an)*(W*1.2+14),by=e[1]-Math.sin(an)*(W*1.2+14);
   return`<g pointer-events="none"><path d="${d}" stroke="#ffd35a" stroke-opacity=".28" stroke-width="${W}" fill="none"/><path d="${d}" stroke="#ffd35a" stroke-width="2.5" stroke-dasharray="7 5" fill="none"/>
     <rect x="${bx-26}" y="${by-11}" width="52" height="22" rx="6" fill="#1f6f43" stroke="#fff" stroke-width="2"/><text x="${bx}" y="${by+.5}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="900" fill="#fff">${L.i+1}차로</text></g>`;}
@@ -6422,7 +6436,7 @@ function dxSchemePick(){dxClose();DX.menu={k:'sch'};const st=$('stage');let b=$(
   b.hidden=false;}
 // ----- 지도 누르기: 차로(기존), 교차로 가운데, 도로. 예전 접근로 창 대신 원형 메뉴 -----
 function dxArmAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.75;
-  for(const a of APPR){const segs=[...(net.inL[a]||[]),...(net.outL[hk([-HEAD[a][0],-HEAD[a][1]])]||[])];for(const sg of segs){const P=sg.pts;for(let i=1;i<P.length;i++){const ax=P[i-1][0],ay=P[i-1][1],bx=P[i][0],by=P[i][1],dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best=a;}}}}
+  for(const a of APPR){const segs=[...(net.inL[a]||[]),...(net.outL[hk([-HEAD[a][0],-HEAD[a][1]])]||[])];for(const sg of segs){const P=(sg.vis||sg).pts;for(let i=1;i<P.length;i++){const ax=P[i-1][0],ay=P[i-1][1],bx=P[i][0],by=P[i][1],dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best=a;}}}}
   return best;}
 $('cv').addEventListener('click',e=>{if(!dxActive())return;e.stopImmediatePropagation();
   const h=laneAt(e);if(h){if(!unlocked('lanes')){dxToast('이 단계에서는 차로를 바꿀 수 없어요');return;}if(DX.paint)return;dxLanePick(h.a,h.i);return;}
@@ -6434,7 +6448,7 @@ $('cv').addEventListener('click',e=>{if(!dxActive())return;e.stopImmediatePropag
   if(unlocked('lanes')){const ln=dxInLaneAt(e);if(ln){dxLanePick(ln.a,ln.i);return;}}
   const a=dxArmAt(e);if(a){dxRoadMenu(a,x,y);return;}closePop();},true);
 function dxInLaneAt(ev){const w=screenToWorld(ev),net=sim.net,W=cfg.geo.LW;let best=null,bd=W*.5;
-  for(const a of APPR)(net.inL[a]||[]).forEach((sg,i)=>{if(sg.slip||i>=cfg.appr[a].lanes.length)return;const P=sg.pts;for(let k=1;k<P.length;k++){const ax=P[k-1][0],ay=P[k-1][1],dx=P[k][0]-ax,dy=P[k][1]-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best={a,i};}}});
+  for(const a of APPR)(net.inL[a]||[]).forEach((sg,i)=>{if(sg.slip||i>=cfg.appr[a].lanes.length)return;const P=(sg.vis||sg).pts;for(let k=1;k<P.length;k++){const ax=P[k-1][0],ay=P[k-1][1],dx=P[k][0]-ax,dy=P[k][1]-ay,L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((w[0]-ax)*dx+(w[1]-ay)*dy)/L2)),d=Math.hypot(w[0]-ax-dx*t,w[1]-ay-dy*t);if(d<bd){bd=d;best={a,i};}}});
   return best;}
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(DX.paint)dxPaint(false);else dxClose();}});
 // 예전 조작 숨김: 접근로 버튼, 귀퉁이 신호 시계 카드(신호 시간은 도로 띠로). 세션 기록은 재생 줄로
