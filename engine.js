@@ -92,11 +92,24 @@ function buildNet(G){const D=geoDims(G),W=G.LW;
         else{const t1=dot(sub(P3,P0),d),C=add(P0,mul(d,t1)),t2=Math.hypot(P3[0]-C[0],P3[1]-C[1]);
           pts=bez(P0,add(P0,mul(d,.552*t1)),sub(P3,mul(d2,.552*t2)),P3,22);}
         const s=mkSeg(pts,move==='T'?V_FREE:move==='L'?9:move==='U'?5:slipR?8:6);
-        s.out=outSeg;s.heading=hk(d2);s.appr=a;s.move=move;s.lane=i;s.outOffset=off;s.slip=slipR;
+        s._j=j;s._nO=o2.length;s.out=outSeg;s.heading=hk(d2);s.appr=a;s.move=move;s.lane=i;s.outOffset=off;s.slip=slipR;
         conn[`${a}${move}${i}>${j}`]=s;conns.push(s);}}}
+  untangleLefts(conns);
   attachConflicts(conns,G);
   for(const c of conns)if(c.outOffset)(c.out.feeders||(c.out.feeders=[])).push(c);
   return{inL,outL,conn,conns,ins,outs,G,D};}
+// 마주 보는 좌회전 두 경로가 교차로 안에서 엇갈리면(남북 길이 서로 반대쪽으로 어긋난 교차로, 예: 토론토) 실제 좌회전 유도선처럼 곡선을 덜 부풀려 서로 비켜 가게 함
+// 마주 보는 보호 좌회전은 같은 녹색에 함께 갈 수 있어야 함(일반 사거리처럼 운전석끼리 스치며 비켜 감). 곡선을 다 펴도 엇갈리면 원래 곡선을 그대로 둠
+function pathsCross(P,Q){for(let i=0;i<P.length-1;i++)for(let j=0;j<Q.length-1;j++){const p1=P[i],p2=P[i+1],p3=Q[j],p4=Q[j+1],dx1=p2[0]-p1[0],dy1=p2[1]-p1[1],dx2=p4[0]-p3[0],dy2=p4[1]-p3[1],den=dx1*dy2-dy1*dx2;if(Math.abs(den)<1e-9)continue;
+  const t=((p3[0]-p1[0])*dy2-(p3[1]-p1[1])*dx2)/den,u=((p3[0]-p1[0])*dy1-(p3[1]-p1[1])*dx1)/den;if(t>=0&&t<=1&&u>=0&&u<=1)return true;}return false;}
+function leftPath(c,k){const P0=c.pts[0],P3=c.pts[c.pts.length-1],d=HEAD[c.appr],d2=turnDir(d,'L'),t1=dot(sub(P3,P0),d),C=add(P0,mul(d,t1)),t2=Math.hypot(P3[0]-C[0],P3[1]-C[1]);
+  const s=mkSeg(bez(P0,add(P0,mul(d,k*t1)),sub(P3,mul(d2,k*t2)),P3,22),c.v0);c.pts=s.pts;c.cum=s.cum;c.length=s.length;}
+// 판단은 실제로 쓰는 좌회전(안쪽 1, 2차로가 같은 순서의 나가는 차로로)끼리만. 곡선을 펼 때는 같은 접근로의 좌회전을 모두 같이 펴서 이중 좌회전끼리 엇갈리지 않게 함
+function untangleLefts(conns){const main=c=>c.lane<=1&&c._j===Math.min(c.lane,c._nO-1);
+  for(const [a,b] of [['E','W'],['N','S']]){const A=conns.filter(c=>c.appr===a&&c.move==='L'),B=conns.filter(c=>c.appr===b&&c.move==='L');if(!A.length||!B.length)continue;
+  const bad=()=>A.some(x=>main(x)&&B.some(y=>main(y)&&pathsCross(x.pts,y.pts)));if(!bad())continue;let ok=false;
+  for(let k=.5;k>-.001;k-=.05){for(const c of [...A,...B])leftPath(c,Math.max(0,k));if(!bad()){ok=true;break;}}
+  if(!ok)for(const c of [...A,...B])leftPath(c,.552);}}
 // 교차로 안 충돌 지점: 서로 다른 접근로의 경로가 교차하거나 같은 나가는 차로로 합류하는 지점. 기하별로 한 번만 계산
 const SLIP_BACK=22,SLIP_FWD=20,czCache={};
 function attachConflicts(conns,G){const key=JSON.stringify(G);let list=czCache[key];
@@ -467,6 +480,7 @@ REAL.toronto={id:'toronto',title:'레이크쇼어 / 파를러먼트',city:'토�
          ['같은 시간 보행자 85명, 자전거 35대(4개 횡단보도 합)','측정값','같은 조사. 시뮬레이터에 보행자와 자전거는 아직 없음'],
          ['2022년 토론토 혼잡 교차로 10위','측정값','토론토시 통행시간 지수(출퇴근 대 심야), CP24 보도'],
          ['차로 수: 레이크쇼어 양방향 각 3차로, 파를러먼트 양방향 각 2차로','지도 자료','OpenStreetMap 차로 수(lanes)'],
+         ['좌회전 경로: 남북 길이 서로 반대쪽으로 어긋나 있어도 동서 좌회전 두 흐름은 서로 비켜 가게 그림(같은 녹색에 함께 좌회전 가능)','가정','OSM에는 교차로 안 좌회전 유도선이 없음. 마주 보는 보호 좌회전을 함께 내보내는 일반 신호 운영 기준'],
          ['차로 용도: 동서 1차로 좌회전 전용, 남북 직좌 및 직우 겸용','가정','OSM에 차로별 회전 표시가 없어 좌회전 교통량(동 370, 서 303대/시)을 보고 정함'],
          ['레이크쇼어 중앙분리대 약 7.6m(가디너 고속도로 교각)','지도 자료','OSM 차도 중심선 간격에서 계산. 고가 고속도로 자체는 그리지 않음'],
          ['파를러먼트 남쪽 접근로가 약 45도 비스듬히 만남','지도 자료','OSM 도로 선형 그대로 그림. 주변에 도로 재정비 공사 구간이 있음'],
@@ -544,7 +558,7 @@ const LEVELS=[
  {id:'1-4',stage:1,real:'toronto',title:'실제 교차로: 토론토 레이크쇼어',unlock:['split','cycle'],
   story:'2장의 마지막은 토론토 호숫가 레이크쇼어 대로와 파를러먼트 거리입니다. 2022년 토론토 혼잡 교차로 10위이고, 교통량은 토론토시가 2024년 6월에 실제로 센 출근 시간 값입니다. 동서 좌회전 보호, 동서 직진, 남북 순서의 3현시 신호입니다. 지금은 신호 비중과 주기 길이만 바꿀 수 있습니다.',
   goal:'방향별 녹색 시간을 실제 교통량에 맞게 다듬어 흐름 점수를 올리세요.',
-  hint:'동쪽에서 시간당 1,326대가 들어옵니다. 동서 직진 현시의 비중과 주기 길이를 함께 보세요.',stars:[279,291,301]},
+  hint:'동쪽에서 시간당 1,326대가 들어옵니다. 동서 직진 현시의 비중과 주기 길이를 함께 보세요.',stars:[403,438,467]},
  {id:'2-1',stage:2,title:'직진이 몰린다',unlock:['split','cycle','lanes'],scheme:{NS:'split',EW:'thru'},plan:{S_A:24,N_A:22,EW_T:20},
   appr:{N:[700,10,10,'L','TR'],S:[750,10,10,'L','TR'],E:[300,0,10,'T','TR'],W:[300,0,10,'T','TR']},
   story:'남북은 방향별로 직진과 좌회전을 함께 내보내는 직좌 동시 신호입니다. 그런데 1차로가 좌회전 전용이라 좌회전 10%를 위해 차로 하나를 비워두고 있습니다.',
@@ -645,5 +659,5 @@ function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,p
 function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
   if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
-return {VER:'v0.47',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
+return {VER:'v0.48',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
 })();
