@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261119123925">
+<meta name="gl-build" content="20261119124809">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1328,12 +1328,50 @@ body.sk-cute .monovbox,body.sk-cute .monsk{border-radius:18px}
 body.titleon .journey{z-index:5100;background:linear-gradient(180deg,rgba(59,37,70,.82),rgba(42,26,51,.92));backdrop-filter:blur(10px)}
 @media (max-width:640px){.whint{white-space:normal;width:calc(100vw - 32px);text-align:center;border-radius:16px}.wsign .pill{font-size:14px;padding:8px 12px 7px 8px}.wcard{left:12px;bottom:12px;width:calc(100vw - 24px)}}
 @media (prefers-reduced-motion:reduce){.plusone{animation:none;opacity:0}}
+/* ===== v0.45 창(결과, 상점, 기록) = 줌 월드 카드 결: 보라 반투명 판, 위쪽 색 띠, 노란 알약 버튼 ===== */
+body.sk-sunset .modal{background:rgba(28,16,36,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+body.sk-sunset .modalbox{--mc:#ffd34d;background:rgba(59,37,70,.96);border:0;border-top:6px solid var(--mc);border-radius:24px;padding:18px 20px 20px;box-shadow:0 24px 60px rgba(20,8,30,.5);color:#fff8ee}
+body.sk-sunset .modal[data-k="shop"] .modalbox{--mc:#f49ac1}body.sk-sunset .modal[data-k="board"] .modalbox{--mc:#5fb8e6}body.sk-sunset .modal[data-k="info"] .modalbox{--mc:#7bd389}
+body.sk-sunset .modalbox .poph b,body.sk-sunset .monovbox .monh{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:24px;color:#fff;letter-spacing:.01em}
+body.sk-sunset .modalbox .poph button{background:transparent;border:2px solid rgba(255,248,238,.4);color:#fff8ee;border-radius:99px;padding:6px 14px;font-weight:700}
+body.sk-sunset .modalbox button.primary,body.sk-sunset .monovbox button.primary,body.sk-sunset .monpass button{background:#ffd34d!important;color:#2a1a33!important;border:0!important;border-radius:99px;box-shadow:0 5px 0 #e0a92a!important;font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:16px;padding:10px 18px}
+body.sk-sunset .modalbox button.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #e0a92a!important}
+body.sk-sunset .modalbox button:not(.primary):not(.lncol):not(.lnopt){border-radius:99px;background:rgba(255,248,238,.08);border:2px solid rgba(255,248,238,.28);color:#fff8ee}
+/* 결과 */
+body.sk-sunset .modal[data-k="result"] .modalbox{background:linear-gradient(180deg,rgba(244,169,138,.22),rgba(59,37,70,0) 120px),rgba(59,37,70,.96)}
+body.sk-sunset .res-top small{color:#e8cfe0;font-size:12.5px}
+body.sk-sunset .big{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:52px;color:#ffd34d;text-shadow:0 4px 0 #b9781f,0 10px 24px rgba(20,8,30,.4)}
+body.sk-sunset .stars{font-size:30px;color:#ffd34d;text-shadow:0 0 14px rgba(255,211,77,.55)}body.sk-sunset .stars .off{color:rgba(255,248,238,.18);text-shadow:none}
+body.sk-sunset .record{background:#ffd34d;color:#2a1a33;font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:15px;border-radius:99px;padding:4px 14px;box-shadow:0 3px 0 #e0a92a}
+body.sk-sunset .cmp div,body.sk-sunset .goalres,body.sk-sunset .tries,body.sk-sunset .jamres,body.sk-sunset .chg,body.sk-sunset .nextstar{background:rgba(255,248,238,.07);border-radius:16px;padding:10px 12px}
+body.sk-sunset .cmp .k{color:#e8cfe0}body.sk-sunset .cmp b{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:20px;color:#fff}
+body.sk-sunset .nextq{background:rgba(255,211,77,.1);border:2px solid rgba(255,211,77,.55);border-radius:18px}
+body.sk-sunset .nextq b{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:18px;color:#ffd34d}
+body.sk-sunset .cit{background:rgba(255,248,238,.07);border-color:rgba(255,248,238,.15);border-radius:16px}
+body.sk-sunset .hist tr.best td{background:rgba(255,211,77,.12)}
+/* 상점 */
+body.sk-sunset .montest{background:rgba(255,248,238,.08);border:1px dashed rgba(255,248,238,.4);color:#e8cfe0}
+body.sk-sunset .monpass{border-radius:20px;padding:16px 18px;background:linear-gradient(135deg,#ffcf9a 0%,#f4a98a 40%,#b98aa8 100%);color:#2a1a33;box-shadow:0 10px 26px rgba(20,8,30,.35)}
+body.sk-sunset .monpass .monph b{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:22px}body.sk-sunset .monpass .monph span{color:#4a2c3f}
+body.sk-sunset .monpass ul{color:#3a2840}body.sk-sunset .monpass.on{outline:3px solid #ffd34d;outline-offset:3px}
+body.sk-sunset .monh4{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:18px;color:#fff;margin-top:12px}body.sk-sunset .monh4 small{font-family:var(--f-body);color:#e8cfe0}
+body.sk-sunset .mongrid button{border-radius:18px!important;background:rgba(255,248,238,.08)!important;border:2px solid rgba(255,248,238,.18)!important;padding:10px 12px}
+body.sk-sunset .mongrid button b{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:16px;color:#ffd34d}body.sk-sunset .mongrid small{color:#e8cfe0}
+body.sk-sunset .monsk{border-radius:18px;background:rgba(255,248,238,.07);border:2px solid transparent}body.sk-sunset .monsk.cur{border-color:#ffd34d}
+body.sk-sunset .monsw{border-radius:12px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+body.sk-sunset .monovbox{background:rgba(59,37,70,.97);border:0;border-top:6px solid #f49ac1;border-radius:24px;color:#fff8ee}
+body.sk-sunset .monprice{font-family:"Black Han Sans",var(--f-display);font-weight:400;color:#ffd34d;font-size:28px}
+body.sk-sunset .monad{border-radius:18px;background:linear-gradient(160deg,#ffcf9a,#f4a98a 55%,#b98aa8);color:#2a1a33}
+body.sk-sunset .monadbar i{background:#ffd34d}
+/* 랭킹, 기록 표 */
+body.sk-sunset .modalbox table th{color:#e8cfe0}body.sk-sunset .modalbox table td{border-color:rgba(255,248,238,.12)}
+body.sk-sunset .modal{z-index:50}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.44. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.45. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -6581,6 +6619,77 @@ function monSkinLabels(){const sel=$('skinsel');if(!sel)return;for(const o of se
     it.addEventListener('click',ev=>{ev.stopPropagation();m.hidden=true;shopOpen();});m.appendChild(it);}}
 setInterval(()=>{const b=$('shopbtn');if(b)b.classList.toggle('pass',passOn());},5000);
 window.__mon={MON,SKU,ent:entGet,passOn,open:shopOpen,grant:monGrant,bonus:bonusGet};
+// ---------- 노을 도시 스킨 v2(v0.45): 첫 화면 줌 월드와 같은 질감, 광원, 그림자를 플레이 지도에 ----------
+// 해는 화면 왼쪽 위. 그림자는 오른쪽 아래(월드 좌표 +x, -y)로 부드럽게. 땅, 아스팔트, 보도는 월드에 붙은 질감 패턴
+// 지도는 위에서 내려다보므로 건물은 지붕 빛 그라데이션 + 해 받는 가장자리 빛 + 옥상 시설, 나무는 빛 받은 둥근 수관
+const SUNFX={pat:null};
+function sfxPatMake(base,draw){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');g.fillStyle=base;g.fillRect(0,0,128,128);draw(g);const p=ctx.createPattern(c,'repeat');
+  try{p.setTransform(new DOMMatrix([1/16,0,0,1/16,0,0]));}catch(e){}return p;}
+function sfxPats(){if(SUNFX.pat)return SUNFX.pat;let sd=5;const R=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const grass=(base,a,b)=>sfxPatMake(base,g=>{for(let i=0;i<900;i++){g.fillStyle=R()<.5?a:b;g.fillRect(R()*128,R()*128,1.6+R()*2,1.2);}for(let i=0;i<10;i++){g.fillStyle=['#fff6c8','#ffc2d4','#ffffff'][i%3];g.fillRect(R()*128,R()*128,1.6,1.6);}});
+  SUNFX.pat={ground:grass('#a6d08d','rgba(120,175,100,.35)','rgba(200,235,170,.35)'),park:grass('#97c983','rgba(100,160,90,.4)','rgba(190,230,160,.35)'),
+    asphalt:sfxPatMake('#4e5765',g=>{for(let i=0;i<1600;i++){g.fillStyle=R()<.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.09)';g.fillRect(R()*128,R()*128,1.3,1.3);}
+      g.strokeStyle='rgba(25,25,35,.2)';g.lineWidth=1;for(let i=0;i<4;i++){g.beginPath();let x=R()*128,y=R()*128;g.moveTo(x,y);for(let k=0;k<5;k++){x+=(R()-.5)*16;y+=(R()-.3)*12;g.lineTo(x,y);}g.stroke();}}),
+    pave:sfxPatMake('#ecdcc0',g=>{g.strokeStyle='rgba(140,110,80,.16)';g.lineWidth=1.2;for(let k=0;k<=128;k+=32){g.beginPath();g.moveTo(k,0);g.lineTo(k,128);g.moveTo(0,k);g.lineTo(128,k);g.stroke();}for(let i=0;i<260;i++){g.fillStyle=R()<.5?'rgba(255,255,255,.18)':'rgba(120,90,60,.08)';g.fillRect(R()*128,R()*128,1.4,1.4);}}),
+    walk:sfxPatMake('#dccdb2',g=>{g.strokeStyle='rgba(120,95,70,.2)';g.lineWidth=1;for(let k=0;k<=128;k+=16){g.beginPath();g.moveTo(k,0);g.lineTo(k,128);g.stroke();}for(let k=0;k<=128;k+=32){g.beginPath();g.moveTo(0,k);g.lineTo(128,k);g.stroke();}})};
+  return SUNFX.pat;}
+// 노을 도시일 때 땅, 아스팔트, 섬 색을 질감으로(색 문자열을 쓰는 곳은 없음: fillStyle, strokeStyle로만 씀)
+function sfxApply(){if(skin!=='sunset')return;const P=sfxPats();COL.ground=P.ground;COL.asphalt=P.asphalt;COL.island=P.walk;COL.park=P.park;}
+{const _a=applySkin;applySkin=function(id){_a(id);try{sfxApply();}catch(e){}};}
+try{sfxApply();}catch(e){}
+const sfxR=s=>{let v=s;return()=>(v=(v*16807)%2147483647)/2147483647;};
+// 그림자 여러 개를 한 경로에 모아 한 번만 흐리게(겹쳐도 진해지지 않게)
+function sfxShadows(paths,blur){ctx.save();ctx.fillStyle='rgba(61,33,71,.3)';try{ctx.filter=`blur(${Math.max(1,blur*dpr)}px)`;}catch(e){}ctx.beginPath();for(const f of paths)f();ctx.fill();ctx.restore();}
+// 지붕: 왼쪽 위에서 오는 빛(밝게) → 오른쪽 아래(어둡게), 해 받는 두 가장자리 빛
+function sfxRoof(x0,y0,x1,y1,col,dark){const g=ctx.createLinearGradient(x0,y1,x1,y0);g.addColorStop(0,shade(col,.14));g.addColorStop(.55,col);g.addColorStop(1,shade(col,-.08));ctx.fillStyle=g;ctx.fillRect(x0,y0,x1-x0,y1-y0);
+  ctx.strokeStyle='rgba(255,246,228,.85)';ctx.lineWidth=.35;ctx.beginPath();ctx.moveTo(x0,y0+.2);ctx.lineTo(x0,y1);ctx.lineTo(x1-.2,y1);ctx.stroke();
+  ctx.strokeStyle=dark;ctx.globalAlpha=.55;ctx.lineWidth=.3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1,y0);ctx.lineTo(x0,y0);ctx.stroke();ctx.globalAlpha=1;}
+function sfxRoofDetail(x0,y0,x1,y1,r){const w=x1-x0,h=y1-y0,k=r();
+  if(k<.28){for(let i=0;i<2;i++){const ax=x0+1+(w-3)*r(),ay=y0+1+(h-3)*r();ctx.fillStyle='rgba(61,33,71,.22)';ctx.fillRect(ax+.35,ay-.35,1.4,1);ctx.fillStyle='#d3d6dc';ctx.fillRect(ax,ay,1.4,1);ctx.fillStyle='#a7abb4';ctx.fillRect(ax+1.1,ay,.3,1);}}
+  else if(k<.45){ctx.fillStyle='#9fd18a';ctx.fillRect(x0+1,y0+1,w-2,h-2);for(let i=0;i<3;i++){const tx=x0+1.6+(w-3.2)*r(),ty=y0+1.6+(h-3.2)*r(),rr=.6+r()*.5;ctx.fillStyle='#62a55e';ctx.beginPath();ctx.arc(tx,ty,rr,0,7);ctx.fill();ctx.fillStyle='rgba(220,245,170,.7)';ctx.beginPath();ctx.arc(tx-rr*.3,ty+rr*.3,rr*.45,0,7);ctx.fill();}}
+  else if(k<.49&&w>9.5){const cx=(x0+x1)/2,cy=(y0+y1)/2,rr=Math.min(w,h)*.32;ctx.fillStyle='#ffd35a';ctx.beginPath();ctx.arc(cx,cy,rr,0,7);ctx.fill();ctx.fillStyle='#5a5560';ctx.beginPath();ctx.arc(cx,cy,rr*.82,0,7);ctx.fill();
+    ctx.save();ctx.translate(cx,cy);ctx.scale(1,-1);ctx.fillStyle='#fff8ee';ctx.font=`700 ${rr*1.1}px "IBM Plex Sans KR",sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('H',0,.1);ctx.restore();}
+  else if(k<.68){const cx=x0+w*.7,cy=y0+h*.3;ctx.fillStyle='rgba(61,33,71,.22)';ctx.beginPath();ctx.arc(cx+.4,cy-.4,1.1,0,7);ctx.fill();ctx.fillStyle='#c48a55';ctx.beginPath();ctx.arc(cx,cy,1.1,0,7);ctx.fill();ctx.fillStyle='#e0aa74';ctx.beginPath();ctx.arc(cx-.25,cy+.25,.5,0,7);ctx.fill();}
+  else{ctx.fillStyle='rgba(0,0,0,.07)';ctx.fillRect(x0+.8,y0+.8,w-1.6,h-1.6);}}
+function sfxTree(tx,ty,r){const g=ctx.createRadialGradient(tx-r*.35,ty+r*.35,r*.05,tx,ty,r*1.05);g.addColorStop(0,'#9fd88a');g.addColorStop(.6,'#62a55e');g.addColorStop(1,'#4f8d4f');ctx.fillStyle=g;ctx.beginPath();ctx.arc(tx,ty,r,0,7);ctx.fill();
+  ctx.fillStyle='rgba(230,250,190,.55)';ctx.beginPath();ctx.arc(tx-r*.35,ty+r*.35,r*.32,0,7);ctx.fill();}
+// 레벨(가상 교차로) 주변 도시
+sunsetDecor=function(stage){if(stage!=='ground'||!sim||curReal())return;const G=sim.cfg.geo,D=geoDims(G),hx=D.hNS+Math.max(...APPR.map(a=>Math.abs(D.off(a))))+.5,hy=D.hEW+Math.max(...APPR.map(a=>Math.abs(D.off(a))))+.5,W=VIEW+10,SW=4.5,P=sfxPats();
+  ctx.fillStyle=P.pave;ctx.fillRect(-hx-SW,-W,2*(hx+SW),2*W);ctx.fillRect(-W,-hy-SW,2*W,2*(hy+SW));
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(-hx-SW,-W,.25,2*W);ctx.fillRect(hx+SW-.25,-W,.25,2*W);ctx.fillRect(-W,-hy-SW,2*W,.25);ctx.fillRect(-W,hy+SW-.25,2*W,.25);
+  const r=sfxR(11),B=[],T=[],PK=[];
+  for(const [sx,sy] of [[1,1],[-1,1],[1,-1],[-1,-1]])for(let i=0;i<5;i++)for(let j=0;j<5;j++){const x0=hx+SW+2+i*13,y0=hy+SW+2+j*13;if(x0>W||y0>W)continue;
+    const w=8+r()*3,h=8+r()*3,x=sx>0?x0:-x0-w,y=sy>0?y0:-y0-h;
+    if(r()<.14){PK.push([x,y,w,h]);T.push([x+w*.5,y+h*.5,2.2],[x+1.6,y+h-1.6,1.2],[x+w-1.6,y+1.6,1.3]);continue;}
+    B.push({x,y,w,h,P:SUN_BLD[Math.floor(r()*SUN_BLD.length)],ht:1.4+r()*2.6,seed:Math.floor(r()*1e6)+1});}
+  for(const s of [-1,1])for(let t=Math.max(hx,hy)+SW+6;t<W;t+=11)for(const [tx,ty] of [[s*t,hy+SW-1.3],[s*t,-hy-SW+1.3],[hx+SW-1.3,s*t],[-hx-SW+1.3,s*t]])T.push([tx,ty,1.5]);
+  for(const [x,y,w,h] of PK){ctx.fillStyle=P.park;ctx.fillRect(x,y,w,h);ctx.fillStyle='#e9d8c0';ctx.fillRect(x+w*.45,y,w*.12,h);ctx.fillStyle='#a8744f';ctx.fillRect(x+w*.62,y+h*.3,1.4,.5);}
+  // 그림자(건물은 높이만큼 길게, 나무는 둥글게)
+  sfxShadows([...B.map(b=>()=>{const d=b.ht*1.1;ctx.moveTo(b.x,b.y+b.h);ctx.lineTo(b.x+b.w,b.y+b.h);ctx.lineTo(b.x+b.w+d,b.y+b.h-d);ctx.lineTo(b.x+b.w+d,b.y-d);ctx.lineTo(b.x+d,b.y-d);ctx.lineTo(b.x,b.y);ctx.closePath();}),
+    ...T.map(([tx,ty,rr])=>()=>{ctx.moveTo(tx+rr*.8+rr,ty-rr*.8);ctx.arc(tx+rr*.8,ty-rr*.8,rr,0,7);})],1.6);
+  for(const b of B){const {x,y,w,h,P:C,ht}=b;ctx.fillStyle=C[1];ctx.fillRect(x+ht*.35,y-ht*.35,w,h);sfxRoof(x,y,x+w,y+h,C[0],C[1]);sfxRoofDetail(x,y,x+w,y+h,sfxR(b.seed));}
+  for(const [tx,ty,rr] of T)sfxTree(tx,ty,rr);};
+// 실제 교차로: 지도 건물(파스텔)에 부드러운 그림자, 지붕 빛, 가장자리 빛. 공원은 잔디 질감
+{const _dc=drawContext;drawContext=function(R){if(skin!=='sunset'){_dc(R);return;}const X=R.ctx;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  const poly=(a,close)=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)ctx.lineTo(a[i],a[i+1]);if(close)ctx.closePath();};
+  const path=a=>{ctx.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)ctx.lineTo(a[i],a[i+1]);ctx.closePath();};
+  ctx.fillStyle=COL.park;for(const b of X.parks||[]){poly(b,true);ctx.fill();}
+  const BB=X.blds.map((b,i)=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(let k=0;k<b.length;k+=2){x0=Math.min(x0,b[k]);x1=Math.max(x1,b[k]);y0=Math.min(y0,b[k+1]);y1=Math.max(y1,b[k+1]);}return{b,i,x0,y0,x1,y1,ht:1.2+((i*2654435761)>>>0)%100/100*2.4};});
+  sfxShadows(BB.map(o=>()=>{const d=o.ht,s=o.b.map((v,j)=>v+(j%2?-d:d));path(o.b);path(s);}),1.4);
+  for(const o of BB){const P=SUN_BLD[o.i%SUN_BLD.length];ctx.fillStyle=P[1];poly(o.b.map((v,j)=>v+(j%2?-o.ht*.3:o.ht*.3)),true);ctx.fill();
+    const g=ctx.createLinearGradient(o.x0,o.y1,o.x1,o.y0);g.addColorStop(0,shade(P[0],.14));g.addColorStop(.6,P[0]);g.addColorStop(1,shade(P[0],-.06));ctx.fillStyle=g;poly(o.b,true);ctx.fill();
+    ctx.strokeStyle='rgba(255,246,228,.7)';ctx.lineWidth=.35;ctx.stroke();}
+  const wid={p:16,s:11,r:7,v:4,l:4.5};
+  ctx.save();ctx.strokeStyle=COL.wall||'#9b7d57';ctx.globalAlpha=.85;ctx.lineWidth=3.6;for(const w of X.roads){if(w.c!=='w')continue;poly(w.p,false);ctx.stroke();}ctx.setLineDash([1.2,1.6]);ctx.lineWidth=5.4;ctx.globalAlpha=.6;for(const w of X.roads){if(w.c!=='w')continue;poly(w.p,false);ctx.stroke();}ctx.restore();
+  ctxTunnels(X,poly);
+  for(const pass of [0,1])for(const w of X.roads){if(w.c==='l'||w.c==='w')continue;const ww=wid[w.c]||4;ctx.lineWidth=pass?ww:ww+2.4;ctx.strokeStyle=pass?COL.asphalt:COL.mapCase;poly(w.p,false);ctx.stroke();}
+  ctx.restore();};}
+// 화면 전체: 왼쪽 위 해 번짐과 위쪽 노을 아지랑이(지도를 가리지 않게 아주 옅게)
+{const _dr=draw;draw=function(){_dr();if(skin!=='sunset'||!cw)return;ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
+  const hz=ctx.createLinearGradient(0,0,0,ch*.4);hz.addColorStop(0,'rgba(255,205,175,.18)');hz.addColorStop(1,'rgba(255,205,175,0)');ctx.fillStyle=hz;ctx.fillRect(0,0,cw,ch*.4);
+  ctx.globalCompositeOperation='lighter';const R=Math.max(cw,ch)*.7,sb=ctx.createRadialGradient(cw*.04,-ch*.08,0,cw*.04,-ch*.08,R);sb.addColorStop(0,'rgba(255,170,110,.22)');sb.addColorStop(.5,'rgba(255,150,110,.05)');sb.addColorStop(1,'rgba(255,150,110,0)');ctx.fillStyle=sb;ctx.fillRect(0,0,cw,ch);ctx.restore();};}
+// 결과 창, 상점 등 창 종류 표시(창마다 위쪽 띠 색을 다르게)
+{const _om=openModal;openModal=function(t,els){const r=_om(t,els);const m=$('modal');if(m)m.dataset.k=/결과|끝났|기회를 모두|다시 도전/.test(t)?'result':t==='상점'?'shop':t==='랭킹'||t==='공동 기록판'||t==='세션 기록'?'board':'info';return r;};}
 // ---------- 데스크톱 화면 A안(네 모서리): 오른쪽 옆 칸을 없애고 지도를 가로 전체로 씀 ----------
 // 도로 밖 네 블록에 카드 하나씩: 왼쪽 위 할 일, 오른쪽 위 점수 막대, 왼쪽 아래 지금 흐름, 오른쪽 아래 조작
 // 나머지 메뉴(게임 모드, 도움말, 기록, 다시, 보기, 설정)는 ⋯ 버튼, 지도 우클릭, 휠 클릭으로 여는 원형 메뉴 하나로
