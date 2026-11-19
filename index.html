@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261119145206">
+<meta name="gl-build" content="20261119151558">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1390,12 +1390,42 @@ body.sk-sunset #hqctl #hqskip{background:#ffd34d!important;color:#2a1a33!importa
 .nxbtn:hover{background:#6ff0a0!important}
 #hqctl .nxbtn{font-size:12.5px;padding:6px 12px;border-radius:99px}
 body.mobile.m2 .stage>.hud-tr #nextbtn{flex:1 1 100%;font-size:14px;padding:8px 10px}
+/* ---------- 지도 위 카메라(livecam.js, v0.50) ---------- */
+#lcbtn{display:none!important}
+.camlay{position:absolute;z-index:28;pointer-events:none}
+.camlay[hidden]{display:none}
+.camcone{position:absolute;left:0;top:0;overflow:visible}
+.camcone path.dim{opacity:.55}
+.campins{position:absolute;inset:0}
+.campin{position:absolute;left:0;top:0;margin:-20px 0 0 -20px;width:40px;height:40px;border-radius:50%!important;padding:0!important;display:flex;align-items:center;justify-content:center;background:#3b2546!important;color:#ffd34d!important;border:3px solid #ffd34d!important;box-shadow:0 6px 14px rgba(42,26,51,.45)!important;pointer-events:auto;cursor:pointer}
+.campin b{position:absolute;right:-6px;top:-6px;min-width:17px;height:17px;border-radius:9px;background:#fff8ee;color:#3b2546;font-size:11px;line-height:17px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.campin:hover,.campin.on{background:#ffd34d!important;color:#3b2546!important;border-color:#3b2546!important}
+.campin .camfar{display:none}
+.campin.far .camfar{display:flex;position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:6px;gap:4px;align-items:center;white-space:nowrap;background:rgba(59,37,70,.9);color:#fff8ee;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px}
+.campin.far .camfar i{font-style:normal;display:inline-block;color:#ffd34d}
+.campop{position:absolute;left:12px;top:12px;z-index:36;width:320px;box-sizing:border-box;background:rgba(59,37,70,.96);color:#fff8ee;border-radius:22px;padding:12px;box-shadow:0 16px 34px rgba(42,26,51,.45);display:flex;flex-direction:column;gap:10px;font-size:13px}
+.campop[hidden]{display:none}
+.cph{display:flex;align-items:center;gap:8px}.cph b{font-size:13.5px;white-space:nowrap}.cph span{flex:1;min-width:0;font-size:11.5px;color:#cbbfd2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cph .cpx{width:32px;height:32px;border-radius:50%!important;padding:0!important;font-size:17px;line-height:1;flex:none}
+.cpm{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#1c1524}
+.cpm img,.cpm video,.cpm iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
+.cpts{position:absolute;left:8px;bottom:8px;background:rgba(42,26,51,.8);border-radius:99px;padding:2px 9px;font-size:11px}
+.cpwarn{margin:0;padding:8px 10px;border-radius:10px;background:rgba(255,211,77,.12);border:1px solid rgba(255,211,77,.45);font-size:12px;line-height:1.5}
+.cpw{display:flex;gap:8px;align-items:flex-start}.cpw .cpic{width:28px;height:28px;flex:none;border-radius:50%;background:#ffd34d;color:#3b2546;display:flex;align-items:center;justify-content:center}
+.cpw .cpic svg{width:15px;height:15px}.cpw div{display:flex;flex-direction:column;gap:2px;line-height:1.45}.cpw b{font-size:13px}.cpw small{font-size:12px;color:#cbbfd2}
+.cprefs{display:grid;gap:6px}
+.cpref{display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px!important;border-radius:10px!important;background:transparent!important;border:2px solid transparent!important;color:#cbbfd2!important;font-size:12px}
+.cpref img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;opacity:.8}
+.cpref.on{border-color:#ffd34d!important;color:#ffd34d!important;font-weight:700}.cpref.on img{opacity:1}
+.cpf{display:flex;gap:8px;align-items:center}.cpf .cpbig{flex:1}.cpf a{font-size:12px;color:#cbbfd2}
+body.mobile .campop{position:fixed;left:0!important;right:0;bottom:0;top:auto!important;width:auto;border-radius:22px 22px 0 0;padding:12px 14px max(16px,env(safe-area-inset-bottom,0px));z-index:70;max-height:80dvh;overflow-y:auto}
+body.mobile .campin{width:36px;height:36px;margin:-18px 0 0 -18px}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.49. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.50. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3897,6 +3927,76 @@ PIP.querySelector('.lpbig').addEventListener('click',openLiveCam);
 // 버튼: 작은 창이 꺼져 있으면 다시 켜고, 켜져 있거나 띄울 수 없으면 크게 보기
 {const b=$('lcbtn');b.removeEventListener('click',openLiveCam);b.addEventListener('click',()=>{const k=lcKey();if(PS.off&&k&&LIVECAM[k].cams.length&&lcPub()&&!document.body.classList.contains('mobile')){PS.off=false;try{localStorage.removeItem('lcpip-off');}catch(e){}pipUpdate();}else openLiveCam();});}
 setInterval(()=>{try{pipUpdate();}catch(e){}},500);
+// ---------- 지도 위 카메라(v0.50): 카메라 아이콘을 실제 위치에 꽂고, 누를 때만 사진 창을 띄움. 보는 방향을 알면 지도에 보이는 범위(부채꼴)를 그림 ----------
+// 좌표: 토론토시 교통 카메라 공개 목록(traffic-camera-list, 2026-11-19 받음), TfL JamCam API(Place/JamCams_*), 도쿄는 방남정역 위치(카메라 근처)
+// refs: 방향을 돌리는 카메라에 시가 함께 공개한 방향별 참고 사진(토론토 ComparisonImages). 길 방향 기준이라 지도 위 그 길 쪽으로 그림
+// bearing: 방향이 정해진 카메라의 실제 방위(도, 북=0, 시계 방향). TfL 설명 'Zoom west towards Arnos Grove'
+const TO_REF='https://opendata.toronto.ca/transportation/tmc/rescucameraimages/ComparisonImages/';
+const CAMGEO={
+ toronto:[{lat:43.647587,lon:-79.361403,refs:{N:TO_REF+'loc9301n.jpg',E:TO_REF+'loc9301e.jpg',S:TO_REF+'loc9301s.jpg',W:TO_REF+'loc9301w.jpg'}},
+   {lat:43.647738,lon:-79.361043,where:'가디너 고가도로 위',refs:{E:TO_REF+'loc9201e.jpg',W:TO_REF+'loc9201w.jpg'}}],
+ london:[{lat:51.6112,lon:-0.13544,view:'피카딜리선 철교 쪽을 확대해서 봅니다(TfL 설명)'},{lat:51.6151,lon:-0.12769,bearing:270,view:'서쪽 아르노스 그로브 방향을 확대해서 봅니다(TfL 설명)'}],
+ tokyo:[{lat:35.6833,lon:139.6567,view:'같은 환7 도로의 다른 교차로(방남정)입니다'}]};
+const DIRN={N:'북',E:'동',S:'남',W:'서'};
+const CM={open:-1,dir:{},timer:null};
+function camWorld(R,g){const gr=R.geoRef,a=-gr.rot*Math.PI/180,n=(g.lat-gr.lat)*110540,e=(g.lon-gr.lon)*111320*Math.cos(gr.lat*Math.PI/180);
+  const X=e*Math.cos(a)+n*Math.sin(a),Y=-e*Math.sin(a)+n*Math.cos(a),x=X-gr.ox;return[R.lht?-x:x,Y-gr.oy];}
+function bearingWorld(R,b){const gr=R.geoRef,a=-gr.rot*Math.PI/180,e=Math.sin(b*Math.PI/180),n=Math.cos(b*Math.PI/180),X=e*Math.cos(a)+n*Math.sin(a),Y=-e*Math.sin(a)+n*Math.cos(a);return[R.lht?-X:X,Y];}
+// 길 방향(카메라 참고 사진의 북, 동, 남, 서 = 그 길이 뻗은 쪽): 들어오는 차로 모양의 45m 지점 쪽
+function armDir(R,a){const ig=R.geo.inGeo&&R.geo.inGeo[a]&&R.geo.inGeo[a]['0'];if(ig&&ig.length){let best=ig[0],bd=1e9;for(const q of ig){const d=Math.abs(Math.hypot(q[0],q[1])-45);if(d<bd){bd=d;best=q;}}const l=Math.hypot(best[0],best[1])||1;return[best[0]/l,best[1]/l];}
+  const h=HEAD[a];return[-h[0],-h[1]];}
+function camList(){const R=curReal(),k=lcKey();if(!R||!k||!R.geoRef)return[];const G=CAMGEO[k]||[];
+  return LIVECAM[k].cams.map((c,i)=>{const g=G[i];if(!g)return null;const p=camWorld(R,g);return{c,g,i,p,R};}).filter(Boolean);}
+function camDirVec(o){if(o.g.bearing!=null)return bearingWorld(o.R,o.g.bearing);const d=CM.dir[o.R.id+':'+o.i];if(d&&o.g.refs&&o.g.refs[d.k]&&Date.now()-d.t<15*60e3)return armDir(o.R,d.k);return null;}
+function camWhere(o){const x=o.R.lht?-o.p[0]:o.p[0],y=o.p[1],d=Math.hypot(x,y),ang=Math.atan2(y,x)*180/Math.PI;
+  const s=['동','북동','북','북서','서','남서','남','남동'][((Math.round(ang/45)%8)+8)%8];
+  if(d<70)return`교차로 ${s.length>1?s+'쪽 모서리':s+'쪽'}, 중심에서 약 ${Math.round(d/5)*5}m`;return`교차로에서 ${s}쪽으로 약 ${d>=1000?(d/1000).toFixed(1)+'km':Math.round(d/10)*10+'m'}`;}
+const CAMIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z"/><path d="M16 11l5-3v10l-5-3"/></svg>';
+const CAMLAY=(()=>{const d=document.createElement('div');d.id='camlay';d.className='camlay';d.innerHTML='<svg class="camcone" aria-hidden="true"></svg><div class="campins"></div>';$('stage').appendChild(d);return d;})();
+const CAMPOP=(()=>{const d=document.createElement('div');d.id='campop';d.className='campop';d.hidden=true;d.setAttribute('role','dialog');d.setAttribute('aria-label','실시간 카메라');$('stage').appendChild(d);return d;})();
+function camDraw(){const list=document.body.classList.contains('titleon')||!playMode?[]:camList(),pins=CAMLAY.querySelector('.campins'),svg=CAMLAY.querySelector('.camcone');
+  CAMLAY.hidden=!list.length;if(!list.length){if(!CAMPOP.hidden)camClose();return;}
+  const cvr=cv.getBoundingClientRect(),sr=$('stage').getBoundingClientRect();CAMLAY.style.left=(cvr.left-sr.left)+'px';CAMLAY.style.top=(cvr.top-sr.top)+'px';CAMLAY.style.width=cw+'px';CAMLAY.style.height=ch+'px';
+  svg.setAttribute('width',cw);svg.setAttribute('height',ch);
+  if(pins.children.length!==list.length){pins.innerHTML=list.map(o=>`<button type="button" class="campin" data-i="${o.i}" aria-label="실시간 카메라 ${o.i+1} 보기">${CAMIC}<b>${o.i+1}</b><span class="camfar"></span></button>`).join('');
+    pins.querySelectorAll('.campin').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const i=+b.dataset.i;if(CM.open===i)camClose();else camOpen(i);}));}
+  let cones='';const M=26,ps=document.querySelector('.phstrip'),pr=ps&&!ps.hidden&&ps.offsetParent?ps.getBoundingClientRect():null,MT=pr?Math.max(M,pr.bottom-cvr.top+M):M;
+  list.forEach((o,k)=>{const b=pins.children[k],[sx,sy]=toScreen(o.p[0],o.p[1]),off=sx<M||sy<MT||sx>cw-M||sy>ch-M;
+    let px=Math.max(M,Math.min(cw-M,sx)),py=Math.max(MT,Math.min(ch-M,sy));b.classList.toggle('far',off);b.classList.toggle('on',CM.open===o.i);
+    if(off){const obs=[...document.querySelectorAll('.hqc,.phstrip,.hud-tl,.hud-top,.citcard')].filter(e=>!e.hidden&&e.offsetParent).map(e=>e.getBoundingClientRect());
+      for(let t=0;t<4;t++){const X=px+cvr.left,Y=py+cvr.top,hit=obs.find(r=>X+22>r.left&&X-22<r.right&&Y+44>r.top&&Y-22<r.bottom);if(!hit)break;py=hit.bottom-cvr.top+M;if(py>ch-M){py=ch-M;break;}}}
+    b.style.transform=`translate(${px}px,${py}px)`;const fl=b.querySelector('.camfar');
+    if(off){const ang=Math.atan2(sy-py,sx-px)*180/Math.PI,t=`<i style="transform:rotate(${ang}deg)">➜</i>${camWhere(o).replace(/^교차로에서 /,'')}`;if(fl.innerHTML!==t)fl.innerHTML=t;}else if(fl.innerHTML)fl.innerHTML='';
+    const v=camDirVec(o);if(v&&!off){const L=48,[ex,ey]=toScreen(o.p[0]+v[0]*L,o.p[1]+v[1]*L),dx=ex-sx,dy=ey-sy,r=Math.hypot(dx,dy),a0=Math.atan2(dy,dx),h=26*Math.PI/180;
+      const p1=[sx+r*Math.cos(a0-h),sy+r*Math.sin(a0-h)],p2=[sx+r*Math.cos(a0+h),sy+r*Math.sin(a0+h)],id='cg'+o.i;
+      cones+=`<defs><radialGradient id="${id}" cx="${sx}" cy="${sy}" r="${r}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd34d" stop-opacity=".7"/><stop offset="1" stop-color="#ffd34d" stop-opacity=".06"/></radialGradient></defs><path d="M${sx.toFixed(1)} ${sy.toFixed(1)}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}Z" fill="url(#${id})" stroke="#ffd34d" stroke-width="2" stroke-dasharray="6 6" class="${CM.open===o.i?'':'dim'}"/>`;}});
+  if(svg.innerHTML!==cones)svg.innerHTML=cones;
+  if(!CAMPOP.hidden&&!document.body.classList.contains('mobile')){const b=pins.querySelector(`.campin[data-i="${CM.open}"]`);if(b){const m=/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(b.style.transform);if(m){const x=+m[1]+(cvr.left-sr.left),y=+m[2]+(cvr.top-sr.top),w=CAMPOP.offsetWidth,h=CAMPOP.offsetHeight;
+    const cx=(cvr.left-sr.left)+cw/2;let L=x<cx?x-32-w:x+32;if(L<12)L=x+32;if(L+w>sr.width-12)L=x-32-w;L=Math.max(12,Math.min(sr.width-w-12,L));const T=Math.max(12,Math.min(sr.height-h-12,y-h/2));CAMPOP.style.left=L+'px';CAMPOP.style.top=T+'px';}}}}
+(function loop(){try{camDraw();}catch(e){}requestAnimationFrame(loop);})();
+function camMedia(c){const ts=Date.now();
+  if(c.kind==='yt')return`<div class="cpm"><iframe src="https://www.youtube-nocookie.com/embed/${c.id}?autoplay=1&mute=1&playsinline=1" title="${c.title}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+  if(c.kind==='video')return`<div class="cpm"><video src="${c.src}?t=${ts}" poster="${c.poster}?t=${ts}" autoplay muted loop playsinline></video></div>`;
+  return`<div class="cpm"><img src="${c.src}?t=${ts}" alt="${c.title} 실시간 사진"><span class="cpts">불러오는 중</span></div>`;}
+function camOpen(i){const o=camList().find(x=>x.i===i);if(!o)return;CM.open=i;const c=o.c,g=o.g,key=o.R.id+':'+i,cur=CM.dir[key]&&Date.now()-CM.dir[key].t<15*60e3?CM.dir[key].k:null;
+  const refs=g.refs?Object.keys(g.refs):[];
+  CAMPOP.innerHTML=`<div class="cph"><i class="lcdot"></i><b>실시간 카메라 ${i+1}</b><span>${c.title}</span><button type="button" class="cpx" aria-label="닫기">×</button></div>
+   ${lcPub()?camMedia(c):`<p class="cpwarn">이 미리보기에서는 외부 카메라 사진이 막혀 있어요. <a href="${LC_PUB}" target="_blank" rel="noopener">공개 주소에서 열기</a></p>`}
+   <div class="cpw"><span class="cpic">${CAMIC}</span><div><b>${camWhere(o)}${g.where?', '+g.where:''}</b><small>${g.view||(refs.length?'방향을 돌리는 카메라예요. 지금 사진과 같은 방향을 고르면 지도에 보이는 범위가 그려져요.':c.dist)}</small></div></div>
+   ${refs.length?`<div class="cprefs" style="grid-template-columns:repeat(${refs.length},minmax(0,1fr))">${refs.map(k=>`<button type="button" class="cpref${cur===k?' on':''}" data-k="${k}" aria-pressed="${cur===k}"><img src="${g.refs[k]}" alt="${DIRN[k]}쪽 참고 사진" loading="lazy"><span>${DIRN[k]}</span></button>`).join('')}</div>`:''}
+   <div class="cpf"><button type="button" class="primary cpbig">크게 보기</button>${c.link?`<a href="${c.link}" target="_blank" rel="noopener">출처</a>`:''}</div>`;
+  CAMPOP.hidden=false;try{camDraw();}catch(e){}
+  CAMPOP.querySelector('.cpx').onclick=camClose;CAMPOP.querySelector('.cpbig').onclick=()=>{camClose();openLiveCam();};
+  CAMPOP.querySelectorAll('.cpref').forEach(b=>b.onclick=()=>{CM.dir[key]={k:b.dataset.k,t:Date.now()};CAMPOP.querySelectorAll('.cpref').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on);});try{anTrack('cam_dir',{city:o.R.id,i,k:b.dataset.k});}catch(e){}});
+  const im=CAMPOP.querySelector('.cpm img'),st=()=>{const t=CAMPOP.querySelector('.cpts');if(t)t.textContent='받은 시각 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});};
+  if(im){im.onload=st;im.onerror=()=>{const t=CAMPOP.querySelector('.cpts');if(t)t.textContent='지금은 사진을 받을 수 없어요';};}
+  clearInterval(CM.timer);if(c.kind==='img')CM.timer=setInterval(()=>{const m=CAMPOP.querySelector('.cpm img');if(m&&!CAMPOP.hidden)m.src=c.src+'?t='+Date.now();},60000);
+  try{anTrack('cam_open',{city:o.R.id,i});}catch(e){}}
+function camClose(){CM.open=-1;CAMPOP.hidden=true;CAMPOP.innerHTML='';clearInterval(CM.timer);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!CAMPOP.hidden)camClose();});
+{const lm=loadMode;loadMode=function(m){camClose();CAMLAY.querySelector('.campins').innerHTML='';lm(m);};}
+// 예전 작은 창(자동으로 뜨던 사진)과 '실시간 카메라' 칩은 쓰지 않음: 카메라 아이콘을 눌렀을 때만 띄움
+pipUpdate=function(){if(!PIP.hidden){PIP.hidden=true;PIP.querySelector('.lpm').innerHTML='';clearInterval(PS.timer);PS.key=null;}};
 // ---------- 화면 배치: 정보와 조작 UI가 도로를 가리지 않게 ----------
 // 도로 = 교차로를 지나는 남북, 동서 띠(시뮬레이션 도로 폭 + 여유). 그 밖의 네 귀퉁이(사분면)에만 패널을 둠
 // 왼쪽 위: 세션 HUD, 민원 카드 / 오른쪽 위: 재생 패널, 레벨 칩과 계기판(자리가 없으면 다른 사분면)
