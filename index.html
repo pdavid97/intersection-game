@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261119132141">
+<meta name="gl-build" content="20261119141120">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -580,7 +580,7 @@ body.mobile.m2 .stage>.dock #sigcore{display:block}body.mobile.m2 .stage>.dock .
 /* 확정과 재생 카드: 확정, 일시정지, 배속, 더보기만 */
 body.mobile.m2 .stage>.hud-tr{padding:6px}
 body.mobile.m2 .stage>.hud-tr .bar{display:flex;flex-wrap:wrap!important;overflow:visible!important;gap:6px}
-body.mobile.m2 .stage>.hud-tr .bar>:not(#skip):not(#play):not(.seg):not(#mmore){display:none!important}
+body.mobile.m2 .stage>.hud-tr .bar>:not(#skip):not(#play):not(.seg):not(#mmore):not(#nextbtn){display:none!important}
 body.mobile.m2 .stage>.hud-tr #skip{order:-2;flex:1 1 100%!important;font-size:14px;padding:9px 10px;white-space:normal;line-height:1.25}
 body.mobile.m2 .stage>.hud-tr button{min-height:34px;padding:5px 10px;font-size:12.5px}
 body.mobile.m2 .stage>.hud-tr .seg button{padding:5px 8px}
@@ -1384,12 +1384,18 @@ body.sk-sunset #hqtask #lvchip,body.sk-sunset .phh b{font-family:"Black Han Sans
 body.sk-sunset .hqn{font-family:"Black Han Sans",var(--f-display);font-weight:400;font-size:30px;color:#ffd34d}
 body.sk-sunset #hqctl #hqskip,body.sk-sunset #hqctl #dxsig{border-radius:99px!important}
 body.sk-sunset #hqctl #hqskip{background:#ffd34d!important;color:#2a1a33!important;box-shadow:0 4px 0 #e0a92a!important;font-family:"Black Han Sans",var(--f-display);font-weight:400}
+
+/* 다음 단계 버튼(별 1개 이상) */
+.nxbtn{white-space:nowrap;font-weight:700;background:#4fe08a!important;color:#173d29!important;border-color:#4fe08a!important;box-shadow:0 3px 0 #2c9a5c!important}
+.nxbtn:hover{background:#6ff0a0!important}
+#hqctl .nxbtn{font-size:12.5px;padding:6px 12px;border-radius:99px}
+body.mobile.m2 .stage>.hud-tr #nextbtn{flex:1 1 100%;font-size:14px;padding:8px 10px}
 </style>
 
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.46. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.47. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -6527,6 +6533,14 @@ function mvRetry(){if(!limited())return;if(triesUsed()===0){mvToast('아직 조�
   $('mvre').onclick=()=>{closeModal();restartStage();};$('mvno').onclick=closeModal;}
 openOutOfTries=mvOut;
 window.__mv={retry:mvRetry,tix:tixGet,add:tixAdd,out:mvOut,noTix:mvNoTix,get state(){return{...MV,cfg:null}}};
+// 별 1개 이상 받은 단계: 언제든 다음 단계로 넘어가는 버튼(PC 조작 카드, 모바일 조작 줄)
+function nxStars(){if(!mode||mode.kind==='lab'||mode.daily)return 0;const lv=mode.kind==='level'?curLevel():null,pk=lv?lv.id:modeId();return(prog[pk]||{}).stars||0;}
+function nxGo(){const nx=nextTarget();if(!nx)return;try{closePop();closeModal();}catch(_){}try{anTrack('next_stage',{from:modeId(),stars:nxStars(),via:'button'});}catch(_){}loadMode(nx.m);}
+function nxSync(){const nx=nxStars()>=1?nextTarget():null;
+  let b=$('nextbtn');if(!b&&$('skip')){b=document.createElement('button');b.type='button';b.id='nextbtn';b.className='nxbtn';b.hidden=true;b.onclick=nxGo;$('skip').after(b);}
+  let h=$('hqnext');if(!h&&$('hqmore')){h=document.createElement('button');h.type='button';h.id='hqnext';h.className='nxbtn';h.hidden=true;h.onclick=nxGo;$('hqmore').before(h);}
+  for(const x of [b,h]){if(!x)continue;const show=!!nx;if(x.hidden===show)x.hidden=!show;if(nx){const t='다음 단계 ▶',ti=`다음 단계로: ${nx.name}. 받은 별과 기록은 남아요`;if(x.textContent!==t)x.textContent=t;if(x.title!==ti)x.title=ti;}}}
+setInterval(()=>{try{nxSync();}catch(e){}},400);
 // ---------- 수익 모델 v1 (테스트 모드) ----------
 // 1 보상형 광고: 도전권 +1(하루 5번), 조작이 끝났을 때 조작 +2(도전마다 1번)
 // 2 조작 +5, 도전권 묶음: 추가 조작으로 낸 기록은 별과 내 기록에는 남지만 랭킹에는 올라가지 않음(rec.boost)
