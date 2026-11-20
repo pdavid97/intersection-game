@@ -83,7 +83,9 @@ function buildNet(G){const D=geoDims(G),W=G.LW;
       let pts=[add(p,mul(d,-L)),add(p,mul(d,-sd-(sl?SLIP_BACK:0)))];
       if(sg){const latMin=(G.nIn[a]+.5)*W+D.off(a),q=sg.in.map(x=>{const lt=dot(x,r);return lt<latMin?add(x,mul(r,latMin-lt)):x;});pts=[add(mul(r,dot(q[0],r)),mul(d,-L)),...q];}
       const ig=!sl&&G.inGeo&&G.inGeo[a]&&G.inGeo[a][i];if(ig)pts=[...ig,add(p,mul(d,-sd))];
-      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,easeJoin(pts));ins.push(s);return s;});}
+      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,easeJoin(pts));
+      // 분리 우회전 차로(실제 모양 없음): 정지선 뒤 끝 30~60m에서 바깥 직진 차로 옆으로 생겨남(화면만). 그 앞에서는 바깥 직진 차로 위로 그림
+      if(sl&&!sg){const b=sd+SLIP_BACK,q=add(p,mul(r,-W));visOf(s,[add(q,mul(d,-L)),add(q,mul(d,-b-SLIP_TAPER[1])),add(p,mul(d,-b-SLIP_TAPER[0])),add(p,mul(d,-b))]);}ins.push(s);return s;});}
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),bd=D.boxD(a);
     outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);if(og)visOf(s,easeJoin([...s.pts].reverse()).reverse());outs.push(s);return s;});}
   // 실제 교차로: 분리 우회전 도로의 전용 진출 차로(합류하지 않고 이어지는 차로)
@@ -125,7 +127,7 @@ function untangleLefts(conns){const main=c=>c.lane<=1&&c._j===Math.min(c.lane,c.
   for(let k=.5;k>-.001;k-=.05){for(const c of [...A,...B])leftPath(c,Math.max(0,k));if(!bad()){ok=true;break;}}
   if(!ok)for(const c of [...A,...B])leftPath(c,.552);}}
 // 교차로 안 충돌 지점: 서로 다른 접근로의 경로가 교차하거나 같은 나가는 차로로 합류하는 지점. 기하별로 한 번만 계산
-const SLIP_BACK=22,SLIP_FWD=20,czCache={};
+const SLIP_BACK=22,SLIP_FWD=20,SLIP_TAPER=[30,60],czCache={};
 function attachConflicts(conns,G){const key=JSON.stringify(G);let list=czCache[key];
   if(!list){list=[];const bb=conns.map(c=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const q of c.pts){x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);}return[x0,y0,x1,y1];});
     for(let a=0;a<conns.length;a++)for(let b=a+1;b<conns.length;b++){const A=conns[a],B=conns[b];if(A.appr===B.appr&&A.lane===B.lane)continue;
@@ -452,7 +454,7 @@ REAL.gangnam={id:'gangnam',title:'강남역 사거리',city:'서울',rot:20.1,it
 // 보행 횡단량(명/시, 08~09시): 추정값. 서울시 유동인구조사 2015(교차로 모서리 보도 1,500~2,700명/시)의 30~50%가 지상 횡단보도를 건넌다고 가정. 네 방향 횡단보도 존재는 로드뷰 확인 필요
 REAL.gangnam.ped={N:750,S:750,E:650,W:650};
 // 이스탄불 에디르네카프 교차로: 도로 기하, 차로 수, 회전 제한, 지하차도는 OpenStreetMap(© OpenStreetMap contributors, ODbL). 교통량은 İBB 시간대별 교통 밀도(2023)로 보정, 신호는 가정값
-REAL.edirnekapi={id:'edirnekapi',title:'에디르네카프 교차로',city:'이스탄불',rot:-35.05,geoRef:{lat:41.03141,lon:28.93542,rot:35.05,ox:6.85,oy:0.31},bend:{"S":[[110,0.0],[130,-0.8],[150,-2.1],[170,-3.5],[190,-4.5],[210,-5.5],[230,-6.4],[250,-7.0],[270,-7.8],[290,-8.7],[310,-9.2],[330,-9.6],[350,-10.0],[370,-10.3],[390,-11.3],[410,-12.5],[430,-13.6],[450,-14.4],[470,-14.7],[490,-16.0],[510,-16.7],[530,-17.2],[550,-17.7],[570,-18.0],[590,-18.3],[610,-18.7],[630,-19.2],[650,-19.6],[670,-20.0],[690,-20.5],[710,-20.9],[730,-21.3],[750,-21.6],[770,-22.0],[790,-22.4],[810,-22.7],[830,-23.0],[850,-23.2],[870,-23.5],[890,-24.0]],"N":[[110,0.0],[130,-0.2],[150,0.1],[170,0.6],[190,1.1],[210,1.5],[230,1.5],[250,1.1],[270,0.1],[290,0.1],[310,0.1],[330,0.3],[350,1.2],[370,3.0],[390,5.9],[410,9.9],[430,15.3]],"W":[[110,0.0],[130,0.9],[150,2.3],[170,3.0]],"E":[[110,0.0],[130,-5.7],[150,-11.7]]},station:'Edirnekapı 역 (T4 트램, 지하)',stOff:[0,-14],stR:130,
+REAL.edirnekapi={id:'edirnekapi',title:'에디르네카프 교차로',city:'이스탄불',rot:-35.05,geoRef:{lat:41.03141,lon:28.93542,rot:35.05,ox:6.85,oy:0.31},bend:{"S":[[110,0.0],[130,-0.8],[150,-2.1],[170,-3.5],[190,-4.5],[210,-5.5],[230,-6.4],[250,-7.0],[270,-7.8],[290,-8.7],[310,-9.2],[330,-9.6],[350,-10.0],[370,-10.3],[390,-11.3],[410,-12.5],[430,-13.6],[450,-14.4],[470,-14.7],[490,-16.0],[510,-16.7],[530,-17.2],[550,-17.7],[570,-18.0],[590,-18.3],[610,-18.7],[630,-19.2],[650,-19.6],[670,-20.0],[690,-20.5],[710,-20.9],[730,-21.3],[750,-21.6],[770,-22.0],[790,-22.4],[810,-22.7],[830,-23.0],[850,-23.2],[870,-23.5],[890,-24.0]],"N":[[110,0.0],[130,-0.2],[150,0.1],[170,0.6],[190,1.1],[210,1.5],[230,1.5],[250,1.1],[270,0.1],[290,0.1],[310,0.1],[330,0.3],[350,1.2],[370,3.0],[390,5.9],[410,9.9],[430,15.3]],"W":[[110,0.0],[130,0.9],[150,2.3],[170,3.0]],"E":[[110,0.0],[130,-0.8],[150,-3.0],[170,-6.8],[190,-12.0],[210,-18.0]]},station:'Edirnekapı 역 (T4 트램, 지하)',stOff:[0,-14],stR:130,
    desc:'구시가를 둘러싼 테오도시우스 성벽의 에디르네 문 앞에서 간선 4개가 만나는 교차로입니다. 이스탄불은 INRIX 2025 기준 세계에서 정체가 가장 심한 도시(운전자 1인당 연 118시간 손실)입니다. 남북 직진은 지하차도로 빠지고, 지상에서는 동서 직진과 남북 좌회전이 신호를 나눠 씁니다. 차로와 회전 제한은 OpenStreetMap에서 가져왔고, 교통량은 이스탄불시 시간대별 교통 밀도 자료(2023년 평일 18시)의 혼잡 수준에 맞춰 보정했고, 신호 시간은 가정값입니다.',
    srcNote:'차로 수, 회전 제한, 지하차도, 분리 우회전 도로는 OpenStreetMap 자료를 반영했습니다. 시간대별 교통 밀도 자료에서 하루 중 가장 느린 평일 18시 기준입니다.',orient:'지도를 약 35도 돌려 사바클라르 거리와 베일레르베이 거리를 위아래로 맞췄습니다.',
    arm:{N:'Savaklar Cd. (아이반사라이 방향)',S:'Beylerbeyi Cd. (톱카프 방향)',E:'Fevzipaşa Cd. (파티흐 방향)',W:'Edirnekapı Rami Cd. (라미 방향)'},
@@ -673,5 +675,5 @@ function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,p
 function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
   if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
-return {VER:'v0.54',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
+return {VER:'v0.55',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
 })();
