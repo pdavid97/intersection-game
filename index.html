@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261120131353">
+<meta name="gl-build" content="20261120132623">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1432,7 +1432,7 @@ body.sk-sunset #hqtask #lvchip .lvx{font-family:"IBM Plex Sans KR",system-ui,san
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.56. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.57. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -4430,6 +4430,8 @@ function tsSig(t){const M=tsMode(),Y=SG.Y,AR=SG.AR,u0=t-TM.t0;
   const st=u<G?'G':u<G+Y?'Y':'R';const s=ph===0?[st,'R']:['R',st];s.left=st==='G'?G-u:0;s.ph=ph;return s;}
 const LANES=[];for(const [ax,dir] of [['x',1],['x',-1],['y',1],['y',-1]])for(const o of [1.75,5.25])LANES.push({ax,dir,off:(ax==='x'?-dir:dir)*o});
 // 차는 직진만. 차 좌표 s는 자기 축 위치, 앞범퍼 = s*dir + 길이/2. 정지선은 횡단보도(|축|=8.9~12.3) 앞 -13
+// 화면 밖인지(차가 생기거나 없어져도 되는 곳). 여유 80px
+function tsOffScr(x,y){if(!TS.w)return true;const [sx,sy]=tsP(x,y,0);return sx<-80||sx>TS.w+80||sy<-120||sy>TS.h+80;}
 const STOP=-13,BOX=12.3,CWX=10.6,CWH=1.7,PV=1.45;
 const front=c=>c.s*c.dir+c.len/2,rear=c=>c.s*c.dir-c.len/2;
 const inBox=c=>front(c)>STOP&&rear(c)<BOX+.5;
@@ -4437,7 +4439,7 @@ function tsStep(dt){eggStep(dt);const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
   tsModeStep(dt);const M=tsMode();
   for(const [li,L] of LANES.entries()){TS.spawn[li]=(TS.spawn[li]??trnd()*3)-dt;const dir=M.k==='ow'&&L.ax==='y'?1:L.dir,busL=M.k==='bus'&&L.ax==='x'&&Math.abs(L.off)>4;
     if(TS.spawn[li]<=0){const q=TS.cars.filter(c=>c.li===li),last=q.reduce((m,c)=>Math.min(m,rear(c)),1e9);
-      const wrong=q.some(c=>c.dir!==dir);if(last>-106&&!wrong){const kind=busL?'bus':M.k==='bus'?'sedan':W_READY?vPick():'sedan',len=kind==='bus'?7:W_READY?VK[kind].L:4.2;const mm=(L.ax==='x'?M.ew:M.ns)[Math.abs(L.off)<3?0:1]||'T',r=trnd(),turn=busL?'T':mm.length===1?mm:mm.includes('L')?(r<.28?'L':'T'):mm.includes('R')?(r<.35?'R':'T'):'T';TS.cars.push({li,ax:L.ax,dir,off:L.off,s:(-120+len/2)*dir,v:8,len,turn,kind,col2:PAL.car[Math.floor(trnd()*8)],col:busL?(trnd()<.5?'#3f8fd8':'#4fb06b'):PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=busL?5+trnd()*4:1.8+trnd()*3.5;}}
+      const wrong=q.some(c=>c.dir!==dir),sp=L.ax==='x'?[-146*dir,L.off]:[L.off,-146*dir];if(last>-132&&!wrong&&tsOffScr(sp[0],sp[1])){const kind=busL?'bus':M.k==='bus'?'sedan':W_READY?vPick():'sedan',len=kind==='bus'?7:W_READY?VK[kind].L:4.2;const mm=(L.ax==='x'?M.ew:M.ns)[Math.abs(L.off)<3?0:1]||'T',r=trnd(),turn=busL?'T':mm.length===1?mm:mm.includes('L')?(r<.28?'L':'T'):mm.includes('R')?(r<.35?'R':'T'):'T';TS.cars.push({li,ax:L.ax,dir,off:L.off,s:(-146+len/2)*dir,v:8,len,turn,kind,col2:PAL.car[Math.floor(trnd()*8)],col:busL?(trnd()<.5?'#3f8fd8':'#4fb06b'):PAL.car[Math.floor(trnd()*PAL.car.length)]});}TS.spawn[li]=busL?5+trnd()*4:1.8+trnd()*3.5;}}
   for(const c of TS.cars){if(c.tr){const T=c.tr;c.v=Math.min(6,c.v+3*dt);T.th=Math.min(Math.PI/2,T.th+c.v*dt/T.rho);const a=T.th,cs=Math.cos(a),sn=Math.sin(a);
       T.p=[T.C[0]+T.rho*(cs*T.u[0]+sn*T.h0[0]),T.C[1]+T.rho*(cs*T.u[1]+sn*T.h0[1])];T.h=[-sn*T.u[0]+cs*T.h0[0],-sn*T.u[1]+cs*T.h0[1]];
       if(a>=Math.PI/2-1e-6){const H=T.hEnd,ax=Math.abs(H[0])>.5?'x':'y',dir=ax==='x'?Math.sign(H[0]):Math.sign(H[1]),off=ax==='x'?T.p[1]:T.p[0],li=LANES.findIndex(L=>L.ax===ax&&L.dir===dir&&Math.abs(L.off-off)<.6);
@@ -4456,7 +4458,8 @@ function tsStep(dt){eggStep(dt);const t=TS.t,sg=tsSig(t),[sx,sy]=sg;
       if(TS.peds.some(p=>p.cw===c.ax&&p.k===k&&!p.wait&&Math.abs(p.u-c.off)<2.6))gap=Math.min(gap,P-CWH-.4-f);}
     const vt=Math.max(0,Math.min(11,gap*1.3));c.v+=Math.max(-16,Math.min(4,(vt-c.v)*2.2))*dt;c.v=Math.max(0,Math.min(c.v,gap>0?c.v:0));
     const ds=Math.min(c.v*dt,Math.max(0,gap));c.s+=ds*c.dir;if(!c.ent&&front(c)>STOP+.05)c.ent=true;}
-  TS.cars=TS.cars.filter(c=>Math.abs(c.s)<125);
+  // 146m 밖으로 나간 차는 바깥 도시 차로 이어서 달림(사라지지 않음). 바깥 도시가 아직 없으면(첫 화면 초기) 화면 밖일 때만 지움
+  {TS.cars=TS.cars.filter(c=>{if(Math.abs(c.s)<146)return true;if(typeof twHand==='function'&&twHand(c))return false;const p=c.ax==='x'?[c.s,c.off]:[c.off,c.s];if(tsOffScr(p[0],p[1]))return false;return Math.abs(c.s)<400;});}
   // 보행자 1) 횡단: 연석 바로 뒤(|u|=7.6)에서 기다렸다가, 건너는 도로의 차가 멈춘 쪽 녹색이 충분히 남았을 때 출발. 방향마다 다른 줄(서로 엇갈리지 않게)
   const SL=[9.35,10.15,11.05,11.85];
   if(trnd()<dt*(sg.ped?5:1.4)){const cw=trnd()<.5?'x':'y',k=trnd()<.5?1:-1,side=trnd()<.5?1:-1,dirn=-side,slot=dirn>0?trnd()<.5?0:1:trnd()<.5?2:3;
@@ -5049,9 +5052,27 @@ function farStep(dt){if(!TS.tw.cars)return;const cars=TS.tw.cars,E=TW_EXT;
   for(const c of cars){const L=c.len,f=c.s+c.dir*L/2;let step=c.v*dt;
     if(c.ax==='y'){const x=c.av+c.off,dn=barrierDown(x),A=RAIL.y0-4,Bd=RAIL.y1+4;if(dn&&((c.dir>0&&f<=A&&f+step>A)||(c.dir<0&&f>=Bd&&f-step<Bd)))step=0;
       if(Math.abs(c.s-RAIL.y)<70)for(const o of cars){if(o===c||o.ax!=='y'||o.av!==c.av||o.off!==c.off)continue;const gap=(o.s-c.s)*c.dir-(o.len+L)/2;if(gap>-1&&gap<2.2+step)step=Math.max(0,Math.min(step,gap-2.2));}}
-    c.s+=c.dir*step;if(c.s*c.dir>E)c.s=-c.dir*E;if(c.av===0&&Math.abs(c.s)<146&&c.s*c.dir<0)c.s=c.dir*146;
+    // 가운데 교차로로 들어가는 길(av 0): 146m에서 가운데 교차로 차로 넘김(자리가 없으면 그 자리에서 기다림)
+    if(c.av===0&&c.s*c.dir<0&&Math.abs(c.s+c.dir*step)<146){if(twTake(c)){c.dead=1;continue;}step=0;}
+    c.s+=c.dir*step;
+    // 도시 끝: 화면 밖에서만 반대쪽 끝으로 옮김(옮길 자리도 화면 밖일 때). 화면 안이면 흐려지며 계속 달림
+    if(c.s*c.dir>E){const P=farPos(c);if(tsOffScr(P[0],P[1])){const ns=-c.dir*E,Q=farPos({...c,s:ns});if(tsOffScr(Q[0],Q[1])||c.s*c.dir>E+260){c.s=ns;c.al=tsOffScr(Q[0],Q[1])?1:0;}}}
+    if(c.al!=null&&c.al<1)c.al=Math.min(1,c.al+dt);
+    // 대각선 길 시작점(0,-150)과 끝점(140,-290)을 지나는 차는 가끔 대각선 길로 들어감
+    if(TS.tw.dcars.length<9&&Math.random()<.02){const nA=c.ax==='x'&&c.av===-150&&Math.abs(c.s)<1.5,nB=c.ax==='x'&&c.av===-290&&Math.abs(c.s-140)<1.5;
+      if(nA||nB){TS.tw.dcars.push({t:nA?0:1,dir:nA?1:-1,kind:c.kind,len:c.len,col:c.col,v:8});c.dead=1;continue;}}
     for(const g of GAPS)if(g.ax===c.ax&&g.at===c.av&&c.s>g.s0+rhw(g.s0)&&c.s<g.s1-rhw(g.s1)){farTurn(c,g);break;}}
-  for(const d of TS.tw.dcars){d.t+=d.dir*d.v*dt/DG.L;if(d.t>1)d.t-=1;if(d.t<0)d.t+=1;}}
+  // 대각선 길 끝에 닿은 차는 만나는 길로 이어서 달림(순간 이동하지 않음)
+  for(const d of TS.tw.dcars){d.t+=d.dir*d.v*dt/DG.L;if(d.t>1||d.t<0){const atB=d.t>1,nd=Math.random()<.5?1:-1,av=atB?-290:-150,s0=atB?140:0;
+      cars.push({ax:'x',av,s:s0+nd*rhw(av),off:-nd*1.6,kind:d.kind,len:d.len,col:d.col,col2:d.col,v:7+Math.random()*3,dir:nd});d.dead=1;}}
+  TS.tw.dcars=TS.tw.dcars.filter(d=>!d.dead);TS.tw.cars=cars.filter(c=>!c.dead);}
+// 가운데 교차로 차로 넘기기: 같은 축, 같은 방향, 같은 차로 줄
+function twTake(c){const li=LANES.findIndex(L=>L.ax===c.ax&&L.dir===c.dir&&Math.abs(Math.abs(L.off)-Math.abs(c.off))<.3);if(li<0)return true;
+  const q=TS.cars.filter(o=>o.li===li),s0=-146*c.dir,last=q.reduce((m,o)=>Math.min(m,o.s*o.dir-o.len/2),1e9);if(last<-146+c.len+3)return false;
+  TS.cars.push({li,ax:c.ax,dir:c.dir,off:LANES[li].off,s:(-146+c.len/2)*c.dir,v:Math.min(8,c.v),len:c.len,turn:'T',kind:c.kind,col:c.col,col2:c.col2||c.col});return true;}
+// 가운데 교차로를 빠져나간 차: 바깥 도시 차로 이어서
+function twHand(c){if(!TS.tw||!TS.tw.cars)return false;
+  TS.tw.cars.push({ax:c.ax,av:0,s:c.s,off:c.off,kind:c.kind||'sedan',len:c.len,col:c.col,col2:c.col2||c.col,v:Math.max(6,c.v||8),dir:c.dir});return true;}
 // 회전 교차로에서는 섬을 돌아가게 옆으로 비켜 감
 function farPos(car){let lat=car.off;const along=car.s;for(const [a,b] of RB){const on=car.ax==='x'?car.av===b:car.av===a;if(!on)continue;const d=along-(car.ax==='x'?a:b);if(Math.abs(d)<10.5){const R=9.4;lat=Math.sign(car.off)*Math.max(Math.abs(car.off),Math.sqrt(Math.max(0,R*R-d*d)));}}
   return car.ax==='x'?[along,car.av+lat]:[car.av+lat,along];}
@@ -5072,7 +5093,7 @@ twFarItems=function(items){const W=TS.w,H=TS.h;for(const car of TS.tw.cars){cons
       if(k==='bike'||k==='moto'){rBox(x,y,ux,uy,car.len,.5,.3,.9,col,col);const [p,q]=tsP(x,y,1.6);TS.ctx.fillStyle='#f6d2b5';TS.ctx.beginPath();TS.ctx.arc(p,q,TS.s*.35,0,7);TS.ctx.fill();return;}
       const [sx2,sy2]=tsP(x+.4,y+.4,.03);TS.ctx.fillStyle='rgba(42,26,51,.18)';TS.ctx.beginPath();TS.ctx.ellipse(sx2,sy2,TS.s*car.len*.45,TS.s*.9,0,0,7);TS.ctx.fill();
       rBox(x,y,ux,uy,car.len,1.9,.35,h,col,col);if(h<2)rBox(x,y,ux,uy,car.len*.48,1.6,1.15,1.85,shade(col,.15),GL1);}});continue;}
-  items.push({d:x+y+.5,f:()=>vDraw(car,x,y,car.ax,car.dir)});}
+  items.push({d:x+y+.5,f:()=>{if(car.al!=null&&car.al<1){TS.ctx.save();TS.ctx.globalAlpha=car.al;vDraw(car,x,y,car.ax,car.dir);TS.ctx.restore();}else vDraw(car,x,y,car.ax,car.dir);}});}
   for(const d of TS.tw.dcars){const A=DG.a,x=A[0]+DG.u[0]*d.t*DG.L,y=A[1]+DG.u[1]*d.t*DG.L,[sx,sy]=tsP(x,y,0);if(sx<-60||sx>W+60||sy<-60||sy>H+60)continue;items.push({d:x+y+.5,f:()=>dCarDraw(d)});}
   for(const N of farNodes()){if(N.rb||N.arms.filter(Boolean).length<3)continue;const ha=rhw(N.a),hb=rhw(N.b);for(const [x,y] of [[N.a-ha-1.5,N.b-hb-1.5],[N.a+ha+1.5,N.b+hb+1.5]]){const [sx,sy]=tsP(x,y,0);if(sx<-20||sx>W+20||sy<-60||sy>H+20)continue;items.push({d:x+y,f:()=>twMiniSig(x,y,Math.floor(TS.t/8+N.a)%2?'G':'R')});}}
   landFarItems(items);};
@@ -5194,6 +5215,12 @@ function centerCount(){if(ZFX.k!=='center')return;const box=document.getElementB
   const n=document.getElementById('wk-n'),v=document.getElementById('wk-v');if(n){n.textContent=ZFX.n;const mv=TS.cars.filter(c=>c.ent&&!c.cnt||Math.abs(c.s)<40);v.textContent=Math.round(TS.cars.reduce((a,c)=>a+c.v,0)/Math.max(1,TS.cars.length)*3.6);}}
 
 W_READY=true;
+// 시험용: 지금 그려지는 모든 차의 화면 위치
+window.__carScr=()=>{const o=[],P=(x,y)=>tsP(x,y,0);
+  for(const c of TS.cars){const T=c.tr,p=T?T.p:(c.ax==='x'?[c.s,c.off]:[c.off,c.s]);o.push([c,...P(p[0],p[1]),'c']);}
+  if(TS.tw&&TS.tw.cars)for(const c of TS.tw.cars){const p=farPos(c);o.push([c,...P(p[0],p[1]),'f']);}
+  if(TS.tw&&TS.tw.dcars)for(const d of TS.tw.dcars){const x=DG.a[0]+(DG.b[0]-DG.a[0])*d.t,y=DG.a[1]+(DG.b[1]-DG.a[1])*d.t;o.push([d,...P(x,y),'d']);}
+  return o;};
 // ---------- 시작 화면 지구본(2026-11-16): 천천히 도는 지구 위에 실제 교차로(플레이 가능, 챔피언 기록)와 후보 도시(투표) ----------
 // 육지는 납작한 파스텔 면(Natural Earth 110m, world-atlas 패키지). 끌어서 돌리고, 손을 떼면 다시 천천히 돎
 // 실제 교차로를 누르면 그 교차로로 바로 시작. 후보 도시의 하트를 누르면 투표(익명 로그인 1명당 도시마다 1표, 다시 누르면 취소). 표가 많은 도시부터 추가 예정
