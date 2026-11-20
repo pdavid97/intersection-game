@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261120125431">
+<meta name="gl-build" content="20261120130218">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1432,7 +1432,7 @@ body.sk-sunset #hqtask #lvchip .lvx{font-family:"IBM Plex Sans KR",system-ui,san
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.53. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.54. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3140,9 +3140,20 @@ function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=ge
     // 교통섬 모서리: 들어오는 길과 나가는 길의 실제 바깥 가장자리(중앙분리대, 차로 밀림 포함). 예전에는 가운데 기준이라 섬이 교차로 안까지 들어옴
     const latA=nI*W+D.off(a)+.3,latE=nO*W+D.oOff(ex)+.3,corner2=add(mul(r,latA),mul(r2,latE));
     const A1=add(mul(r,latA),mul(d,-sd-SLIP_BACK)),A2=add(mul(r,latA),mul(d,-sd)),E2=add(mul(r2,latE),mul(d2,bd2)),E1=add(mul(r2,latE),mul(d2,bd2+SLIP_FWD));
-    const inner=cn.pts.map(q=>{const v=sub(corner,q),l=Math.hypot(v[0],v[1])||1;return add(q,mul(v,Math.min(l*.45,W/2+.4)/l));}).reverse();
-    ctx.beginPath();ctx.moveTo(A1[0],A1[1]);for(const q of [A2,corner2,E2,E1,...inner])ctx.lineTo(q[0],q[1]);ctx.closePath();
-    ctx.fillStyle=COL.island;ctx.fill();ctx.globalAlpha=.6;ctx.strokeStyle=COL.paint;ctx.lineWidth=.25;ctx.stroke();ctx.restore();}
+    // v0.54: 교통섬은 우회전 도로가 본 도로에서 충분히 벌어진 곳(양쪽 가장자리에서 1m 넘게)만. 갈라지고 합류하는 좁은 틈(고어)은 차도로 칠하고 흰 빗금
+    const P=cn.pts,gIn=q=>dot(q,r)-latA,gOut=q=>dot(q,r2)-latE,half=W/2+.05;
+    const inner=P.map(q=>{const v=sub(corner2,q),l=Math.hypot(v[0],v[1])||1;return add(q,mul(v,Math.min(l*.45,W/2+.4)/l));});
+    const ok=inner.map(q=>gIn(q)>1&&gOut(q)>1);const i0=ok.indexOf(true),i1=ok.lastIndexOf(true);
+    if(i0>=0&&i1>i0){const f=inner.slice(i0,i1+1),Pa=add(mul(r,latA),mul(d,dot(f[0],d))),Pe=add(mul(r2,latE),mul(d2,dot(f[f.length-1],d2)));
+      ctx.beginPath();ctx.moveTo(corner2[0],corner2[1]);for(const q of [Pa,...f,Pe])ctx.lineTo(q[0],q[1]);ctx.closePath();
+      ctx.fillStyle=COL.island;ctx.fill();ctx.globalAlpha=.6;ctx.strokeStyle=COL.paint;ctx.lineWidth=.25;ctx.stroke();ctx.globalAlpha=1;}
+    // 고어: 우회전 도로와 본 도로 가장자리 사이(섬이 아닌 부분)를 차도로 메우고 빗금
+    const gore=(idx,edge,dirv,latv)=>{if(idx.length<2)return;const pts=idx.map(k=>P[k]);const proj=pts.map(q=>add(mul(edge,latv),mul(dirv,dot(q,dirv)))).reverse();
+      ctx.beginPath();pts.forEach((q,k)=>k?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(const q of proj)ctx.lineTo(q[0],q[1]);ctx.closePath();ctx.fillStyle=COL.asphalt;ctx.fill();
+      ctx.save();ctx.clip();ctx.strokeStyle=COL.paint;ctx.globalAlpha=.55;ctx.lineWidth=.25;const c0=pts[0];for(let k=-30;k<30;k+=1.6){ctx.beginPath();ctx.moveTo(c0[0]+k-20,c0[1]-20);ctx.lineTo(c0[0]+k+20,c0[1]+20);ctx.stroke();}ctx.restore();};
+    const head=[],tail=[];P.forEach((q,k)=>{if(k<=Math.max(0,i0)&&gIn(q)<half+1.2)head.push(k);if(k>=(i1<0?P.length:i1)&&gOut(q)<half+1.2)tail.push(k);});
+    gore(head,r,d,latA);gore(tail,r2,d2,latE);
+    ctx.restore();}
   ctx.globalAlpha=1;
   const now=performance.now();
   for(const ac of sim.accidents){const pulse=.5+.5*Math.sin(now/180);ctx.globalAlpha=.18+.22*pulse;ctx.fillStyle=COL.stop;ctx.beginPath();ctx.arc(ac.x,ac.y,5+pulse*1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
