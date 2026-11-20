@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261120123901">
+<meta name="gl-build" content="20261120124109">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1425,7 +1425,7 @@ body.mobile .campin{width:36px;height:36px;margin:-18px 0 0 -18px}
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.51. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.52. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -3932,7 +3932,7 @@ PIP.querySelector('.lpbig').addEventListener('click',openLiveCam);
 // 버튼: 작은 창이 꺼져 있으면 다시 켜고, 켜져 있거나 띄울 수 없으면 크게 보기
 {const b=$('lcbtn');b.removeEventListener('click',openLiveCam);b.addEventListener('click',()=>{const k=lcKey();if(PS.off&&k&&LIVECAM[k].cams.length&&lcPub()&&!document.body.classList.contains('mobile')){PS.off=false;try{localStorage.removeItem('lcpip-off');}catch(e){}pipUpdate();}else openLiveCam();});}
 setInterval(()=>{try{pipUpdate();}catch(e){}},500);
-// ---------- 지도 위 카메라(v0.50): 카메라 아이콘을 실제 위치에 꽂고, 누를 때만 사진 창을 띄움. 보는 방향을 알면 지도에 보이는 범위(부채꼴)를 그림 ----------
+// ---------- 지도 위 카메라(v0.50): 카메라 아이콘을 실제 위치에 꽂고, 누를 때만 사진 창을 띄움. 보는 방향을 알면 사진 창이 열려 있는 동안만 지도에 보이는 범위(부채꼴)를 그림 ----------
 // 좌표: 토론토시 교통 카메라 공개 목록(traffic-camera-list, 2026-11-19 받음), TfL JamCam API(Place/JamCams_*), 도쿄는 방남정역 위치(카메라 근처)
 // refs: 방향을 돌리는 카메라에 시가 함께 공개한 방향별 참고 사진(토론토 ComparisonImages). 길 방향 기준이라 지도 위 그 길 쪽으로 그림
 // bearing: 방향이 정해진 카메라의 실제 방위(도, 북=0, 시계 방향). TfL 설명 'Zoom west towards Arnos Grove'
@@ -3972,7 +3972,7 @@ function camDraw(){const list=document.body.classList.contains('titleon')||!play
       for(let t=0;t<4;t++){const X=px+cvr.left,Y=py+cvr.top,hit=obs.find(r=>X+22>r.left&&X-22<r.right&&Y+44>r.top&&Y-22<r.bottom);if(!hit)break;py=hit.bottom-cvr.top+M;if(py>ch-M){py=ch-M;break;}}}
     b.style.transform=`translate(${px}px,${py}px)`;const fl=b.querySelector('.camfar');
     if(off){const ang=Math.atan2(sy-py,sx-px)*180/Math.PI,t=`<i style="transform:rotate(${ang}deg)">➜</i>${camWhere(o).replace(/^교차로에서 /,'')}`;if(fl.innerHTML!==t)fl.innerHTML=t;}else if(fl.innerHTML)fl.innerHTML='';
-    const v=camDirVec(o);if(v&&!off){const L=48,[ex,ey]=toScreen(o.p[0]+v[0]*L,o.p[1]+v[1]*L),dx=ex-sx,dy=ey-sy,r=Math.hypot(dx,dy),a0=Math.atan2(dy,dx),h=26*Math.PI/180;
+    const v=CM.open===o.i?camDirVec(o):null;if(v&&!off){const L=48,[ex,ey]=toScreen(o.p[0]+v[0]*L,o.p[1]+v[1]*L),dx=ex-sx,dy=ey-sy,r=Math.hypot(dx,dy),a0=Math.atan2(dy,dx),h=26*Math.PI/180;
       const p1=[sx+r*Math.cos(a0-h),sy+r*Math.sin(a0-h)],p2=[sx+r*Math.cos(a0+h),sy+r*Math.sin(a0+h)],id='cg'+o.i;
       cones+=`<defs><radialGradient id="${id}" cx="${sx}" cy="${sy}" r="${r}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd34d" stop-opacity=".7"/><stop offset="1" stop-color="#ffd34d" stop-opacity=".06"/></radialGradient></defs><path d="M${sx.toFixed(1)} ${sy.toFixed(1)}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}Z" fill="url(#${id})" stroke="#ffd34d" stroke-width="2" stroke-dasharray="6 6" class="${CM.open===o.i?'':'dim'}"/>`;}});
   if(svg.innerHTML!==cones)svg.innerHTML=cones;
