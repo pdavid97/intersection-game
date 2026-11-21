@@ -255,8 +255,19 @@ function yellowDecide(sim,veh,seg){const d=seg.length-veh.s;veh.yIv=sim.curIv;ve
   if(!veh.yGo)return;const ry=sim.curIv.e-sim.ct;
   const tReach=d/Math.max(veh.v,.1);if(veh.v>6&&tReach>ry)riskCheck(sim,veh,tReach>ry+AR_T?0.4:0.12,`${NAME[veh.a]} 신호 위반 충돌 (황색이 짧아 멈추지 못함)`,'황색 신호 위반');
   else if((veh.move==='L'||veh.move==='U')&&phaseGives(sim.cfg,sim.curIv.p,veh.a,'L')==='P')riskCheck(sim,veh,0.025,`${NAME[veh.a]} 황색 신호 비보호 좌회전 충돌`,'비보호 좌회전');}
+// 꼬리물기 억제(v0.61): 나갈 차로 건너편에 내 차가 들어갈 자리가 없으면(앞차가 거의 서 있고, 교차로 안에서 같은 차로로 가는 차까지 셈) 녹색이어도 정지선에서 기다림
+// 실제처럼 일부 운전자(약 10%)는 그래도 들어가 꼬리를 문다
+const TAIL_P=10;
+function noRoom(sim,veh){const cn=veh.route[1],out=veh.route[2];if(!out)return false;const off=cn.outOffset||0;
+  const u=off?aheadIn(out,off):out.vehicles[out.vehicles.length-1];if(u&&u.v>2.5)return false;
+  let space=u?u.s-u.len-off:out.length-off;
+  const fd=out._feed||(out._feed=sim.net.conns.filter(c=>c.out===out));for(const c of fd)for(const v of c.vehicles)space-=v.len+2;
+  return space<veh.len+2.5;}
+const QDIV=[25,60,.9];
+function queuePer(sim,a){const L=sim.net.inL[a];let n=0,m=0;for(let i=0;i<L.length;i++){const q=sim.pending[a][i].length+L[i].vehicles.length;n+=q;m=Math.max(m,q);}return Math.max(n/Math.max(1,L.length),m*.7);}
 function canGo(sim,veh,seg){if(veh.committed)return true;
   if(seg.slip)return true;
+  if(((veh.id*2654435761)>>>0)%100>=TAIL_P&&seg.length-veh.s<40&&noRoom(sim,veh))return false;
   const st=sigState(sim,veh.a,veh.move),d=seg.length-veh.s;
   if(st==='G'){if(d<1.5){veh.committed=true;
       // 엇갈린 신호: 지금 조(현시)에 직각으로 만나는 방향(남북 대 동서)이 함께 녹색이면, 교차로에 그쪽 차가 있을 때 충돌 위험
@@ -310,7 +321,11 @@ function step(sim){const dt=DT,cfg=sim.cfg,net=sim.net;sim.t+=dt;
     if(sim.rng()<c.vph*dt/3600){const u=sim.rng()*100,pu=c.pu||0,move=u<c.pl?'L':u<c.pl+c.pr?'R':u<c.pl+c.pr+pu?'U':'T';
       const r2=sim.rng(),cls=r2<MIX.bus?'bus':r2<MIX.bus+MIX.hov?'hov':'car';
       const lanes=net.inL[a].map((_,i)=>i).filter(i=>laneAllows(c,i,move,cls)),slipI=net.inL[a].findIndex(x=>x.slip);
-      if(owBlocked(cfg,a,move)||!lanes.length||!(served(cfg,a,move)||(move==='R'&&(cfg.rtor||slipI>=0))))detour(sim,a,move,cls);
+      // 대기열이 아주 길면(차로당 25대 넘게, 약 180m 이상) 일부 운전자는 다른 길로 돌아감(내비게이션, 우회 도로). 줄이 길수록 많이, 최대 90%(v0.61)
+      // 실제처럼 줄이 끝없이 늘지 않게 하는 장치. 돌아간 차는 우회 비용(시간, 거리)을 그대로 점수에 반영
+      const qp=queuePer(sim,a),pD=qp>QDIV[0]?Math.min(QDIV[2],(qp-QDIV[0])/(QDIV[1]-QDIV[0])*QDIV[2]):0;
+      if(pD>0&&sim.rng()<pD){detour(sim,a,move,cls);sim.divert=(sim.divert||0)+1;}
+      else if(owBlocked(cfg,a,move)||!lanes.length||!(served(cfg,a,move)||(move==='R'&&(cfg.rtor||slipI>=0))))detour(sim,a,move,cls);
       else{let best=lanes[0];const bl=lanes.find(i=>isBusLane(c,i));
         if(move==='R'&&slipI>=0)best=slipI;
         else if(bl!==undefined&&cls!=='car')best=bl;
@@ -690,5 +705,5 @@ function cfgFor(key){const s=SCEN[key],appr={};for(const a of APPR){const [vph,p
 function levelCfg(lv){if(lv.real)return realCfg(REAL[lv.real]);const appr={};for(const a of APPR){const [vph,pl,pr,l0,l1]=lv.appr[a];appr[a]={vph,pl,pr,lanes:[l0,l1],perm:false};if(lv.pu&&lv.pu[a])appr[a].pu=lv.pu[a];if(lv.ped&&lv.ped[a])appr[a].ped=lv.ped[a];if(lv.perm&&lv.perm[a])appr[a].perm=true;}
   if(lv.phases){const c={geo:clone(GEO2),phases:clone(lv.phases),scheme:{NS:'custom',EW:'custom'},yellow:3,rtor:false,appr};if(lv.pedConc===false)c.pedConc=false;return c;}
   return{geo:clone(GEO2),phases:templatePhases(lv.scheme.NS,lv.scheme.EW,lv.plan),scheme:{...lv.scheme},yellow:3,rtor:false,appr};}
-return {VER:'v0.60',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,buildNet,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
+return {VER:'v0.61',getConf,ALLMOVES,owGeo,evalCfg,runSession,realCfg,dailyCfg,levelCfg,cfgFor,LEVELS,STAGES,REAL,SCEN,clone,scoreOf,cycleOf,APPR,SEEDS,stats,warmSim,makeSim,buildNet,step,DT,WXP,demandSig:typeof demandSig==="function"?demandSig:null};
 })();
