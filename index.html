@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=VT323&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<meta name="gl-build" content="20261120222323">
+<meta name="gl-build" content="20261120222942">
 <!-- 자동 생성 파일: src/ 아래를 고친 뒤 python3 build.py 로 다시 만드세요 -->
 <style>
 /* 교통관제 콘솔: 왼쪽 교차로 모니터 + 세션 기록, 오른쪽 조작 패널. 단일 다크 룩(관제실 화면) */
@@ -1432,7 +1432,7 @@ body.sk-sunset #hqtask #lvchip .lvx{font-family:"IBM Plex Sans KR",system-ui,san
 <div class="wrap">
   <header>
     <h1 class="brand">Green <span>Light!</span><small>교차로 신호 퍼즐</small></h1>
-    <div class="sub">프로토타입 v0.58. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
+    <div class="sub">프로토타입 v0.59. 도로 위 색 띠로 녹색 시간을 나누면 조작마다 결과가 바로 나옵니다.</div>
     <button id="modebtn" class="modebtn" type="button">상세 패널 보기</button>
   </header>
 
@@ -1626,6 +1626,16 @@ function easeJoin(pts,R=20){const n=pts.length;if(n<4)return pts;const E=pts[n-1
   const s1=sub(pts[n-2],pts[n-3]),l1=Math.hypot(s1[0],s1[1]);if(l1>1e-6&&dot(mul(s1,1/l1),d)>Math.cos(8*Math.PI/180)&&dot(t,d)>Math.cos(8*Math.PI/180))return pts;
   const ch=Math.hypot(S[0]-A[0],S[1]-A[1]),k=.4*ch;
   return[...pts.slice(0,i),A,...bez(A,add(A,mul(t,k)),sub(S,mul(d,k)),S,14).slice(1),E];}
+// 실제 도로 모양(OSM 차로 선)을 화면용으로 다듬기: 지도 자료의 튀는 점(옆으로 1m 넘게 튀었다 돌아오는 점)을 빼고, 2m 간격으로 다시 찍어 앞뒤 약 8m를 평균해 부드럽게 함
+// 끝의 두 점(정지선 앞 직선 구간)은 그대로 두고, 그 직선과 만나는 곳은 easeJoin으로 이음. 시뮬레이션 경로(pts)는 그대로
+function smoothLane(pts,R=24){const n=pts.length;if(n<5)return easeJoin(pts,R);
+  let P=pts.slice(0,n-2);
+  for(let it=0;it<3;it++){const Q=[P[0]];for(let i=1;i<P.length-1;i++){const a=Q[Q.length-1],b=P[i],c=P[i+1],v=sub(c,a),L=Math.hypot(v[0],v[1]);if(L<1e-6)continue;
+      const lat=Math.abs((b[0]-a[0])*v[1]-(b[1]-a[1])*v[0])/L,t=dot(sub(b,a),v)/(L*L);if(lat>1.2||t<0||t>1)continue;Q.push(b);}Q.push(P[P.length-1]);P=Q;}
+  P.push(pts[n-2]);
+  const m=mkSeg(P,0);if(m.length<12)return easeJoin(pts,R);const N=Math.max(3,Math.round(m.length/2)),Rs=[];for(let k=0;k<=N;k++){const q=posAt(m,m.length*k/N);Rs.push([q.x,q.y]);}
+  let A=Rs;for(let it=0;it<3;it++){const B=A.map((p,i)=>{if(i===0||i>=A.length-1)return p;const w=Math.min(4,i,A.length-1-i);let x=0,y=0;for(let j=-w;j<=w;j++){x+=A[i+j][0];y+=A[i+j][1];}return[x/(2*w+1),y/(2*w+1)];});A=B;}
+  return easeJoin([...A,pts[n-1]],R);}
 // 그리기 전용 모양(vis): 시뮬레이션은 원래 경로(pts)로 계산하고(점수 그대로), 화면의 도로와 차는 부드럽게 이은 모양에 같은 비율로 얹음
 function visOf(seg,vp){if(vp===seg.pts||vp.length===seg.pts.length&&vp.every((q,i)=>q===seg.pts[i]))return;const m=mkSeg(vp,0);seg.vis={pts:m.pts,cum:m.cum,length:m.length};}
 function posAtV(seg,s){if(!seg.vis)return posAt(seg,s);const k=seg.vis.length/seg.length;return posAt(seg.vis,s*k);}
@@ -1637,11 +1647,11 @@ function buildNet(G){const D=geoDims(G),W=G.LW;
       let pts=[add(p,mul(d,-L)),add(p,mul(d,-sd-(sl?SLIP_BACK:0)))];
       if(sg){const latMin=(G.nIn[a]+.5)*W+D.off(a),q=sg.in.map(x=>{const lt=dot(x,r);return lt<latMin?add(x,mul(r,latMin-lt)):x;});pts=[add(mul(r,dot(q[0],r)),mul(d,-L)),...q];}
       const ig=!sl&&G.inGeo&&G.inGeo[a]&&G.inGeo[a][i];if(ig)pts=[...ig,add(p,mul(d,-sd))];
-      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,easeJoin(pts));
+      const s=mkSeg(pts,V_FREE);s.appr=a;s.lane=i;s.slip=sl;if(ig)visOf(s,smoothLane(pts));
       // 분리 우회전 차로(실제 모양 없음): 정지선 뒤 끝 30~60m에서 바깥 직진 차로 옆으로 생겨남(화면만). 그 앞에서는 바깥 직진 차로 위로 그림
       if(sl&&!sg){const b=sd+SLIP_BACK,q=add(p,mul(r,-W));visOf(s,[add(q,mul(d,-L)),add(q,mul(d,-b-SLIP_TAPER[1])),add(p,mul(d,-b-SLIP_TAPER[0])),add(p,mul(d,-b))]);}ins.push(s);return s;});}
   for(const a of APPR){const d=HEAD[a],r=rightOf(d),bd=D.boxD(a);
-    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);if(og)visOf(s,easeJoin([...s.pts].reverse()).reverse());outs.push(s);return s;});}
+    outL[hk(d)]=[...Array(G.nOut[OPP[a]])].map((_,i)=>{const p=mul(r,(i+.5)*W+D.oOff(OPP[a])),og=G.outGeo&&G.outGeo[OPP[a]]&&G.outGeo[OPP[a]][i];const s=mkSeg(og?[add(p,mul(d,D.exitD(OPP[a]))),...og]:[add(p,mul(d,D.exitD(OPP[a]))),add(p,mul(d,L))],V_FREE);if(og)visOf(s,smoothLane([...s.pts].reverse()).reverse());outs.push(s);return s;});}
   // 실제 교차로: 분리 우회전 도로의 전용 진출 차로(합류하지 않고 이어지는 차로)
   const slipOut={};
   if(G.slipGeo)for(const a of APPR){const sg=G.slipGeo[a];if(!sg||sg.merge)continue;const d2=turnDir(HEAD[a],'R'),r2=rightOf(d2),q=sg.out,lt=dot(q[q.length-1],r2);
@@ -3082,10 +3092,23 @@ function drawTurnGuides(G){if(!sim||!curReal())return;const c=sim.cfg;ctx.save()
   for(const a of APPR){const n=G.nIn[a];for(let i=0;i<n;i++){if(!laneMode(c.appr[a],i).includes('L'))continue;const j=targetOut(c.appr[a],G,a,i,'L'),cn=sim.net.conn[`${a}L${i}>${j}`];if(!cn)continue;
     for(const sgn of [-1,1]){ctx.beginPath();cn.pts.forEach((q,k)=>{const b=cn.pts[Math.max(0,k-1)],e=cn.pts[Math.min(cn.pts.length-1,k+1)],dx=e[0]-b[0],dy=e[1]-b[1],l=Math.hypot(dx,dy)||1,o=sgn*G.LW/2;const X=q[0]-dy/l*o,Y=q[1]+dx/l*o;k?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();}}}
   ctx.restore();}
+// 교차로 안 포장(v0.59): 네모 대신, 각 갈래 입구(진입 차로 바깥 끝 ~ 진출 차로 바깥 끝)를 잇고 갈래 사이 모서리는 연석처럼 둥글게
+// 예전 네모는 갈래가 비스듬하거나 좁으면 모서리가 잔디 쪽으로 튀어나와 90도로 꺾인 포장이 보였음
+function boxPath(G,D){const W=G.LW,P=[];
+  for(const a of APPR){const d=HEAD[a],pp=[-d[1],d[0]],w=(x,y)=>[x*d[0]+y*pp[0],x*d[1]+y*pp[1]],sgA=G.slipGeo&&G.slipGeo[a],nA=sgA?G.nIn[a]:D.nAll(a);
+    P.push({a,p:w(-D.stopD(a),-D.off(a)-nA*W)},{a,p:w(-D.exitD(a),D.oOff(a)+G.nOut[a]*W)});}
+  for(const q of P)q.t=Math.atan2(q.p[1],q.p[0]);P.sort((u,v)=>u.t-v.t);
+  const xs=[-D.stopD('W'),D.stopD('E')],ys=[-D.stopD('S'),D.stopD('N')],K=[];for(const x of xs)for(const y of ys)K.push([x,y]);
+  ctx.beginPath();ctx.moveTo(P[0].p[0],P[0].p[1]);
+  for(let i=1;i<=P.length;i++){const A=P[i-1],B=P[i%P.length];
+    if(A.a===B.a){ctx.lineTo(B.p[0],B.p[1]);continue;}
+    const m=[(A.p[0]+B.p[0])/2,(A.p[1]+B.p[1])/2],C=K.reduce((b,k)=>Math.hypot(k[0]-m[0],k[1]-m[1])<Math.hypot(b[0]-m[0],b[1]-m[1])?k:b,K[0]),f=.55;
+    ctx.bezierCurveTo(A.p[0]+(C[0]-A.p[0])*f,A.p[1]+(C[1]-A.p[1])*f,B.p[0]+(C[0]-B.p[0])*f,B.p[1]+(C[1]-B.p[1])*f,B.p[0],B.p[1]);}
+  ctx.closePath();}
 function drawMain(){if(!cw||!sim)return;world();const sc2=sim.cfg,G=sc2.geo,D=geoDims(G),W=G.LW,R=curReal();
   {const vx=VIEW*cw/Math.min(cw,ch)+5,vy=VIEW*ch/Math.min(cw,ch)+5;ctx.fillStyle=COL.ground;ctx.fillRect(-vx,-vy,2*vx,2*vy);}decorate('ground');
   if(R)drawContext(R);
-  ctx.fillStyle=COL.asphalt;ctx.fillRect(-D.stopD('W'),-D.stopD('S'),D.stopD('W')+D.stopD('E'),D.stopD('S')+D.stopD('N'));
+  ctx.fillStyle=COL.asphalt;boxPath(G,D);ctx.fill();
   const visX=VIEW*cw/Math.min(cw,ch),visY=VIEW*ch/Math.min(cw,ch),LV=Math.max(L,Math.max(visX,visY)*1.1+8);
   // 실제 교차로: 정지선 앞에서 비스듬히 들어오는 차로는 지도 경로 그대로 그림
   if(G.outGeo)for(const a of APPR){const og=G.outGeo[a];if(!og)continue;const ol=sim.net.outL[hk([-HEAD[a][0],-HEAD[a][1]])];for(const i in og){const sg=ol&&ol[+i];if(!sg)continue;const vp=(sg.vis||sg).pts,path=[...vp,extPt(vp,false,LV)];ctx.save();ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0],path[0][1]);for(const q of path)ctx.lineTo(q[0],q[1]);
